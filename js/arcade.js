@@ -82,6 +82,9 @@
 
   // ---------------------------------------------------------- enlaces con la aldea
   KRAldea.al.hud = () => {
+    if (actual === 'aldea' && revisarArbol()) {             // árbol completo: abrir la barrera en el acto
+      pendiente = null; KRAldea.abrirBarrera(3); KRAldea.avisar('¡Árbol completo! La barrera hacia la Biblioteca se abrió', 220);
+    }
     const p = prog(), m = MISIONES[p.etapa];
     return m ? { titulo: m.titulo, mision: m.texto(p), ph: p.ph } : { titulo: `AVENTURA COMPLETADA · RÉCORD ${p.record || 0} OLEADAS`, mision: 'Entra a la Torre del Dato para jugar oleadas infinitas · P: hoja de personaje', ph: p.ph };
   };
