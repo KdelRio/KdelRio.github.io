@@ -48,10 +48,11 @@
 
   const seg = () => +(f / 60).toFixed(1);
   function registrar(tipo, datos) { T.eventos.push(Object.assign({ t: seg(), ola: ola + 1, tipo }, datos)); }
+  function golpe(e, dano, fuente) { e.ultimo = fuente; registrar('golpe', { enemigo: e.tipo, dano, fuente }); }   // fuente del último golpe = quién lo derrotó
 
   function reiniciar() {
     f = 0; ola = 0; enemigos = []; aliados = []; flechas = []; items = []; efectos = []; cola = []; pausa = 0; finT = 0;
-    P = { x: WW / 2, y: (LIM.y0 + LIM.y1) / 2 + 10, r: 5, v: B.vel, hp: B.vidaMax, max: B.vidaMax, inv: 0, fx: 0, fy: 1, cd: 0, atk: 0, en: B.energiaMax, esp: 0, dronA: 0, dronCd: 60, orb: 0, escudo: nv([0, 1, 2, 3]), escudoT: 0, auraT: 240, mandoT: 300, invocaCd: 0 };
+    P = { x: WW / 2, y: (LIM.y0 + LIM.y1) / 2 + 10, r: 5, v: B.vel, hp: B.vidaMax, max: B.vidaMax, inv: 0, fx: 0, fy: 1, cd: 0, atk: 0, en: B.energiaMax, esp: 0, dronA: 0, dronCd: 60, orb: 0, escudo: nv([0, 2, 3, 4]), escudoT: 0, auraT: 240, mandoT: 300, invocaCd: 0 };
     if (B.esp === 1) aliados.push({ tipo: 'companero', x: P.x - 14, y: P.y + 4, r: 4, v: 1.35, cd: 0, atk: 0, vida: Infinity });
     T = { inicio: 0, fin: 0, resultado: '', modo: infinito ? 'infinito' : 'mision', eventos: [], vida: [], pos: [], olas: [], distancia: 0, hpMax: B.vidaMax, bonos: B };
     balas.length = 0;
@@ -104,15 +105,20 @@
   // ---------------------------------------------------------- lógica
   const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
   const limitar = o => { o.x = Math.max(LIM.x0 + o.r, Math.min(LIM.x1 - o.r, o.x)); o.y = Math.max(LIM.y0 + o.r, Math.min(LIM.y1 - o.r, o.y)); };
-  function recibir(n, origen, via) {
+  function recibir(n, origen, via, atacante) {
     if (P.inv > 0 || estado !== 'jugando') return;
     if (B.esp === 2 && P.escudo > 0) {                       // escudo de código: absorbe el golpe completo
-      P.escudo--; P.escudoT = 0; P.inv = 40; registrar('bloqueo', { enemigo: origen, via, fuente: 'codigo' });
+      P.escudo--; P.escudoT = 0; P.inv = 40; registrar('bloqueo', { enemigo: origen, via, dano: n, fuente: 'codigo' });
+      if (atacante) {                                        // el código devuelve el golpe y empuja al atacante
+        const dn = B.nivel >= 3 ? 2 : 1.5, d = Math.hypot(atacante.x - P.x, atacante.y - P.y) || 1;
+        atacante.hp -= dn; atacante.kx = (atacante.x - P.x) / d * 7; atacante.ky = (atacante.y - P.y) / d * 7;
+        efectos.push({ tipo: 'chispa', x: atacante.x, y: atacante.y, t: 10 }); golpe(atacante, dn, 'codigo');
+      }
       efectos.push({ tipo: 'txt', x: P.x, y: P.y - 14, txt: 'ABSORBIDO', col: '#4ade80', t: 40 }); window.KR && KR.beep([[988, .04], [1319, .05]]);
       return;
     }
     if (Math.random() < B.bloqueo) {
-      P.inv = 30; registrar('bloqueo', { enemigo: origen, via });
+      P.inv = 30; registrar('bloqueo', { enemigo: origen, via, dano: n, fuente: 'suerte' });
       efectos.push({ tipo: 'txt', x: P.x, y: P.y - 14, txt: 'BLOQUEO', col: '#7ec8ff', t: 40 }); window.KR && KR.beep([[880, .05]]);
       return;
     }
@@ -156,7 +162,7 @@
         const ddx = e.x - P.x, ddy = e.y - P.y, d = Math.hypot(ddx, ddy) || 1;
         if (d < 22 + e.r && (ddx * P.fx + ddy * P.fy) / d > .2) {
           e.hp -= B.ataque; e.golpes++; golpes++; e.kx = ddx / d * (e.tipo === 'golem' ? 1.5 : 4); e.ky = ddy / d * (e.tipo === 'golem' ? 1.5 : 4);
-          efectos.push({ tipo: 'chispa', x: e.x, y: e.y, t: 12 }); registrar('golpe', { enemigo: e.tipo, dano: +B.ataque.toFixed(2), fuente: 'espada' });
+          efectos.push({ tipo: 'chispa', x: e.x, y: e.y, t: 12 }); golpe(e, +B.ataque.toFixed(2), 'espada');
         }
       });
       registrar('ataque', { acierto: golpes > 0, golpes });
@@ -171,7 +177,7 @@
         enemigos.forEach(e => {
           if (e.portal > 0) return;
           const ddx = e.x - P.x, ddy = e.y - P.y, d = Math.hypot(ddx, ddy) || 1;
-          if (d < 36 + e.r) { e.hp -= B.ataque * 1.5; golpes++; e.kx = ddx / d * 5; e.ky = ddy / d * 5; registrar('golpe', { enemigo: e.tipo, dano: +(B.ataque * 1.5).toFixed(2), fuente: 'especial' }); }
+          if (d < 36 + e.r) { e.hp -= B.ataque * 1.5; golpes++; e.kx = ddx / d * 5; e.ky = ddy / d * 5; golpe(e, +(B.ataque * 1.5).toFixed(2), 'especial'); }
         });
         registrar('especial', { golpes }); window.KR && KR.beep([[330, .06], [660, .1]]);
       } else efectos.push({ tipo: 'txt', x: P.x, y: P.y - 14, txt: 'SIN ENERGÍA', col: '#7ec8ff', t: 30 });
@@ -193,7 +199,7 @@
     balas.forEach(bl => {
       bl.x += bl.vx; bl.y += bl.vy; bl.t--;
       const e = enemigos.find(x => x.portal <= 0 && Math.hypot(x.x - bl.x, x.y - bl.y) < x.r + 2);
-      if (e) { const dn = B.nivel >= 3 ? 1.5 : 1; e.hp -= dn; e.kx += bl.vx * .6; e.ky += bl.vy * .6; bl.t = 0; registrar('golpe', { enemigo: e.tipo, dano: dn, fuente: 'robot' }); efectos.push({ tipo: 'chispa', x: e.x, y: e.y, t: 8 }); }
+      if (e) { const dn = B.nivel >= 3 ? 1.5 : 1; e.hp -= dn; e.kx += bl.vx * .6; e.ky += bl.vy * .6; bl.t = 0; golpe(e, dn, 'robot'); efectos.push({ tipo: 'chispa', x: e.x, y: e.y, t: 8 }); }
     });
     for (let i = balas.length - 1; i >= 0; i--) if (balas[i].t <= 0) balas.splice(i, 1);
     if (B.regenVida && f % 1200 === 0 && P.hp < P.max) { P.hp++; registrar('curacion', { fuente: 'regeneracion' }); efectos.push({ tipo: 'txt', x: P.x, y: P.y - 14, txt: '+1', col: '#f472b6', t: 40 }); }
@@ -210,7 +216,7 @@
           const d2 = dist(otro, e) || 1; e.x += (otro.x - e.x) / d2 * e.v * 1.2; e.y += (otro.y - e.y) / d2 * e.v * 1.2;
           if (d2 < e.r + otro.r + 2 && e.golpeCd <= 0) {
             const dn = TIPOS[e.tipo].dano; otro.hp -= dn; otro.kx = (otro.x - e.x) / d2 * 3; otro.ky = (otro.y - e.y) / d2 * 3; e.golpeCd = 36;
-            efectos.push({ tipo: 'chispa', x: otro.x, y: otro.y, t: 8 }); registrar('golpe', { enemigo: otro.tipo, dano: dn, fuente: 'confusion' });
+            efectos.push({ tipo: 'chispa', x: otro.x, y: otro.y, t: 8 }); golpe(otro, dn, 'confusion');
           }
         } else { e.x += Math.cos(e.fase * .4) * e.v; e.y += Math.sin(e.fase * .3) * e.v; }
         e.x += e.kx; e.y += e.ky; e.kx *= .78; e.ky *= .78; limitar(e);
@@ -231,7 +237,7 @@
         else if (e.mt <= 0) { e.modo = 'camina'; e.mt = 160 + Math.random() * 60; }
       }
       e.x += e.kx; e.y += e.ky; e.kx *= .78; e.ky *= .78; limitar(e);
-      if (d < e.r + P.r) recibir(TIPOS[e.tipo].dano, e.tipo, e.tipo === 'golem' && e.modo === 'embiste' ? 'embestida' : 'contacto');
+      if (d < e.r + P.r) recibir(TIPOS[e.tipo].dano, e.tipo, e.tipo === 'golem' && e.modo === 'embiste' ? 'embestida' : 'contacto', e);
     });
     aliadosActualizar();
     for (let i = 0; i < enemigos.length; i++) for (let j = i + 1; j < enemigos.length; j++) {           // separación
@@ -241,7 +247,7 @@
     enemigos = enemigos.filter(e => {
       if (e.hp > 0) return true;
       const ttk = +(seg() - e.t0 - .6).toFixed(1);
-      registrar('derrota', { enemigo: e.tipo, ttk: Math.max(.1, ttk) });
+      registrar('derrota', { enemigo: e.tipo, ttk: Math.max(.1, ttk), fuente: e.ultimo || 'espada' });
       efectos.push({ tipo: 'txt', x: e.x, y: e.y - 8, txt: TIPOS[e.tipo].nombre.split(' ')[0], col: '#f3d27f', t: 36 });
       for (let k = 0; k < 8; k++) efectos.push({ tipo: 'polvo', x: e.x, y: e.y, vx: Math.cos(k) * 1.2, vy: Math.sin(k) * 1.2, t: 18, col: TIPOS[e.tipo].col });
       if (P.hp < P.max && Math.random() < B.cura) items.push({ x: e.x, y: e.y, t: 600 });
@@ -249,6 +255,9 @@
     });
     flechas = flechas.filter(a => {
       a.x += a.vx; a.y += a.vy; a.t--;
+      if (B.esp === 2 && P.escudo > 0 && Math.hypot(a.x - P.x, a.y + 4 - P.y) < 14) {   // el escudo detiene flechas sin gastar cargas
+        registrar('bloqueo', { enemigo: 'arquero', via: 'flecha', dano: 1, fuente: 'codigo' }); efectos.push({ tipo: 'chispa', x: a.x, y: a.y + 4, t: 8 }); return false;
+      }
       if (Math.hypot(a.x - P.x, a.y - P.y) < P.r + 2) { recibir(1, 'arquero', 'flecha'); return false; }
       return a.t > 0 && a.x > LIM.x0 && a.x < LIM.x1 && a.y > LIM.y0 - 6 && a.y < LIM.y1;
     });
@@ -275,11 +284,11 @@
         enemigos.forEach(e => {
           if (e.portal > 0 || e.golpeCd > 0 || Math.hypot(e.x - tx, e.y - ty) > e.r + 5) return;
           e.hp -= dn; e.golpeCd = 26; const d = Math.hypot(e.x - P.x, e.y - P.y) || 1; e.kx = (e.x - P.x) / d * 3; e.ky = (e.y - P.y) / d * 3;
-          efectos.push({ tipo: 'chispa', x: e.x, y: e.y, t: 8 }); registrar('golpe', { enemigo: e.tipo, dano: dn, fuente: 'torta' });
+          efectos.push({ tipo: 'chispa', x: e.x, y: e.y, t: 8 }); golpe(e, dn, 'torta');
         });
       }
     }
-    if (B.esp === 2 && P.escudo < nv([0, 1, 2, 3]) && ++P.escudoT >= nv([0, 420, 360, 300])) {   // el escudo se recarga
+    if (B.esp === 2 && P.escudo < nv([0, 2, 3, 4]) && ++P.escudoT >= nv([0, 300, 240, 180])) {   // el escudo se recarga
       P.escudo++; P.escudoT = 0; efectos.push({ tipo: 'txt', x: P.x, y: P.y - 14, txt: '+ESCUDO', col: '#4ade80', t: 30 });
     }
     if (B.esp === 5 && --P.auraT <= 0) {                      // aura de interferencia
@@ -293,7 +302,7 @@
       if (!obj) { P.mandoT = 30; return; }
       P.mandoT = nv([0, 660, 540, 420]);
       enemigos.splice(enemigos.indexOf(obj), 1);
-      registrar('derrota', { enemigo: obj.tipo, ttk: Math.max(.1, +(seg() - obj.t0 - .6).toFixed(1)), via: 'mando' });
+      registrar('derrota', { enemigo: obj.tipo, ttk: Math.max(.1, +(seg() - obj.t0 - .6).toFixed(1)), via: 'mando', fuente: 'mando' });
       aliados.push({ tipo: 'convertido', et: obj.tipo, x: obj.x, y: obj.y, r: obj.r, v: Math.max(.8, TIPOS[obj.tipo].v * 1.2), cd: 20, atk: 0, vida: nv([0, 480, 600, 720]), dano: TIPOS[obj.tipo].dano, fase: obj.fase });
       efectos.push({ tipo: 'txt', x: obj.x, y: obj.y - 14, txt: 'A TUS ÓRDENES', col: '#fb923c', t: 44 }); window.KR && KR.beep([[392, .06], [523, .06], [659, .1]]);
     }
@@ -312,7 +321,7 @@
           obj.hp -= dn; obj.kx = (obj.x - a.x) / (dObj || 1) * 3; obj.ky = (obj.y - a.y) / (dObj || 1) * 3;
           a.cd = a.tipo === 'companero' ? nv([0, 40, 30, 24]) : 36; a.atk = 8;
           efectos.push({ tipo: 'chispa', x: obj.x, y: obj.y, t: 8 });
-          registrar('golpe', { enemigo: obj.tipo, dano: dn, fuente: a.tipo === 'companero' ? 'companero' : a.tipo === 'esqueleto' ? 'esqueleto' : 'mando' });
+          golpe(obj, dn, a.tipo === 'companero' ? 'companero' : a.tipo === 'esqueleto' ? 'esqueleto' : 'mando');
         }
       } else if (a.tipo === 'companero') {                    // sin enemigos cerca: vuelve a tu lado
         const d = Math.hypot(P.x - 14 - a.x, P.y + 4 - a.y);

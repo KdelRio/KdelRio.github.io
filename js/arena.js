@@ -13,6 +13,12 @@
   const batalla = KRCrearBatalla(cv);
   let esp = null, visible = false;
 
+  // el análisis de Magic Foods aparece cuando ya recolectaste datos en una pelea (aquí o en el modo arcade)
+  const magic = document.getElementById('magic-bloque');
+  const extra = () => (window.KR ? KR.estado().extra : {});
+  function mostrarMagic() { if (magic) magic.hidden = false; }
+  if (extra().magic) mostrarMagic();
+
   document.getElementById('arena-especialidades').innerHTML = RAMAS.map((r, i) =>
     `<button type="button" class="esp-carta" data-esp="${i}"><span class="esp-ico" aria-hidden="true">${r.ico}</span><b>${r.nombre}</b><span class="esp-hab">✦ ${ESPECIALIDADES[i].hab}</span><small>${ESPECIALIDADES[i].desc}</small></button>`).join('');
 
@@ -35,6 +41,8 @@
   function terminar(T) {
     batalla.pausar();
     const gano = T.resultado === 'victoria';
+    if (window.KR) { extra().magic = true; KR.guardar(); }
+    mostrarMagic();
     window.KR && KR.sumarXP(gano ? 40 : 15, gano ? 'Arena del Dato superada' : 'Datos de combate registrados');
     informe.hidden = false;
     KRInforme.construir(informe, T, {

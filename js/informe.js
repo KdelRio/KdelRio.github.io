@@ -8,6 +8,24 @@
   const COLOR = { slime: '#6bd49a', murcielago: '#a78bfa', arquero: '#e6e0d0', golem: '#8a8f9a' };
   const NOMBRE = { slime: 'Slime', murcielago: 'Murciélago', arquero: 'Arquero', golem: 'Gólem' };
   const TIPOS = Object.keys(COLOR);
+  // de dónde sale el daño que causas: tus armas y la habilidad de cada especialidad (índice de rama en gremio.js)
+  const FUENTE = {
+    espada: { n: 'Espada', c: '#f3d27f' }, especial: { n: 'Onda de energía', c: '#7ec8ff' },
+    torta: { n: 'Gráfico de torta', c: '#e0b756', esp: 0 }, companero: { n: 'Compañero pixel', c: '#f472b6', esp: 1 },
+    codigo: { n: 'Escudo de código', c: '#4ade80', esp: 2 }, robot: { n: 'Robot de IA', c: '#a78bfa', esp: 3 },
+    esqueleto: { n: 'Esqueletos', c: '#e6e0d0', esp: 4 }, confusion: { n: 'Confusión del aura', c: '#5eead4', esp: 5 },
+    mando: { n: 'Enemigos bajo tu mando', c: '#fb923c', esp: 6 },
+  };
+  const nombreFuente = f => (FUENTE[f] || { n: f }).n;
+  const CONSEJO_ESP = [
+    'Acércate a los grupos: los gráficos de torta solo golpean lo que tocan en su órbita.',
+    'Pelea cerca de tu compañero para que ambos ataquen al mismo objetivo.',
+    'Deja que el escudo reciba los golpes: cada uno rebota daño al atacante. Recarga lejos del grupo.',
+    'Mantente a distancia media: el robot solo dispara a enemigos cercanos y necesita tiempo para apuntar.',
+    'Invoca esqueletos antes de que lleguen los enemigos: tardan unos segundos en alcanzar su objetivo.',
+    'Deja que los enemigos se agrupen a tu alrededor antes del aura: así se golpean entre ellos.',
+    'Mantén cerca a los enemigos más fuertes: la toma de mando elige al más cercano.',
+  ];
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const pct = (a, b) => b ? Math.round(a / b * 100) : 0;
   const num = n => Number.isInteger(n) ? n : n.toFixed(1).replace('.', ',');
@@ -32,11 +50,19 @@
     });
     const vida = T.vida.filter(v => !ola || v.ola === ola);
     const pos = ola ? T.pos[ola - 1] : T.pos.reduce((a, p) => a.map((v, i) => v + p[i]), Array(T.pos[0].length).fill(0));
+    const golpes = c('golpe'), causado = golpes.reduce((a, e) => a + e.dano, 0);
+    const esp = T.bonos && T.bonos.esp >= 0 ? T.bonos.esp : -1;
+    const porFuente = Object.keys(FUENTE).map(f => ({
+      f, dano: +golpes.filter(e => e.fuente === f).reduce((a, e) => a + e.dano, 0).toFixed(2),
+      golpes: golpes.filter(e => e.fuente === f).length, derrotas: derrotas.filter(e => (e.fuente || 'espada') === f).length, esEsp: FUENTE[f].esp === esp,
+    })).filter(x => x.dano || x.derrotas);
+    const deEsp = porFuente.filter(x => x.esEsp);
+    const absorbido = c('bloqueo').filter(e => e.fuente === 'codigo').reduce((a, e) => a + (e.dano || 0), 0);
     const porOla = T.olas.filter(Boolean).map(o => {
       const e2 = T.eventos.filter(e => e.ola === o.n), d2 = e2.filter(e => e.tipo === 'recibido').reduce((a, e) => a + e.dano, 0), dur = ((o.t1 ?? T.fin) - o.t0) || .1;
       return { n: o.n, dano: d2, dur, dpm: d2 / dur * 60, derrotas: e2.filter(e => e.tipo === 'derrota').length };
     });
-    return { especiales: c('especial').length, bloqueos: c('bloqueo').length, dron: c('golpe').filter(e => e.fuente && !['espada', 'especial'].includes(e.fuente)).length, ev, ataques: ataques.length, aciertos, precision: pct(aciertos, ataques.length), golpes: c('golpe').length, recibidos: recibidos.length, dano, derrotados: derrotas.length, generados: apariciones.length, curaciones: c('curacion').length, disparos: c('disparo').length, tiempo, porTipo, vida, pos, porOla, via: recibidos.reduce((a, e) => (a[e.via] = (a[e.via] || 0) + e.dano, a), {}) };
+    return { causado: +causado.toFixed(2), porFuente, esp, espNombre: esp >= 0 && window.KR_HABILIDADES ? KR_HABILIDADES.ESPECIALIDADES[esp].hab : '', danoEsp: +deEsp.reduce((a, x) => a + x.dano, 0).toFixed(2), derrotasEsp: deEsp.reduce((a, x) => a + x.derrotas, 0), absorbido, especiales: c('especial').length, bloqueos: c('bloqueo').length, dron: c('golpe').filter(e => e.fuente && !['espada', 'especial'].includes(e.fuente)).length, ev, ataques: ataques.length, aciertos, precision: pct(aciertos, ataques.length), golpes: c('golpe').length, recibidos: recibidos.length, dano, derrotados: derrotas.length, generados: apariciones.length, curaciones: c('curacion').length, disparos: c('disparo').length, tiempo, porTipo, vida, pos, porOla, via: recibidos.reduce((a, e) => (a[e.via] = (a[e.via] || 0) + e.dano, a), {}) };
   }
 
   // ---------------------------------------------------------- gráficos SVG
@@ -85,6 +111,11 @@
     M.pos.forEach((v, i) => { const x = i % C, y = Math.floor(i / C), k = v / max; s += `<rect x="${x * cw}" y="${y * ch}" width="${cw - 1}" height="${ch - 1}" fill="rgba(${Math.round(60 + 190 * k)},${Math.round(90 + 60 * k)},${Math.round(200 - 150 * k)},${.12 + k * .88})"><title>${v} muestras</title></rect>`; });
     return s + '</svg>';
   }
+  function fuentes(M) {
+    if (!M.causado) return '<p class="inf-vacio">No causaste daño en este tramo.</p>';
+    const f = [...M.porFuente].sort((a, b) => b.dano - a.dano), max = Math.max(...f.map(x => x.dano));
+    return '<div class="inf-ttk inf-fuentes">' + f.map(x => `<div class="${x.esEsp ? 'es-esp' : ''}"><span>${x.esEsp ? '✦ ' : ''}${nombreFuente(x.f)}</span><i style="width:${x.dano / max * 100}%;background:${FUENTE[x.f].c}" title="${x.golpes} golpes · ${x.derrotas} derrotas"></i><b>${num(x.dano)} · ${pct(x.dano, M.causado)}%</b></div>`).join('') + '</div>';
+  }
   function ttk(M) {
     const t = M.porTipo.filter(x => x.ttk), max = Math.max(1, ...t.map(x => x.ttk));
     if (!t.length) return '<p class="inf-vacio">Sin enemigos derrotados en este tramo.</p>';
@@ -105,6 +136,16 @@
     if (lento) h.push(['⏱️', `<b>${NOMBRE[lento.k]}</b> fue el enemigo más lento de derrotar: <b>${num(lento.ttk)} s</b> en promedio desde que apareció.`]);
     if (!ola) { const dura = [...M.porOla].sort((a, b) => b.dpm - a.dpm)[0]; if (dura && dura.dano) h.push(['📈', `La <b>oleada ${dura.n}</b> fue la más exigente: ${num(dura.dpm)} de daño por minuto.`]); }
     if (M.vida.length) { const min = M.vida.reduce((a, p) => p.hp < a.hp ? p : a, M.vida[0]); h.push(['❤️', `Tu vida mínima fue <b>${min.hp} de ${T.hpMax}</b>, a los ${num(min.t)} s.${M.curaciones ? ` Recogiste ${M.curaciones} corazón(es).` : ''}`]); }
+    if (M.causado) {
+      const top = [...M.porFuente].sort((a, b) => b.dano - a.dano)[0];
+      h.push(['💥', `Causaste <b>${num(M.causado)}</b> de daño. Tu principal fuente fue <b>${nombreFuente(top.f)}</b>, con el <b>${pct(top.dano, M.causado)}%</b>.`]);
+    }
+    if (M.espNombre) {
+      let t = `Tu especialidad <b>${M.espNombre}</b> causó el <b>${pct(M.danoEsp, M.causado)}%</b> del daño (${num(M.danoEsp)} de ${num(M.causado)}) y <b>${M.derrotasEsp} de ${M.derrotados}</b> derrotas.`;
+      if (M.absorbido) t += ` Además absorbió <b>${M.absorbido}</b> de daño que habrías recibido.`;
+      if (M.esp === 5) t += ' Ese daño se lo hicieron los enemigos entre ellos, confundidos.';
+      h.push(['✦', t]);
+    }
     h.push(['🗺️', `Pasaste el <b>${bordes(M)}%</b> del tiempo junto a los muros de la arena.`]);
     h.push(['⚔️', `Diste <b>${M.golpes}</b> golpes y recibiste <b>${M.recibidos}</b>: un ratio de <b>${num(M.golpes / Math.max(1, M.recibidos))}</b> golpes dados por cada golpe recibido.`]);
     return h;
@@ -121,6 +162,8 @@
     if (M.precision < 60) j.push(`Reduce los ataques al aire: ${M.ataques - M.aciertos} de tus ataques no golpearon a nadie. Ataca cuando el enemigo esté a un paso.`);
     if (bordes(M) > 45) j.push('Te acorralaron contra los muros: mantente cerca del centro para tener rutas de escape.');
     if (M.curaciones === 0 && M.dano >= 3) j.push('Recoge los corazones que sueltan algunos enemigos: recuperan 1 punto de vida.');
+    if (M.espNombre && M.esp !== 2 && pct(M.danoEsp, M.causado) < 30) j.push(`${M.espNombre} aportó solo el ${pct(M.danoEsp, M.causado)}% del daño. ${CONSEJO_ESP[M.esp]}`);
+    if (M.esp === 2 && M.dano > M.absorbido) j.push(`El escudo absorbió ${M.absorbido} de daño y recibiste ${M.dano}. ${CONSEJO_ESP[2]}`);
     if (!j.length) j.push('¡Partida sobresaliente! Mantén el ritmo y prueba terminar más rápido.');
     const po = M.porOla;
     if (!ola && po.length >= 2) {
@@ -128,6 +171,10 @@
       d.push(creciente ? 'La curva de dificultad es progresiva: el daño por minuto se mantiene o sube en cada oleada, como se espera en un buen diseño.' : 'La curva de dificultad no es creciente: una oleada intermedia resultó más dura que la siguiente. Conviene reordenar los enemigos o ajustar su cantidad.');
     }
     if (M.dano && pct(fuente.dano, M.dano) >= 50) d.push(`Si en muchos jugadores ${NOMBRE[fuente.k]} concentra más del 50% del daño, estaría desbalanceado: se podría reducir su cadencia, velocidad o daño.`);
+    if (M.espNombre && M.causado) {
+      const p = pct(M.danoEsp + M.absorbido, M.causado + M.absorbido);
+      d.push(`Balance de especialidades: ${M.espNombre} explica el ${p}% del impacto de la partida (daño causado más daño absorbido). ${p > 70 ? 'Si en muchas partidas supera el 70%, la especialidad juega sola y conviene reducirla.' : p < 20 ? 'Si en muchas partidas queda bajo el 20%, la especialidad se siente débil y conviene reforzarla.' : 'Está en un rango sano: ayuda sin reemplazar al jugador.'}`);
+    }
     d.push(`Duración del tramo: ${num(M.tiempo)} s. ${M.tiempo > 150 ? 'Es larga para un minijuego; se podrían reducir enemigos.' : M.tiempo < 45 ? 'Es muy corta; se podrían sumar enemigos.' : 'Está en un rango cómodo para un minijuego (45 a 150 s).'}`);
     if (M.vida.length && Math.min(...M.vida.map(v => v.hp)) <= 2) d.push('El jugador llegó al borde de la derrota: evaluar más curaciones en la oleada final o telegrafiar mejor los ataques.');
     return { j, d };
@@ -145,7 +192,7 @@
         return `<p class="inf-explica">Todo análisis parte de datos crudos. Durante el combate se registró cada acción como una fila, igual que cada factura de Magic Foods era una fila de ventas. Aquí ves <b>${M.ev.length} eventos</b>${ola ? ` de la oleada ${ola}` : ''}.</p>
           <div class="inf-conteo">${conteo}</div>
           <div class="inf-tabla-caja"><table class="inf-tabla"><thead><tr><th>Tiempo</th><th>Oleada</th><th>Evento</th><th>Enemigo</th><th>Detalle</th></tr></thead><tbody>
-          ${filas.map(e => `<tr><td>${num(e.t)} s</td><td>${e.ola}</td><td>${e.tipo}</td><td>${e.enemigo ? NOMBRE[e.enemigo] : '-'}</td><td>${e.tipo === 'ataque' ? (e.acierto ? `acierto ×${e.golpes}` : 'fallo') : e.dano ? `daño ${e.dano}${e.via ? ' · ' + e.via : ''}` : e.ttk ? `derrotado en ${num(e.ttk)} s` : ''}</td></tr>`).join('')}
+          ${filas.map(e => `<tr><td>${num(e.t)} s</td><td>${e.ola}</td><td>${e.tipo}</td><td>${e.enemigo ? NOMBRE[e.enemigo] : '-'}</td><td>${e.tipo === 'ataque' ? (e.acierto ? `acierto ×${e.golpes}` : 'fallo') : e.tipo === 'golpe' ? `daño ${num(e.dano)} · ${nombreFuente(e.fuente)}` : e.tipo === 'bloqueo' ? `absorbido ${e.dano || 1}${e.fuente === 'codigo' ? ' · escudo de código' : ''}` : e.dano ? `daño ${e.dano}${e.via ? ' · ' + e.via : ''}` : e.ttk ? `derrotado en ${num(e.ttk)} s por ${nombreFuente(e.fuente || 'espada')}` : ''}</td></tr>`).join('')}
           </tbody></table></div><p class="inf-nota">Se muestran los 60 eventos más recientes, sin contar las apariciones.</p>`;
       }
       if (paso === 1) {
@@ -154,7 +201,10 @@
           ['Daño recibido', M.dano, 'Suma del daño de cada golpe recibido'], ['Enemigos derrotados', `${M.derrotados}/${M.generados}`, 'Derrotas ÷ apariciones'], ['Enemigos distintos', M.porTipo.filter(t => t.generados).length, 'Tipos con al menos una aparición'],
           ['Tiempo', num(M.tiempo) + ' s', 'Suma de la duración de las oleadas'], ['Derrotas por minuto', num(M.derrotados / M.tiempo * 60), 'Derrotas ÷ minutos'], ['Ratio de combate', num(M.golpes / Math.max(1, M.recibidos)), 'Golpes dados ÷ golpes recibidos'],
           ['Curaciones', M.curaciones, 'Corazones recogidos o regenerados'],
-        ].concat(M.especiales ? [['Ondas de energía', M.especiales, 'Ataques especiales lanzados']] : [], M.dron ? [['Golpes de tu especialidad', M.dron, 'Torta, compañero, robot, esqueletos, confusión o aliados']] : [], M.bloqueos ? [['Bloqueos', M.bloqueos, 'Golpes anulados por el escudo']] : []);
+        ].concat([['Daño causado', num(M.causado), 'Suma del daño de cada golpe que diste']],
+          M.espNombre ? [[`Daño de ${M.espNombre}`, pct(M.danoEsp, M.causado) + '%', `${num(M.danoEsp)} de ${num(M.causado)} de daño vino de tu especialidad`], [`Derrotas de ${M.espNombre}`, `${M.derrotasEsp}/${M.derrotados}`, 'Enemigos cuyo último golpe vino de tu especialidad']] : [],
+          M.absorbido ? [['Daño absorbido', M.absorbido, 'Daño que el escudo de código evitó']] : [],
+          M.especiales ? [['Ondas de energía', M.especiales, 'Ataques especiales lanzados']] : [], M.bloqueos ? [['Bloqueos', M.bloqueos, 'Golpes anulados (escudo o suerte)']] : []);
         return `<p class="inf-explica">Un indicador (KPI) resume muchas filas en un número que responde una pregunta. Pasa el cursor por cada tarjeta para ver cómo se calcula.</p>
           <div class="inf-kpis">${k.map(([n, v, f]) => `<div class="inf-kpi" title="${esc(f)}"><span>${n}</span><b>${v}</b><small>${f}</small></div>`).join('')}</div>`;
       }
@@ -165,7 +215,8 @@
             <figure><figcaption>¿De dónde vino el daño?</figcaption>${dona(M)}<p class="inf-lee">Cómo leerlo: cada sector es la proporción del daño total causado por un tipo de enemigo.</p></figure>
             <figure><figcaption>¿Cómo evolucionó tu vida?</figcaption>${linea(T, M)}<p class="inf-lee">Cómo leerlo: las bajadas son golpes recibidos y las subidas, curaciones. El punto marca tu momento más crítico.</p></figure>
             <figure><figcaption>¿Dónde te moviste?</figcaption>${calor(M)}<p class="inf-lee">Cómo leerlo: la arena vista desde arriba. Mientras más cálido el color, más tiempo estuviste ahí.</p></figure>
-            <figure class="ancho"><figcaption>¿Qué enemigo te costó más derrotar?</figcaption>${ttk(M)}<p class="inf-lee">Cómo leerlo: tiempo promedio entre la aparición de un enemigo y su derrota.</p></figure>
+            <figure><figcaption>¿Cómo causaste el daño?</figcaption>${fuentes(M)}<p class="inf-lee">Cómo leerlo: daño total por fuente y su porcentaje. Las filas con ✦ son tu especialidad.</p></figure>
+            <figure><figcaption>¿Qué enemigo te costó más derrotar?</figcaption>${ttk(M)}<p class="inf-lee">Cómo leerlo: tiempo promedio entre la aparición de un enemigo y su derrota.</p></figure>
           </div>`;
       }
       if (paso === 3) {

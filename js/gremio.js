@@ -65,7 +65,7 @@
   const ESPECIALIDADES = [
     { hab: 'Gráfico de torta', desc: 'Gráficos de torta giran a tu alrededor y golpean a los enemigos que tocan.', niveles: ['1 gráfico en órbita', '2 gráficos y giro más rápido', '3 gráficos con más daño'] },
     { hab: 'Compañero pixel', desc: 'Un compañero pixel art pelea a tu lado desde el primer segundo.', niveles: ['ataca cada 0,7 s', 'ataca cada 0,5 s', 'ataca cada 0,4 s con más daño'] },
-    { hab: 'Escudo de código', desc: 'Líneas de código verde te rodean y absorben golpes completos. Se recargan solas.', niveles: ['1 carga de escudo', '2 cargas y recarga más rápida', '3 cargas, recarga cada 5 s'] },
+    { hab: 'Escudo de código', desc: 'Líneas de código verde te rodean: absorben golpes completos, devuelven daño al atacante y detienen flechas. Se recargan solas.', niveles: ['2 cargas, recarga cada 5 s', '3 cargas, recarga cada 4 s', '4 cargas, recarga cada 3 s y más daño devuelto'] },
     { hab: 'Robot de IA', desc: 'Un robot vuela contigo y dispara al enemigo más cercano.', niveles: ['dispara cada 1,4 s', 'dispara cada 1 s', 'dispara cada 0,7 s con más daño'] },
     { hab: 'Invocar esqueletos', desc: 'No usas espada: cada ataque invoca un esqueleto que pelea por ti durante 11 s.', niveles: ['hasta 2 esqueletos', 'hasta 3 esqueletos', 'hasta 4 esqueletos'] },
     { hab: 'Aura de interferencia', desc: 'Cada pocos segundos emites un aura que confunde a los enemigos cercanos: se golpean entre ellos.', niveles: ['cada 10 s, confunde 4 s', 'cada 8 s, confunde 5 s', 'cada 6 s, confunde 6 s'] },

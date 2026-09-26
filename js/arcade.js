@@ -132,6 +132,7 @@
     const p = prog();
     KRBatalla.iniciar(T => {
       const gano = T.resultado === 'victoria', derrotas = T.eventos.filter(e => e.tipo === 'derrota').length;
+      KR.estado().extra.magic = true; KR.guardar(); const mb = $('#magic-bloque'); if (mb) mb.hidden = false;   // datos recolectados: se abre Magic Foods
       let puntos = 0, nuevo = false;
       if (infinito) {
         nuevo = T.olasSuperadas > (p.record || 0); if (nuevo) p.record = T.olasSuperadas; KR.guardar();
@@ -355,7 +356,7 @@
     if (arranque > 0) {
       arranque--;
       if ((arranque >> 3) % 2) txt('PLAYER 1 START', PW / 2, 318, 34, '#ffd400', 18);
-      if (arranque === 0) revelar();
+      if (arranque === 0) acercar();
     } else if (creditos === 0) {
       if ((tp >> 5) % 2 === 0 || rechazo > 0) txt('INSERT COIN', PW / 2 + sacude, 318, 46, '#ffd400', 22);
       txt('PRESIONA  F  PARA METER UNA FICHA', PW / 2, 392, 15, '#e6eefc');
@@ -384,20 +385,24 @@
     creditos--; arranque = 100; KR.beep([[523, .08], [659, .08], [784, .08], [1047, .08], [1319, .25]]);
   }
 
-  // ---------------------------------------------------------- gabinete: enfoque y revelación
-  function enfocar() {
+  // ---------------------------------------------------------- gabinete: se ve completo con INSERT COIN y, al empezar,
+  // la cámara se acerca hasta que la pantalla llena la ventana. En pantallas táctiles no se acerca:
+  // la cruz y los botones del gabinete son los controles del juego.
+  const tactil = matchMedia('(pointer: coarse)').matches;
+  function enfocar(animado) {
     gab.style.transition = 'none'; gab.style.transform = 'none';
     const g = gab.getBoundingClientRect(), s = pantalla.getBoundingClientRect();
     const k = Math.min(innerWidth / s.width, innerHeight / s.height);
     const cx = s.left + s.width / 2 - g.left, cy = s.top + s.height / 2 - g.top;
-    gab.style.transform = `translate(${innerWidth / 2 - g.left - k * cx}px, ${innerHeight / 2 - g.top - k * cy}px) scale(${k})`;
     void gab.offsetWidth;
+    if (animado) gab.style.transition = 'transform 1.6s cubic-bezier(.65,.02,.2,1)';
+    gab.style.transform = `translate(${innerWidth / 2 - g.left - k * cx}px, ${innerHeight / 2 - g.top - k * cy}px) scale(${k})`;
   }
-  function revelar() {
-    fase = 'revelando';
-    maquina.classList.remove('enfocada'); maquina.classList.add('revelando');
-    gab.style.transition = 'transform 2.2s cubic-bezier(.65,.02,.2,1)'; gab.style.transform = 'none';
-    setTimeout(() => { maquina.classList.remove('revelando'); fase = 'juego'; iniciarJuego(); }, 2300);
+  function acercar() {
+    fase = 'acercando';
+    if (tactil) { fase = 'juego'; iniciarJuego(); return; }
+    maquina.classList.add('enfocada'); enfocar(true);
+    setTimeout(() => { fase = 'juego'; iniciarJuego(); }, 1650);
   }
   function iniciarJuego() {
     KR.desbloquear('start');
@@ -410,17 +415,17 @@
   function abrirMaquina() {
     maquina.hidden = false; document.body.classList.add('bloqueado');
     fase = 'attract'; arranque = 0;
-    maquina.classList.add('enfocada'); maquina.classList.remove('revelando');
-    mostrar('portada'); requestAnimationFrame(enfocar);
+    maquina.classList.remove('enfocada'); gab.style.transition = 'none'; gab.style.transform = 'none';   // primero, el gabinete completo
+    mostrar('portada');
   }
   function cerrarMaquina() {
     if (actual === 'aldea') { prog().x = KRAldea.x; KR.guardar(); }
     KRAldea.pausar(); KRBatalla.pausar(); if (ritmo) ritmo.detener();
     capa.hidden = true; panelTipo = null;
     maquina.hidden = true; document.body.classList.remove('bloqueado'); fase = 'cerrada';
-    gab.style.transform = 'none';
+    maquina.classList.remove('enfocada'); gab.style.transition = 'none'; gab.style.transform = 'none';
   }
-  addEventListener('resize', () => { if (fase === 'attract') enfocar(); });
+  addEventListener('resize', () => { if (maquina.classList.contains('enfocada')) enfocar(false); });   // mantiene el acercamiento al cambiar el tamaño
 
   // ---------------------------------------------------------- teclado global y controles del gabinete
   const botonDe = k => $$('[data-tecla]', maquina).find(b => b.dataset.tecla.toLowerCase() === k);

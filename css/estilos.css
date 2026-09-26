@@ -434,7 +434,7 @@ kbd {
 .maquina.enfocada .pantalla { border-radius: 0; box-shadow: none; }
 
 .consola {
-  width: calc(100% + 34px); display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 16px;
+  width: calc(100% + 34px); display: flex; justify-content: space-between; align-items: center; gap: 16px;
   padding: 16px 48px 30px; border-top: 3px solid var(--oro); border-radius: 6px 6px 20px 20px;
   background: linear-gradient(180deg, #25365f 0%, #17223f 60%, #0f1830 100%);
   clip-path: polygon(0 0, 100% 0, 97% 100%, 3% 100%);
@@ -444,9 +444,6 @@ kbd {
 .palanca button:nth-of-type(1) { grid-area: 1 / 2; } .palanca button:nth-of-type(2) { grid-area: 2 / 1; }
 .palanca button:nth-of-type(3) { grid-area: 2 / 3; } .palanca button:nth-of-type(4) { grid-area: 3 / 2; }
 .palanca-bola { grid-area: 2 / 2; width: 32px; height: 32px; place-self: center; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #ff9b9b, #c0392b 60%, #6b1d16); box-shadow: 0 4px 0 #3a0f0b; }
-.consola-centro { display: flex; gap: 8px; }
-.bt-chico { display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; padding: 8px 11px; border-radius: 9px; font: .6rem/1 var(--pixel); color: var(--suave); background: #0b1226; border: 1px solid var(--linea-oro); box-shadow: 0 3px 0 #050a16; }
-.bt-chico small { font: .62rem/1 "Geist", sans-serif; color: var(--tenue); }
 .botonera { justify-self: end; display: flex; gap: 22px; padding-bottom: 14px; }
 .bt { position: relative; width: 62px; height: 62px; border-radius: 50%; border: 0; cursor: pointer; display: grid; place-items: center; box-shadow: 0 6px 0 rgba(0, 0, 0, .5), inset 0 -6px 12px rgba(0, 0, 0, .25); }
 .bt b { font: 1.05rem/1 var(--pixel); color: #fff; }
@@ -660,6 +657,10 @@ kbd {
 .inf-ttk div { display: grid; grid-template-columns: 110px 1fr 60px; align-items: center; gap: 10px; margin: 6px 0; font-size: .9em; }
 .inf-ttk i { display: block; height: 12px; border-radius: 6px; }
 .inf-ttk b { color: var(--oro-2); }
+.inf-fuentes div { grid-template-columns: 170px 1fr 92px; }
+.inf-fuentes .es-esp { padding: 4px 6px; margin-inline: -6px; border-radius: 8px; background: rgba(107, 212, 154, .1); }
+.inf-fuentes .es-esp span { color: #9dffc0; font-weight: 600; }
+@media (max-width: 560px) { .inf-fuentes div { grid-template-columns: 110px 1fr 78px; } }
 .inf-hallazgos { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 .inf-hallazgos li { display: flex; gap: 12px; align-items: flex-start; padding: 10px 14px; border-radius: 12px; background: rgba(13, 33, 68, .6); border: 1px solid var(--linea); }
 .inf-hallazgos span { font-size: 1.3em; }
@@ -714,7 +715,6 @@ kbd {
   .invitacion { grid-template-columns: 1fr; }
   .capa-panel .estudio-grid, .capa-panel .cv-grid, .inf-graficos, .inf-acciones { grid-template-columns: 1fr; }
   .inf-kpis { grid-template-columns: repeat(3, 1fr); }
-  .consola-centro { flex-direction: column; }
 }
 @media (max-width: 560px) {
   .gabinete { --pw: calc(100vw - 56px); width: calc(var(--pw) + 48px); }
@@ -725,8 +725,7 @@ kbd {
   .palanca { grid-template-columns: repeat(3, 32px); grid-template-rows: repeat(3, 28px); }
   .palanca-bola { width: 26px; height: 26px; }
   .bt { width: 48px; height: 48px; } .botonera { gap: 12px; }
-  .bt-chico { padding: 6px 7px; }
-  .puerta-fichas { gap: 10px; } .ranura { font-size: .45rem; padding: 7px 9px; }
+    .puerta-fichas { gap: 10px; } .ranura { font-size: .45rem; padding: 7px 9px; }
   .inf-kpis { grid-template-columns: repeat(2, 1fr); }
   .mem-grilla { grid-template-columns: repeat(4, 1fr); }
   .mem-frente small { display: none; }

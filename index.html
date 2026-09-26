@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Geist:wght@400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/estilos.css?v=20260926k">
+  <link rel="stylesheet" href="css/estilos.css?v=20260926n">
 </head>
 <body>
 <a class="saltar" href="#contenido">Saltar al contenido</a>
@@ -57,11 +57,6 @@
         <span class="palanca-bola" aria-hidden="true"></span>
         <button type="button" data-tecla="ArrowRight" aria-label="Derecha">▶</button>
         <button type="button" data-tecla="ArrowDown" aria-label="Abajo">▼</button>
-      </div>
-      <div class="consola-centro">
-        <button type="button" class="bt-chico" data-tecla="h">H<small>Rama</small></button>
-        <button type="button" class="bt-chico" data-tecla="p">P<small>Ficha</small></button>
-        <button type="button" class="bt-chico" data-tecla="Escape">ESC<small>Pausa</small></button>
       </div>
       <div class="botonera">
         <button type="button" class="bt bt-a" data-tecla=" "><b>A</b><small>Saltar · Atacar</small></button>
@@ -172,7 +167,7 @@
   <div class="contenedor">
     <p class="kicker">Zona 2 · Torre del Dato</p>
     <h2 class="titulo">Laboratorio de análisis en vivo</h2>
-    <p class="bajada">Primero genera tus propios datos: elige una especialidad y sobrevive a tres oleadas en la Arena del Dato. Cada golpe queda registrado y al terminar lo analizas paso a paso, de los datos crudos a las decisiones.</p>
+    <p class="bajada">Primero genera tus propios datos: elige una especialidad y sobrevive a tres oleadas en la Arena del Dato. Cada golpe queda registrado y al terminar lo analizas paso a paso, de los datos crudos a las decisiones. Con esos datos se desbloquea el análisis de Magic Foods.</p>
 
     <div class="arena panel" id="arena-clasica">
       <div class="arena-elegir">
@@ -192,36 +187,39 @@
     </div>
     <div class="arena-informe panel" id="arena-informe" hidden></div>
 
-    <h3 class="subtitulo" id="magic-foods">Magic Foods S.A.: el mismo proceso con datos de negocio</h3>
-    <p class="bajada">Durante más de tres años implementé la plataforma de BI de una empresa manufacturera de alimentos. Como esos datos son confidenciales, reconstruí el trabajo con <strong>Magic Foods S.A.</strong>, una empresa ficticia con clientes en las 16 regiones de Chile. Este tablero usa esos datos: <strong>filtra y analiza tú mismo</strong>.</p>
+    <!-- se muestra al terminar la Arena del Dato (js/arena.js): primero tus datos, después los del negocio -->
+    <div class="magic-bloque" id="magic-bloque" hidden>
+      <h3 class="subtitulo" id="magic-foods">Magic Foods S.A.: el mismo proceso con datos de negocio</h3>
+      <p class="bajada">Durante más de tres años implementé la plataforma de BI de una empresa manufacturera de alimentos. Como esos datos son confidenciales, reconstruí el trabajo con <strong>Magic Foods S.A.</strong>, una empresa ficticia con clientes en las 16 regiones de Chile. Este tablero usa esos datos: <strong>filtra y analiza tú mismo</strong>.</p>
 
-    <div class="lab panel">
-      <div class="lab-filtros">
-        <label>Año <select id="f-anio"><option value="">Todos</option><option>2023</option><option>2024</option></select></label>
-        <label>Macrozona <select id="f-zona"><option value="">Todas</option></select></label>
-        <label>Canal <select id="f-canal"><option value="">Todos</option></select></label>
-        <button class="btn btn-mini" id="f-limpiar">Limpiar</button>
+      <div class="lab panel">
+        <div class="lab-filtros">
+          <label>Año <select id="f-anio"><option value="">Todos</option><option>2023</option><option>2024</option></select></label>
+          <label>Macrozona <select id="f-zona"><option value="">Todas</option></select></label>
+          <label>Canal <select id="f-canal"><option value="">Todos</option></select></label>
+          <button class="btn btn-mini" id="f-limpiar">Limpiar</button>
+        </div>
+        <div class="lab-kpis">
+          <div class="kpi"><span>Ventas netas</span><b id="k-ventas">…</b></div>
+          <div class="kpi"><span>Margen bruto</span><b id="k-margen">…</b></div>
+          <div class="kpi"><span>Pedidos</span><b id="k-pedidos">…</b></div>
+          <div class="kpi"><span>Ticket promedio</span><b id="k-ticket">…</b></div>
+          <div class="kpi"><span>Var. interanual</span><b id="k-var">…</b></div>
+        </div>
+        <div class="lab-graficos">
+          <figure class="grafico grafico-ancho"><figcaption>Ventas mensuales (millones de pesos): 2023 vs 2024</figcaption><div id="g-linea"></div></figure>
+          <figure class="grafico"><figcaption>Ventas por macrozona</figcaption><div id="g-zonas"></div></figure>
+          <figure class="grafico"><figcaption>Mix por familia</figcaption><div id="g-mix"></div></figure>
+          <figure class="grafico"><figcaption>Top 5 productos</figcaption><div id="g-top"></div></figure>
+        </div>
+        <p class="lab-hallazgo" id="lab-hallazgo" aria-live="polite"></p>
       </div>
-      <div class="lab-kpis">
-        <div class="kpi"><span>Ventas netas</span><b id="k-ventas">…</b></div>
-        <div class="kpi"><span>Margen bruto</span><b id="k-margen">…</b></div>
-        <div class="kpi"><span>Pedidos</span><b id="k-pedidos">…</b></div>
-        <div class="kpi"><span>Ticket promedio</span><b id="k-ticket">…</b></div>
-        <div class="kpi"><span>Var. interanual</span><b id="k-var">…</b></div>
-      </div>
-      <div class="lab-graficos">
-        <figure class="grafico grafico-ancho"><figcaption>Ventas mensuales (millones de pesos): 2023 vs 2024</figcaption><div id="g-linea"></div></figure>
-        <figure class="grafico"><figcaption>Ventas por macrozona</figcaption><div id="g-zonas"></div></figure>
-        <figure class="grafico"><figcaption>Mix por familia</figcaption><div id="g-mix"></div></figure>
-        <figure class="grafico"><figcaption>Top 5 productos</figcaption><div id="g-top"></div></figure>
-      </div>
-      <p class="lab-hallazgo" id="lab-hallazgo" aria-live="polite"></p>
-    </div>
 
-    <div class="desafio panel" id="desafio">
-      <h3>Desafío del analista</h3>
-      <p class="bajada-chica">Responde usando el tablero de arriba. Cada acierto suma experiencia.</p>
-      <div id="desafio-preguntas"></div>
+      <div class="desafio panel" id="desafio">
+        <h3>Desafío del analista</h3>
+        <p class="bajada-chica">Responde usando el tablero de arriba. Cada acierto suma experiencia.</p>
+        <div id="desafio-preguntas"></div>
+      </div>
     </div>
 
     <h3 class="subtitulo">Un mismo requerimiento, dos plataformas</h3>
@@ -412,13 +410,13 @@
 <script src="js/mascota.js?v=20260926b"></script>
 <script src="js/nucleo.js?v=20260926c"></script>
 <script src="js/laboratorio.js?v=20260926b"></script>
-<script src="js/gremio.js?v=20260926e"></script>
+<script src="js/gremio.js?v=20260926f"></script>
 <script src="js/ritmo.js?v=20260926c"></script>
 <script src="js/mundo.js?v=20260926d"></script>
-<script src="js/batalla.js?v=20260926e"></script>
-<script src="js/informe.js?v=20260926e"></script>
+<script src="js/batalla.js?v=20260926f"></script>
+<script src="js/informe.js?v=20260926f"></script>
 <script src="js/memoria.js?v=20260926"></script>
-<script src="js/arena.js?v=20260926"></script>
-<script src="js/arcade.js?v=20260926f"></script>
+<script src="js/arena.js?v=20260926b"></script>
+<script src="js/arcade.js?v=20260926h"></script>
 </body>
 </html>
