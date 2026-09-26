@@ -15,7 +15,7 @@
     { id: 'bilingue', ico: '⚖️', nombre: 'Bilingüe en BI', desc: 'Compara un dashboard entre Power BI y Tableau.', xp: 100 },
     { id: 'memoria', ico: '🧠', nombre: 'Memoria de analista', desc: 'Completa el Memorize de habilidades.', xp: 150 },
     { id: 'ritmo', ico: '🎵', nombre: 'Maestro del ritmo', desc: 'Termina Ritmo Resonancia con 70% de precisión o más.', xp: 250 },
-    { id: 'gremio', ico: '🌳', nombre: 'Maestro del gremio', desc: 'Desbloquea todas las habilidades del árbol.', xp: 200 },
+    { id: 'gremio', ico: '🌳', nombre: 'Maestro del gremio', desc: 'Completa el árbol de habilidades o domina tu especialidad en el modo arcade.', xp: 200 },
     { id: 'cv', ico: '📜', nombre: 'Pergamino obtenido', desc: 'Descarga el CV.', xp: 100 },
     { id: 'contacto', ico: '🕊️', nombre: 'Mensajero', desc: 'Abre uno de los canales de contacto.', xp: 75 },
     { id: 'konami', ico: '🐉', nombre: 'Código ancestral', desc: 'Descubre el código secreto.', xp: 150 },
@@ -109,14 +109,19 @@
 
   // ---------------------------------------------------------- modal de logros
   const modal = $('#modal-logros');
-  const abrirLogros = () => { pintarLogros(); modal.hidden = false; $('#cerrar-logros').focus(); };
+  const abrirLogros = () => { pintarLogros(); $('#confirma-reinicio').hidden = true; $('#reiniciar-progreso').hidden = false; modal.hidden = false; $('#cerrar-logros').focus(); };
   const cerrarLogros = () => { modal.hidden = true; $('#btn-logros').focus(); };
   $('#btn-logros').addEventListener('click', abrirLogros);
   $('#cerrar-logros').addEventListener('click', cerrarLogros);
   modal.addEventListener('click', e => { if (e.target === modal) cerrarLogros(); });
-  $('#reiniciar-progreso').addEventListener('click', () => {
-    if (!confirm('¿Reiniciar tu experiencia y logros?')) return;
+  // confirmación dentro del panel (en vez del cuadro del navegador)
+  const confirma = $('#confirma-reinicio'), btnReiniciar = $('#reiniciar-progreso');
+  const pedirConfirmacion = si => { confirma.hidden = !si; btnReiniciar.hidden = si; (si ? $('#reinicio-no') : btnReiniciar).focus(); };
+  btnReiniciar.addEventListener('click', () => pedirConfirmacion(true));
+  $('#reinicio-no').addEventListener('click', () => pedirConfirmacion(false));
+  $('#reinicio-si').addEventListener('click', () => {
     estado = { xp: 0, logros: [], zonas: [], extra: {} }; guardar(); pintarHUD(); pintarLogros();
+    pedirConfirmacion(false); toast('↺', 'Progreso reiniciado', 'COMIENZAS DE NUEVO');
   });
 
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && !modal.hidden) cerrarLogros(); });

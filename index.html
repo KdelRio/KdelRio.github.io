@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Geist:wght@400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/estilos.css?v=20260927conf">
+  <link rel="stylesheet" href="css/estilos.css?v=20260927conf3">
 </head>
 <body>
 <a class="saltar" href="#contenido">Saltar al contenido</a>
@@ -410,6 +410,10 @@
     <h2 id="logros-titulo" class="titulo-chico">🏆 Logros</h2>
     <ul class="lista-logros" id="lista-logros"></ul>
     <button class="btn btn-mini" id="reiniciar-progreso">Reiniciar progreso</button>
+    <div class="confirma-reinicio" id="confirma-reinicio" hidden>
+      <p><b>¿Reiniciar tu experiencia y logros?</b> Perderás tu nivel, tu XP, los logros y el avance del modo arcade.</p>
+      <div class="fila-botones"><button type="button" class="btn btn-oro btn-mini" id="reinicio-si">Sí, reiniciar</button><button type="button" class="btn btn-linea btn-mini" id="reinicio-no">No, volver</button></div>
+    </div>
   </div>
 </div>
 <div class="toasts" id="toasts" aria-live="polite"></div>
@@ -417,7 +421,7 @@
 
 <script src="js/escena.js?v=20260927a"></script>
 <script src="js/dragon.js?v=20260927a"></script>
-<script src="js/nucleo.js?v=20260926c"></script>
+<script src="js/nucleo.js?v=20260927conf2"></script>
 <script src="js/laboratorio.js?v=20260926b"></script>
 <script src="js/gremio.js?v=20260926f"></script>
 <script src="js/ritmo.js?v=20260926c"></script>
@@ -427,6 +431,6 @@
 <script src="js/memoria.js?v=20260926"></script>
 <script src="js/arena.js?v=20260926b"></script>
 <script src="js/sala.js?v=20260927pj"></script>
-<script src="js/arcade.js?v=20260927conf"></script>
+<script src="js/arcade.js?v=20260927conf2"></script>
 </body>
 </html>

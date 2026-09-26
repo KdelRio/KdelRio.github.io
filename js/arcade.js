@@ -275,7 +275,7 @@
     if (p.etapa !== 3 || !ramaCompleta(p)) return false;
     completar(3, 0, 'gremio'); pendiente = 3;
     const extra = KR.estado().extra, r = ramaDe(p);
-    extra.habilidades = [...new Set([...(extra.habilidades || []), ...r.nodos.map(nd => clave(r, nd))])]; KR.guardar();
+    extra.habilidades = [...new Set([...(extra.habilidades || []), ...r.nodos.map(nd => clave(r, nd))])]; KR.guardar(); KR.desbloquear('gremio');
     return true;
   }
   function abrirArbol(aviso) {
