@@ -66,7 +66,10 @@
     const b = capa.querySelector('button'); b && b.focus({ preventScroll: true });
   }
   function limpiarClon(n) { n.querySelectorAll('.revelar').forEach(x => x.classList.remove('revelar')); n.classList.remove('revelar'); return n; }
+  let pendiente = null;                                     // barrera a abrir al volver (misión completada en un panel)
   function volverAldea(barrera) {
+    if (barrera === undefined && pendiente !== null) barrera = pendiente;
+    pendiente = null;
     mostrar('aldea');
     if (barrera !== undefined) setTimeout(() => { KRAldea.abrirBarrera(barrera); KRAldea.avisar('¡Misión completada! La barrera mágica se abrió', 200); }, 350);
   }
@@ -114,7 +117,9 @@
       <div class="pn-contenido"></div>
       <div class="fila-botones centro"><button type="button" class="btn btn-oro" data-seguir>Continuar la aventura ▶</button></div></div>`);
     capa.querySelector('.pn-contenido').append(limpiarClon($('#estudio .estudio-grid').cloneNode(true)), limpiarClon($('#estudio .disciplinas').cloneNode(true)));
-    capa.querySelector('[data-seguir]').onclick = () => { completar(0, 3, 'estudio'); volverAldea(0); };
+    if (prog().etapa === 0) pendiente = 0;
+    completar(0, 3, 'estudio');
+    capa.querySelector('[data-seguir]').onclick = () => volverAldea();
   }
 
   // ---------------------------------------------------------- misión 2: Arena del Dato + informe
@@ -128,7 +133,7 @@
         nuevo = T.olasSuperadas > (p.record || 0); if (nuevo) p.record = T.olasSuperadas; KR.guardar();
         KR.sumarXP(10 + T.olasSuperadas * 10, nuevo ? `Nuevo récord: ${T.olasSuperadas} oleadas superadas` : `Oleadas infinitas: ${T.olasSuperadas} superadas`);
       } else {
-        if (!p.premios[1]) { puntos = gano ? 25 : 22; completar(1, puntos, 'datos'); }
+        if (!p.premios[1]) { puntos = gano ? 25 : 22; if (p.etapa === 1) pendiente = 1; completar(1, puntos, 'datos'); }
         else { puntos = Math.floor(derrotas / (gano ? 4 : 6)); p.ph += puntos; KR.guardar(); }
         KR.sumarXP(gano ? 40 : 15, gano ? 'Arena del Dato superada' : 'Datos de combate registrados');
       }
@@ -136,7 +141,7 @@
       KRInforme.construir(capa, T, {
         puntos, infinito, record: p.record || 0, nuevo,
         alMagic: () => window.open('?clasico#datos', '_blank', 'noopener'),
-        alContinuar: () => volverAldea(infinito ? undefined : 1),
+        alContinuar: () => volverAldea(),
         alReintentar: () => iniciarBatalla(infinito),
       });
     }, { bonos: bonos(), infinito, record: p.record || 0 });
@@ -185,15 +190,24 @@
     if (!ritmo) ritmo = KRCrearRitmo(CV.ritmo, {
       activo: () => actual === 'ritmo' && !ritmoPausado && !maquina.hidden,
       alTerminar: st => {
+        if (prog().etapa === 2) pendiente = 2;
+        completar(2, 3, 'arcade');
         flotante.innerHTML = `<p><b>¡Canción completada!</b> Precisión ${Math.round(st.precision * 100)}% · ${st.puntos} puntos</p><div class="fila-botones centro"><button type="button" class="btn btn-oro" data-seguir>Continuar la aventura ▶</button></div>`;
         flotante.hidden = false;
-        flotante.querySelector('[data-seguir]').onclick = () => { completar(2, 3, 'arcade'); volverAldea(2); };
+        flotante.querySelector('[data-seguir]').onclick = () => volverAldea();
       },
     });
     mostrar('ritmo');
   }
 
   // ---------------------------------------------------------- misión 4: mapa del árbol de habilidades
+  function revisarArbol() {                                  // la misión se cumple apenas el árbol está completo
+    const p = prog();
+    if (p.etapa !== 3 || p.arbol.length < TOTAL) return false;
+    completar(3, 0, 'gremio'); pendiente = 3;
+    const extra = KR.estado().extra; extra.habilidades = RAMAS.flatMap(r => r.nodos.map(nd => clave(r, nd))); KR.guardar(); KR.desbloquear('gremio');
+    return true;
+  }
   let nodoSel = null;
   function abrirArbol() {
     const p = prog(), cx = 480, cy = 540, n = RAMAS.length;
@@ -235,7 +249,7 @@
       const x = nodos.find(z => z.k === el.dataset.k);
       const accion = () => {
         if (nodoSel === x.k && x.disp && p.ph > 0) {
-          p.arbol.push(x.k); p.ph--; KR.guardar(); KR.sumarXP(10); KR.beep([[523, .05], [784, .09]]);
+          p.arbol.push(x.k); p.ph--; KR.guardar(); KR.sumarXP(10); KR.beep([[523, .05], [784, .09]]); revisarArbol();
           nodoSel = x.k; abrirArbol();
           if (prog().arbol.length >= TOTAL) KR.beep([[523, .1], [659, .1], [784, .1], [1047, .3]]);
           return;
@@ -249,11 +263,7 @@
     capa.onclick = e => {
       if (e.target.closest('[data-cerrar]')) volverAldea();
       if (e.target.closest('[data-entrenar]')) iniciarBatalla(false);
-      if (e.target.closest('[data-seguir]')) {
-        completar(3, 0, 'gremio');
-        const extra = KR.estado().extra; extra.habilidades = RAMAS.flatMap(r => r.nodos.map(nd => clave(r, nd))); KR.guardar(); KR.desbloquear('gremio');
-        volverAldea(3);
-      }
+      if (e.target.closest('[data-seguir]')) { revisarArbol(); volverAldea(); }
     };
   }
 
@@ -394,6 +404,7 @@
   }
   function iniciarJuego() {
     KR.desbloquear('start');
+    revisarArbol(); pendiente = null;
     const p = prog(); KRAldea.fijar({ etapa: p.etapa, fragmentos: p.fragmentos, x: p.x });
     pantalla.classList.add('encendido'); setTimeout(() => pantalla.classList.remove('encendido'), 700);
     mostrar('aldea');
