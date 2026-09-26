@@ -396,7 +396,7 @@ kbd {
 .maquina.enfocada .sala { opacity: 0; }   /* al acercar, las bandas laterales quedan negras como el marco de un arcade */
 
 .gabinete {
-  --pw: min(86vw, calc((100vh - 390px) * 16 / 9), 1200px);
+  --pw: min(86vw, max(calc((100vh - 390px) * 16 / 9), calc(70vh * 16 / 9)), 1200px);   /* mínimo: pantallas bajas como un celular en horizontal */
   position: relative; width: calc(var(--pw) + 84px); transform-origin: 0 0;
   display: flex; flex-direction: column; align-items: center;
   filter: drop-shadow(0 12px 0 rgba(0, 0, 0, .45));                      /* sombra dura, sin desenfoque */
@@ -952,4 +952,39 @@ kbd {
   .hud { backdrop-filter: none; background: rgba(5, 14, 29, .97); }
   .escena-tinte { display: none; }
   .plano { will-change: auto; }
+}
+
+/* --------------------------------------------------------------- celular: gira tu celular */
+.girar { position: fixed; inset: 0; z-index: 300; display: grid; place-content: center; justify-items: center; gap: 14px; padding: 24px; text-align: center; background: #070a1f; }
+.girar[hidden] { display: none; }
+.girar-titulo { margin: 26px 0 0; font: 1rem/1.4 var(--pixel); color: #ffd400; text-shadow: 0 0 10px rgba(255, 212, 0, .5); }
+.girar-texto { margin: 0; max-width: 22em; color: var(--suave); }
+.girar-telefono { width: 44px; height: 76px; border: 4px solid var(--oro-2); border-radius: 8px; position: relative; animation: girar-tel 2.4s ease-in-out infinite; }
+.girar-telefono i { position: absolute; left: 50%; bottom: 4px; width: 8px; height: 4px; margin-left: -4px; background: var(--oro-2); }
+@keyframes girar-tel { 0%, 20% { transform: rotate(0); } 55%, 100% { transform: rotate(-90deg); } }
+@media (prefers-reduced-motion: reduce) { .girar-telefono { animation: none; transform: rotate(-90deg); } }
+
+/* --------------------------------------------------------------- celular: controles transparentes sobre el juego */
+.controles-tactiles { position: fixed; inset: 0; z-index: 220; pointer-events: none; }
+.controles-tactiles[hidden] { display: none; }
+.analogo, .tb, .tb-pausa { pointer-events: auto; touch-action: none; -webkit-tap-highlight-color: transparent; user-select: none; }
+.analogo {
+  position: absolute; left: max(22px, env(safe-area-inset-left)); bottom: 22px; width: 132px; height: 132px; border-radius: 50%;
+  background: rgba(255, 255, 255, .06); border: 2px solid rgba(255, 255, 255, .28); box-shadow: inset 0 0 0 10px rgba(255, 255, 255, .03);
+}
+.analogo-perilla {
+  position: absolute; left: 50%; top: 50%; width: 56px; height: 56px; margin: -28px 0 0 -28px; border-radius: 50%;
+  background: rgba(255, 255, 255, .22); border: 2px solid rgba(255, 255, 255, .5); transition: transform .08s ease-out;
+}
+.tactil-botones { position: absolute; right: max(22px, env(safe-area-inset-right)); bottom: 22px; display: grid; grid-template-columns: auto auto; grid-template-rows: 44px auto; gap: 0 16px; }
+.tb {
+  width: 70px; height: 70px; border-radius: 50%; cursor: pointer; font: 1.1rem/1 var(--pixel); color: rgba(255, 255, 255, .85);
+  background: rgba(255, 255, 255, .08); border: 2px solid rgba(255, 255, 255, .35); text-shadow: 0 2px 4px rgba(0, 0, 0, .6);
+}
+.tb-a { grid-row: 1 / span 2; align-self: start; border-color: rgba(243, 210, 127, .7); color: rgba(255, 241, 168, .95); }
+.tb-b { grid-row: 2; border-color: rgba(126, 200, 255, .7); color: rgba(196, 235, 255, .95); }
+.tb.pulsado { background: rgba(255, 255, 255, .28); transform: scale(.94); }
+.tb-pausa {
+  position: absolute; top: 12px; right: max(14px, env(safe-area-inset-right)); width: 42px; height: 42px; border-radius: 10px; cursor: pointer;
+  font: .7rem/1 var(--pixel); color: rgba(255, 255, 255, .8); background: rgba(255, 255, 255, .08); border: 2px solid rgba(255, 255, 255, .3);
 }

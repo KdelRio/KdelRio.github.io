@@ -19,7 +19,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Geist:wght@400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/estilos.css?v=20260927movil">
+  <link rel="stylesheet" href="css/estilos.css?v=20260927tactil2">
 </head>
 <body>
 <a class="saltar" href="#contenido">Saltar al contenido</a>
@@ -50,6 +50,22 @@
 <!-- ============================================================ MÁQUINA ARCADE -->
 <div id="maquina" class="maquina" role="dialog" aria-modal="true" aria-label="Portafolio en modo arcade">
   <div class="sala" aria-hidden="true"></div>
+  <!-- celular: pedir horizontal antes de jugar -->
+  <div class="girar" id="girar" hidden>
+    <div class="carga-dragon" aria-hidden="true"></div>
+    <div class="girar-telefono" aria-hidden="true"><i></i></div>
+    <p class="girar-titulo">GIRA TU CELULAR</p>
+    <p class="girar-texto">Para vivir la experiencia interactiva, ponlo en horizontal. El juego empieza solo.</p>
+  </div>
+  <!-- celular: controles transparentes sobre el juego -->
+  <div class="controles-tactiles" id="controles-tactiles" hidden>
+    <div class="analogo" id="analogo" aria-label="Palanca para moverte"><div class="analogo-perilla"></div></div>
+    <div class="tactil-botones">
+      <button type="button" class="tb tb-b" data-tactil="e" aria-label="Botón B: acción">B</button>
+      <button type="button" class="tb tb-a" data-tactil=" " aria-label="Botón A: saltar o atacar">A</button>
+    </div>
+    <button type="button" class="tb-pausa" data-tactil="Escape" aria-label="Pausa">II</button>
+  </div>
   <div class="gabinete" id="gabinete">
     <div class="marquesina"><img src="assets/img/conari-wordmark.png" alt="Studios Conari"><span>ARCADE</span></div>
     <div class="bisel">
@@ -444,6 +460,6 @@
 <script src="js/memoria.js?v=20260926"></script>
 <script src="js/arena.js?v=20260926b"></script>
 <script src="js/sala.js?v=20260927pj"></script>
-<script src="js/arcade.js?v=20260927movil"></script>
+<script src="js/arcade.js?v=20260927tactil"></script>
 </body>
 </html>

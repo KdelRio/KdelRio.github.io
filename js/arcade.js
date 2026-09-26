@@ -504,6 +504,7 @@
     if (creditos === 0 && !monedas.length) { rechazo = 30; KR.beep([[150, .15]]); return; }
     if (creditos === 0) return;
     destino = OPCIONES[eleccion][2];
+    if (tactil && destino === 'interactivo') pedirHorizontal();
     creditos--; arranque = 100; KR.beep([[523, .08], [659, .08], [784, .08], [1047, .08], [1319, .25]]);
   }
 
@@ -522,10 +523,11 @@
   }
   function acercar() {
     fase = 'acercando';
-    if (tactil) { if (destino === 'clasico') return abrirClasico(); fase = 'juego'; iniciarJuego(); return; }
+    if (tactil && destino === 'clasico') return abrirClasico();
     maquina.classList.add('enfocada'); enfocar(true);
     setTimeout(() => {
       if (destino === 'clasico') return abrirClasico();
+      if (tactil) return esperarHorizontal(() => { fase = 'juego'; iniciarJuego(); });
       fase = 'juego'; iniciarJuego();
     }, 1650);
   }
@@ -547,6 +549,62 @@
     }, 450);                                                       // un instante con el borde negro, como en el juego
     setTimeout(() => marco.remove(), 450 + 1100);
   }
+  // ---------------------------------------------------------- celular: horizontal y controles táctiles
+  const girar = $('#girar'), controles = $('#controles-tactiles');
+  const horizontal = matchMedia('(orientation: landscape)');
+  function pedirHorizontal() {                                   // Android: pantalla completa y giro automático; iOS lo ignora
+    try {
+      const el = document.documentElement, fs = el.requestFullscreen || el.webkitRequestFullscreen;
+      const p = fs && fs.call(el, { navigationUI: 'hide' });
+      Promise.resolve(p).then(() => screen.orientation && screen.orientation.lock && screen.orientation.lock('landscape')).catch(() => {});
+    } catch (e) { /* sin pantalla completa */ }
+  }
+  function esperarHorizontal(listo) {
+    if (horizontal.matches) return listo();
+    girar.hidden = false;
+    const alGirar = () => {
+      if (!horizontal.matches) return;
+      horizontal.removeEventListener('change', alGirar);
+      setTimeout(() => { girar.hidden = true; enfocar(false); listo(); }, 350);   // espera a que el navegador termine de girar
+    };
+    horizontal.addEventListener('change', alGirar);
+  }
+  // si en pleno juego vuelve a vertical, se pide girar de nuevo
+  horizontal.addEventListener('change', () => { if (tactil && fase === 'juego') { girar.hidden = horizontal.matches; if (horizontal.matches) setTimeout(() => enfocar(false), 350); } });
+
+  // teclas virtuales: llegan al lienzo del juego activo, igual que los botones del gabinete
+  const enviarTecla = (tipo, k) => ((fase === 'juego' && capa.hidden && CV[actual]) ? CV[actual] : document).dispatchEvent(new KeyboardEvent(tipo, { key: k, bubbles: true }));
+  // palanca analógica: 8 direcciones a partir del ángulo del dedo
+  const analogo = $('#analogo'), perilla = analogo.querySelector('.analogo-perilla');
+  let dedo = null, activas = new Set();
+  function moverPalanca(e) {
+    const r = analogo.getBoundingClientRect(), R = r.width / 2;
+    let dx = e.clientX - (r.left + R), dy = e.clientY - (r.top + R);
+    const d = Math.hypot(dx, dy); if (d > R) { dx *= R / d; dy *= R / d; }
+    perilla.style.transform = `translate(${dx}px, ${dy}px)`;
+    const u = R * .35, nuevas = new Set();
+    if (dx < -u) nuevas.add('ArrowLeft'); if (dx > u) nuevas.add('ArrowRight');
+    if (dy < -u) nuevas.add('ArrowUp'); if (dy > u) nuevas.add('ArrowDown');
+    activas.forEach(k => { if (!nuevas.has(k)) enviarTecla('keyup', k); });
+    nuevas.forEach(k => { if (!activas.has(k)) enviarTecla('keydown', k); });
+    activas = nuevas;
+  }
+  function soltarPalanca() { dedo = null; perilla.style.transform = ''; activas.forEach(k => enviarTecla('keyup', k)); activas = new Set(); }
+  analogo.addEventListener('pointerdown', e => { e.preventDefault(); dedo = e.pointerId; analogo.setPointerCapture(dedo); moverPalanca(e); });
+  analogo.addEventListener('pointermove', e => { if (e.pointerId === dedo) moverPalanca(e); });
+  ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(ev => analogo.addEventListener(ev, e => { if (e.pointerId === dedo) soltarPalanca(); }));
+  $$('[data-tactil]', controles).forEach(b => {
+    const k = b.dataset.tactil;
+    b.addEventListener('pointerdown', e => { e.preventDefault(); b.classList.add('pulsado'); if (k === 'Escape') escape(); else enviarTecla('keydown', k); });
+    ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => b.addEventListener(ev, () => { if (!b.classList.contains('pulsado')) return; b.classList.remove('pulsado'); if (k !== 'Escape') enviarTecla('keyup', k); }));
+  });
+  // los controles solo se ven jugando en horizontal (aldea y arena), no sobre paneles ni en Ritmo, que se toca en los carriles
+  if (tactil) (function vigilar() {
+    const ver = fase === 'juego' && !maquina.hidden && capa.hidden && girar.hidden && horizontal.matches && (actual === 'aldea' || actual === 'batalla');
+    if (controles.hidden === ver) { controles.hidden = !ver; if (!ver) soltarPalanca(); }
+    requestAnimationFrame(vigilar);
+  })();
+
   function iniciarJuego() {
     KR.desbloquear('start');
     revisarArbol(); pendiente = null;
@@ -567,6 +625,8 @@
     capa.hidden = true; panelTipo = null;
     maquina.hidden = true; document.body.classList.remove('bloqueado'); fase = 'cerrada';
     maquina.classList.remove('enfocada'); gab.style.transition = 'none'; gab.style.transform = 'none';
+    girar.hidden = true;
+    if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {});
   }
   addEventListener('resize', () => { if (maquina.classList.contains('enfocada')) enfocar(false); });   // mantiene el acercamiento al cambiar el tamaño
 
