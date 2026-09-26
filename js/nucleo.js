@@ -13,7 +13,7 @@
     { id: 'filtro', ico: '🔍', nombre: 'Filtro en mano', desc: 'Usa un filtro del laboratorio de análisis.', xp: 75 },
     { id: 'analista', ico: '📊', nombre: 'Analista certificado', desc: 'Responde correctamente las tres preguntas del desafío.', xp: 200 },
     { id: 'bilingue', ico: '⚖️', nombre: 'Bilingüe en BI', desc: 'Compara un dashboard entre Power BI y Tableau.', xp: 100 },
-    { id: 'mazmorra', ico: '👑', nombre: 'Cazador de reyes', desc: 'Derrota al Rey Slime en la Mini Mazmorra.', xp: 250 },
+    { id: 'memoria', ico: '🧠', nombre: 'Memoria de analista', desc: 'Completa el Memorize de habilidades.', xp: 150 },
     { id: 'ritmo', ico: '🎵', nombre: 'Maestro del ritmo', desc: 'Termina Ritmo Resonancia con 70% de precisión o más.', xp: 250 },
     { id: 'gremio', ico: '🌳', nombre: 'Maestro del gremio', desc: 'Desbloquea todas las habilidades del árbol.', xp: 200 },
     { id: 'cv', ico: '📜', nombre: 'Pergamino obtenido', desc: 'Descarga el CV.', xp: 100 },
@@ -51,7 +51,7 @@
     $('#hud-nivel').textContent = nv;
     $('#hud-xp').style.width = (dentro / XP_NIVEL * 100) + '%';
     $('#hud-xp-texto').textContent = `${estado.xp} XP · ${TITULOS[Math.min(nv - 1, TITULOS.length - 1)]}`;
-    $('#hud-logros').textContent = estado.logros.length;
+    $('#hud-logros').textContent = estado.logros.filter(id => LOGROS.some(l => l.id === id)).length;
     $('#hud-logros-total').textContent = LOGROS.length;
   }
 

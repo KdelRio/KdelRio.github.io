@@ -10,38 +10,58 @@
   const gab = $('#gabinete'), pantalla = $('#pantalla'), capa = $('#capa-panel');
   const CV = { portada: $('#portada-canvas'), aldea: $('#aldea-canvas'), batalla: $('#batalla-canvas'), ritmo: $('#ritmo-arcade-canvas') };
   const RAMAS = window.KR_HABILIDADES ? KR_HABILIDADES.RAMAS : [];
-  const TOTAL = RAMAS.reduce((a, r) => a + r.nodos.length, 0);
   const clave = (r, n) => r.nombre + '·' + n[0];
-  // cada rama del árbol mejora una estadística de combate (mismo orden que en gremio.js)
+  // cada rama del árbol es una especialidad: sus habilidades suben una estadística
+  // y el nivel (1 a 3) de una habilidad de combate propia (mismo orden que en gremio.js)
   const BONO_RAMA = [
-    { ico: '⚔️', nombre: 'Ataque', txt: () => '+0,25 de daño en cada golpe' },
-    { ico: '⚡', nombre: 'Energía', txt: () => '+10 de energía máxima y recarga 8% más rápida' },
-    { ico: '💨', nombre: 'Rapidez', txt: () => 'Ataques más seguidos y +3% de velocidad de movimiento' },
-    { ico: '🤖', nombre: 'Dron de datos', txt: j => ['Un dron aliado dispara solo a los enemigos', 'El dron dispara más seguido', 'El dron hace 50% más daño'][j] },
-    { ico: '❤️', nombre: 'Vida', txt: () => '+1 corazón de vida máxima' },
-    { ico: '🛡️', nombre: 'Escudo', txt: () => '+12% de probabilidad de bloquear un golpe y más invulnerabilidad' },
-    { ico: '✚', nombre: 'Curación', txt: j => j === 3 ? 'Regeneras 1 corazón cada 20 segundos' : '+6% de probabilidad de que los enemigos suelten corazones' },
+    { ico: '⚔️', nombre: 'Ataque', txt: '+0,25 de daño en cada golpe' },
+    { ico: '⚡', nombre: 'Energía', txt: '+10 de energía máxima y recarga 8% más rápida' },
+    { ico: '💨', nombre: 'Rapidez', txt: 'ataques más seguidos y +3% de velocidad' },
+    { ico: '⚡', nombre: 'Energía', txt: '+10 de energía máxima y recarga 8% más rápida' },
+    { ico: '❤️', nombre: 'Vida', txt: '+1 corazón de vida máxima' },
+    { ico: '🛡️', nombre: 'Bloqueo', txt: '+12% de probabilidad de bloquear un golpe' },
+    { ico: '✚', nombre: 'Curación', txt: '+6% de probabilidad de que los enemigos suelten corazones' },
   ];
+  const ESPECIALIDADES = [
+    { hab: 'Gráfico de torta', desc: 'Gráficos de torta giran a tu alrededor y golpean a los enemigos que tocan.', niveles: ['1 gráfico en órbita', '2 gráficos y giro más rápido', '3 gráficos con más daño'] },
+    { hab: 'Compañero pixel', desc: 'Un compañero pixel art pelea a tu lado desde el primer segundo.', niveles: ['ataca cada 0,7 s', 'ataca cada 0,5 s', 'ataca cada 0,4 s con más daño'] },
+    { hab: 'Escudo de código', desc: 'Líneas de código verde te rodean y absorben golpes completos. Se recargan solas.', niveles: ['1 carga de escudo', '2 cargas y recarga más rápida', '3 cargas, recarga cada 5 s'] },
+    { hab: 'Robot de IA', desc: 'Un robot vuela contigo y dispara al enemigo más cercano.', niveles: ['dispara cada 1,4 s', 'dispara cada 1 s', 'dispara cada 0,7 s con más daño'] },
+    { hab: 'Invocar esqueletos', desc: 'No usas espada: cada ataque invoca un esqueleto que pelea por ti durante 11 s.', niveles: ['hasta 2 esqueletos', 'hasta 3 esqueletos', 'hasta 4 esqueletos'] },
+    { hab: 'Aura de interferencia', desc: 'Cada pocos segundos emites un aura que confunde a los enemigos cercanos: se golpean entre ellos.', niveles: ['cada 10 s, confunde 4 s', 'cada 8 s, confunde 5 s', 'cada 6 s, confunde 6 s'] },
+    { hab: 'Toma de mando', desc: 'Cada cierto tiempo, el enemigo más cercano pasa a tu lado y pelea por ti.', niveles: ['cada 11 s, durante 8 s', 'cada 9 s, durante 10 s', 'cada 7 s, durante 12 s'] },
+  ];
+  const ramaDe = p => (p.esp === null || p.esp === undefined) ? null : RAMAS[p.esp];
+  const aprendidas = p => { const r = ramaDe(p); return r ? r.nodos.filter(nd => p.arbol.includes(clave(r, nd))).length : 0; };
+  const ramaCompleta = p => { const r = ramaDe(p); return !!r && aprendidas(p) >= r.nodos.length; };
+  function nivelEsp(p) {
+    const r = ramaDe(p), n = aprendidas(p); if (!r || !n) return 0;
+    return n >= r.nodos.length ? 3 : n >= Math.ceil(r.nodos.length / 2) ? 2 : 1;
+  }
   function bonos() {
-    const p = prog(), n = RAMAS.map(r => r.nodos.filter(nd => p.arbol.includes(clave(r, nd))).length).concat([0, 0, 0, 0, 0, 0, 0]);
-    return { ataque: 1 + n[0] * .25, energiaMax: 60 + n[1] * 10, regen: .12 * (1 + n[1] * .08), cd: 18 - n[2] * 2, vel: 1.45 * (1 + n[2] * .03), dron: n[3], vidaMax: 8 + n[4], bloqueo: n[5] * .12, invul: n[5] * 10, cura: .14 + n[6] * .06, regenVida: n[6] >= 4 };
+    const p = prog(), n = [0, 0, 0, 0, 0, 0, 0]; if (ramaDe(p)) n[p.esp] = aprendidas(p);
+    const en = n[1] + n[3];
+    return { ataque: 1 + n[0] * .25, energiaMax: 60 + en * 10, regen: .12 * (1 + en * .08), cd: 18 - n[2] * 2, vel: 1.45 * (1 + n[2] * .03), vidaMax: 8 + n[4], bloqueo: n[5] * .12, invul: n[5] * 10, cura: .14 + n[6] * .06, regenVida: n[6] >= 4, esp: ramaDe(p) ? p.esp : -1, nivel: nivelEsp(p) };
   }
   function resumenBonos() {
-    const b = bonos();
-    return `<ul class="stats-juego"><li>⚔️ Ataque <b>${b.ataque.toFixed(2).replace('.', ',')}</b></li><li>❤️ Vida <b>${b.vidaMax}</b></li><li>⚡ Energía <b>${b.energiaMax}</b></li><li>💨 Cadencia <b>${b.cd}</b></li><li>🤖 Dron <b>${b.dron ? 'nv. ' + b.dron : '-'}</b></li><li>🛡️ Bloqueo <b>${Math.round(b.bloqueo * 100)}%</b></li><li>✚ Curación <b>${Math.round(b.cura * 100)}%${b.regenVida ? ' + regen.' : ''}</b></li></ul>`;
+    const b = bonos(), e = ESPECIALIDADES[b.esp];
+    return `${e ? `<p class="esp-linea">✦ <b>${e.hab}</b>, nivel ${b.nivel} de 3</p>` : ''}<ul class="stats-juego"><li>⚔️ Ataque <b>${b.ataque.toFixed(2).replace('.', ',')}</b></li><li>❤️ Vida <b>${b.vidaMax}</b></li><li>⚡ Energía <b>${b.energiaMax}</b></li><li>💨 Cadencia <b>${b.cd}</b></li><li>🛡️ Bloqueo <b>${Math.round(b.bloqueo * 100)}%</b></li><li>✚ Curación <b>${Math.round(b.cura * 100)}%${b.regenVida ? ' + regen.' : ''}</b></li></ul>`;
   }
 
   // ---------------------------------------------------------- progreso de la partida (persistente)
   function prog() {
     const e = KR.estado().extra;
-    if (!e.arcade) e.arcade = { etapa: 0, ph: 0, fragmentos: [false, false, false], arbol: [], x: 44, premios: {} };
-    return e.arcade;
+    if (!e.arcade) e.arcade = { v: 2, etapa: 0, ph: 0, esp: null, fragmentos: [false, false, false], arbol: [], x: 44, premios: {} };
+    const p = e.arcade;
+    // partidas guardadas con el árbol anterior (31 habilidades): se elige especialidad y se aprende una habilidad por misión cumplida
+    if (p.v !== 2) { p.v = 2; p.esp = null; p.arbol = []; p.ph = Math.min(p.etapa, 3); }
+    return p;
   }
   const MISIONES = [
     { titulo: 'MISIÓN 1/5 · CASTILLO CONARI', texto: p => { const n = p.fragmentos.filter(Boolean).length; return n < 3 ? `Recupera los fragmentos del emblema Conari (${n}/3)` : 'Entra al Castillo Conari: pulsa E en el portón'; } },
     { titulo: 'MISIÓN 2/5 · TORRE DEL DATO', texto: () => 'Entra a la torre y supera las 3 oleadas de la Arena del Dato' },
     { titulo: 'MISIÓN 3/5 · ARCADE DEL DRAGÓN', texto: () => 'Entra al arcade: completa el Memorize y Ritmo Resonancia' },
-    { titulo: 'MISIÓN 4/5 · GREMIO', texto: p => `Presiona H y sube todas las ramas del árbol (${p.arbol.length}/${TOTAL})` },
+    { titulo: 'MISIÓN 4/5 · GREMIO', texto: p => { const r = ramaDe(p); return r ? `Entra al Gremio o presiona H y domina tu especialidad (${aprendidas(p)}/${r.nodos.length})` : 'Entra al Gremio'; } },
     { titulo: 'MISIÓN 5/5 · BIBLIOTECA', texto: () => 'Presiona P para abrir la hoja de personaje' },
   ];
 
@@ -70,6 +90,9 @@
   function volverAldea(barrera) {
     if (barrera === undefined && pendiente !== null) barrera = pendiente;
     pendiente = null;
+    const p = prog();
+    if (p.etapa >= 1 && !ramaDe(p)) return elegirEspecialidad(() => volverAldea(barrera));     // tras la misión 1
+    if (p.ph > 0 && ramaDe(p) && !ramaCompleta(p)) return subirPendientes(() => volverAldea(barrera));   // cada misión enseña una habilidad
     mostrar('aldea');
     if (barrera !== undefined) setTimeout(() => { KRAldea.abrirBarrera(barrera); KRAldea.avisar('¡Misión completada! La barrera mágica se abrió', 200); }, 350);
   }
@@ -108,7 +131,7 @@
   };
   KRAldea.al.tecla = k => {
     const p = prog(); p.x = KRAldea.x;
-    if (k === 'h') return p.etapa >= 3 ? abrirArbol() : KRAldea.avisar('El mapa del árbol se desbloquea en el Gremio (misión 4)', 170);
+    if (k === 'h') return ramaDe(p) ? abrirArbol() : KRAldea.avisar('Elegirás tu especialidad al cumplir la misión 1', 170);
     if (k === 'p') return p.etapa >= 4 ? abrirFicha() : KRAldea.avisar('La hoja de personaje espera en la Biblioteca (misión 5)', 170);
   };
 
@@ -116,12 +139,12 @@
   function abrirEstudio() {
     panel('estudio', `<div class="pn">
       <p class="pn-kicker">Misión 1 · Castillo Conari</p><h2 class="pn-titulo">Studios Conari SpA</h2>
-      <p class="pn-logro">✓ Emblema restaurado · +3 puntos de habilidad</p>
+      <p class="pn-logro">✓ Emblema restaurado · +1 punto de habilidad</p>
       <div class="pn-contenido"></div>
       <div class="fila-botones centro"><button type="button" class="btn btn-oro" data-seguir>Continuar la aventura ▶</button></div></div>`);
     capa.querySelector('.pn-contenido').append(limpiarClon($('#estudio .estudio-grid').cloneNode(true)), limpiarClon($('#estudio .disciplinas').cloneNode(true)));
     if (prog().etapa === 0) pendiente = 0;
-    completar(0, 3, 'estudio');
+    completar(0, 1, 'estudio');
     capa.querySelector('[data-seguir]').onclick = () => volverAldea();
   }
 
@@ -136,8 +159,8 @@
         nuevo = T.olasSuperadas > (p.record || 0); if (nuevo) p.record = T.olasSuperadas; KR.guardar();
         KR.sumarXP(10 + T.olasSuperadas * 10, nuevo ? `Nuevo récord: ${T.olasSuperadas} oleadas superadas` : `Oleadas infinitas: ${T.olasSuperadas} superadas`);
       } else {
-        if (!p.premios[1]) { puntos = gano ? 25 : 22; if (p.etapa === 1) pendiente = 1; completar(1, puntos, 'datos'); }
-        else { puntos = Math.floor(derrotas / (gano ? 4 : 6)); p.ph += puntos; KR.guardar(); }
+        if (!p.premios[1]) { puntos = 1; if (p.etapa === 1) pendiente = 1; completar(1, puntos, 'datos'); }
+        else { puntos = gano && !ramaCompleta(p) ? 1 : 0; p.ph += puntos; KR.guardar(); }
         KR.sumarXP(gano ? 40 : 15, gano ? 'Arena del Dato superada' : 'Datos de combate registrados');
       }
       panel('informe', '');
@@ -151,50 +174,28 @@
   }
 
   // ---------------------------------------------------------- misión 3: memorize + ritmo
-  const JUEGOS = [
-    { id: 'tower', img: 'assets/img/juegos/banner-tower.jpg', nombre: 'Dungeon Ascent', txt: 'RPG de mazmorras top-down: una torre de 10 pisos con 10 jefes y una ciudad base. Proyecto personal en Godot 4.5.' },
-    { id: 'vilu', img: 'assets/img/juegos/banner-vilu.jpg', nombre: 'VILU: El Despertar', txt: 'Primera IP original de Studios Conari: aventura narrativa 3D cooperativa inspirada en la mitología de Chile.' },
-    { id: 'origen', img: 'assets/img/juegos/banner-origen.jpg', nombre: 'Proyecto Origen', txt: 'Prototipo formativo del estudio: RPG 2D con IA enemiga, inventario, equipamiento y progresión.' },
-    { id: 'resonancia', img: 'assets/img/juegos/banner-resonancia.jpg', nombre: 'Proyecto Resonancia', txt: 'Juego de ritmo con análisis de audio, generación automática de charts y modo versus en red local.' },
-  ];
+  // el memorize de habilidades vive en js/memoria.js y se comparte con el salón de la página clásica
   function abrirMemoria() {
-    const cartas = [...JUEGOS, ...JUEGOS].map(j => j).sort(() => Math.random() - .5);
     panel('memoria', `<div class="pn pn-memoria">
-      <div class="pn-cab"><div><p class="pn-kicker">Misión 3 · Arcade del Dragón</p><h2 class="pn-titulo">Memorize del estudio</h2></div>
-      <div class="mem-marcador"><span>Movimientos <b data-mov>0</b></span><span>Pares <b data-pares>0</b>/${JUEGOS.length}</span></div></div>
-      <p class="pn-texto">Da vuelta dos cartas por turno y encuentra el par de cada juego creado por Kevin y Studios Conari.</p>
-      <div class="mem-grilla">${cartas.map((c, i) => `<button type="button" class="mem-carta" data-i="${i}" aria-label="Carta ${i + 1}, boca abajo"><span class="mem-cara mem-dorso"><img src="assets/img/logo-estrella.png" alt=""></span><span class="mem-cara mem-frente"><img src="${c.img}" alt=""></span></button>`).join('')}</div>
-      <div class="mem-info" aria-live="polite"><p>Encuentra los ${JUEGOS.length} pares para desbloquear Ritmo Resonancia.</p></div></div>`);
-    let abiertas = [], bloqueo = false, mov = 0, pares = 0;
-    const info = capa.querySelector('.mem-info');
-    capa.querySelectorAll('.mem-carta').forEach(b => b.addEventListener('click', () => {
-      if (bloqueo || b.classList.contains('abierta') || b.classList.contains('hecha')) return;
-      b.classList.add('abierta'); b.setAttribute('aria-label', cartas[+b.dataset.i].nombre); abiertas.push(b); KR.beep([[523, .03]]);
-      if (abiertas.length < 2) return;
-      mov++; capa.querySelector('[data-mov]').textContent = mov;
-      const [a, c] = abiertas, ja = cartas[+a.dataset.i], jc = cartas[+c.dataset.i];
-      if (ja.id === jc.id) {
-        a.classList.add('hecha'); c.classList.add('hecha'); abiertas = []; pares++;
-        capa.querySelector('[data-pares]').textContent = pares; KR.beep([[659, .06], [880, .1]]);
-        info.innerHTML = `<p class="mem-par"><b>¡Par encontrado! ${ja.nombre}</b> · ${ja.txt}</p>`;
-        if (pares === JUEGOS.length) {
-          const p = prog(); if (!p.premios.memoria) { p.premios.memoria = true; p.ph += 3; KR.guardar(); }
-          info.innerHTML = `<p class="mem-par"><b>¡Memorize completado en ${mov} movimientos!</b> +3 puntos de habilidad. Ahora, al ritmo de Proyecto Resonancia.</p>
-            <div class="fila-botones centro"><button type="button" class="btn btn-oro" data-ritmo>Siguiente: Ritmo Resonancia ▶</button></div>`;
-          const bt = info.querySelector('[data-ritmo]'); bt.onclick = iniciarRitmo; bt.focus({ preventScroll: true });
-        }
-      } else {
-        bloqueo = true; KR.beep([[220, .06]]);
-        setTimeout(() => { a.classList.remove('abierta'); c.classList.remove('abierta'); a.setAttribute('aria-label', 'Carta boca abajo'); c.setAttribute('aria-label', 'Carta boca abajo'); abiertas = []; bloqueo = false; }, 850);
+      <div class="pn-cab"><div><p class="pn-kicker">Misión 3 · Arcade del Dragón</p><h2 class="pn-titulo">Memorize de habilidades</h2></div></div>
+      <p class="pn-texto">Encuentra los pares de las disciplinas de Kevin para desbloquear Ritmo Resonancia.</p>
+      <div class="mem" data-memoria></div></div>`);
+    KRMemoria.montar(capa.querySelector('[data-memoria]'), {
+      alCompletar: (mov, info) => {
+        const p = prog(); if (!p.premios.memoria) { p.premios.memoria = true; p.ph += 1; KR.guardar(); }
+        KR.desbloquear('memoria');
+        info.innerHTML = `<p class="mem-par"><b>Memorize completado en ${mov} movimientos.</b> +1 punto de habilidad. Ahora, al ritmo de Proyecto Resonancia.</p>
+          <div class="fila-botones centro"><button type="button" class="btn btn-oro" data-ritmo>Siguiente: Ritmo Resonancia ▶</button></div>`;
+        const bt = info.querySelector('[data-ritmo]'); bt.onclick = iniciarRitmo; bt.focus({ preventScroll: true });
       }
-    }));
+    });
   }
   function iniciarRitmo() {
     if (!ritmo) ritmo = KRCrearRitmo(CV.ritmo, {
       activo: () => actual === 'ritmo' && !ritmoPausado && !maquina.hidden,
       alTerminar: st => {
         if (prog().etapa === 2) pendiente = 2;
-        completar(2, 3, 'arcade');
+        completar(2, 0, 'arcade');
         flotante.innerHTML = `<p><b>¡Canción completada!</b> Precisión ${Math.round(st.precision * 100)}% · ${st.puntos} puntos</p><div class="fila-botones centro"><button type="button" class="btn btn-oro" data-seguir>Continuar la aventura ▶</button></div>`;
         flotante.hidden = false;
         flotante.querySelector('[data-seguir]').onclick = () => volverAldea();
@@ -203,70 +204,85 @@
     mostrar('ritmo');
   }
 
-  // ---------------------------------------------------------- misión 4: mapa del árbol de habilidades
-  function revisarArbol() {                                  // la misión se cumple apenas el árbol está completo
+  // ---------------------------------------------------------- especialidad: elección, subidas y misión 4
+  const estrellas = n => '★'.repeat(n) + '☆'.repeat(5 - n);
+  const tarjetaHabilidad = (nd, i) => `<div class="hab-carta"><b>${nd[0]}</b> <span class="hab-estrellas" aria-label="Dominio ${nd[1]} de 5">${estrellas(nd[1])}</span><p>${nd[2]}</p><p class="bono">${BONO_RAMA[i].ico} En combate: ${BONO_RAMA[i].txt}</p></div>`;
+  function elegirEspecialidad(despues) {
+    panel('especialidad', `<div class="pn pn-esp">
+      <p class="pn-kicker">Tu camino en el reino</p><h2 class="pn-titulo">Elige tu especialidad</h2>
+      <p class="pn-texto">Cada especialidad es una rama del árbol de Kevin y trae una habilidad de combate propia. Cada misión que cumplas te enseñará una habilidad nueva de esa rama.</p>
+      <div class="esp-grilla">${RAMAS.map((r, i) => `<button type="button" class="esp-carta" data-esp="${i}"><span class="esp-ico" aria-hidden="true">${r.ico}</span><b>${r.nombre}</b><span class="esp-hab">✦ ${ESPECIALIDADES[i].hab}</span><small>${ESPECIALIDADES[i].desc}</small></button>`).join('')}</div></div>`);
+    capa.onclick = ev => {
+      const b = ev.target.closest('[data-esp]'); if (!b) return;
+      const p = prog(); p.esp = +b.dataset.esp; p.arbol = []; KR.guardar(); KR.beep([[523, .06], [659, .06], [784, .1]]);
+      despues();
+    };
+  }
+  function aprender(p) {
+    const r = ramaDe(p), nd = r && r.nodos.find(x => !p.arbol.includes(clave(r, x)));
+    if (nd) p.arbol.push(clave(r, nd));
+    return nd || null;
+  }
+  function subirPendientes(despues) {                        // la habilidad nueva se muestra sola, en una tarjeta que se lee en segundos
+    const p = prog(), antes = nivelEsp(p), nuevas = [];
+    while (p.ph > 0 && !ramaCompleta(p)) { nuevas.push(aprender(p)); p.ph--; }
+    if (ramaCompleta(p)) p.ph = 0;
+    KR.guardar();
+    if (!nuevas.length) return despues();
+    KR.sumarXP(10 * nuevas.length);
+    const r = ramaDe(p), e = ESPECIALIDADES[p.esp], ahora = nivelEsp(p);
+    panel('subida', `<div class="pn pn-subida">
+      <p class="pn-kicker">${r.ico} ${r.nombre} · ${aprendidas(p)} de ${r.nodos.length}</p>
+      <h2 class="pn-titulo">${nuevas.length > 1 ? 'Nuevas habilidades' : 'Nueva habilidad'}</h2>
+      ${nuevas.map(nd => tarjetaHabilidad(nd, p.esp)).join('')}
+      ${ahora > antes ? `<p class="subida-nivel">✦ <b>${e.hab}</b> ${antes ? 'sube a' : 'desbloqueada:'} nivel ${ahora}, ${e.niveles[ahora - 1]}.${antes ? '' : ` ${e.desc}`}</p>` : ''}
+      <div class="fila-botones centro"><button type="button" class="btn btn-oro" data-seguir>Continuar ▶</button></div></div>`);
+    KR.beep([[523, .05], [784, .09]]);
+    capa.querySelector('[data-seguir]').onclick = despues;
+  }
+  function revisarArbol() {                                  // la misión 4 se cumple al dominar la rama de tu especialidad
     const p = prog();
-    if (p.etapa !== 3 || p.arbol.length < TOTAL) return false;
+    if (p.etapa !== 3 || !ramaCompleta(p)) return false;
     completar(3, 0, 'gremio'); pendiente = 3;
-    const extra = KR.estado().extra; extra.habilidades = RAMAS.flatMap(r => r.nodos.map(nd => clave(r, nd))); KR.guardar(); KR.desbloquear('gremio');
+    const extra = KR.estado().extra, r = ramaDe(p);
+    extra.habilidades = [...new Set([...(extra.habilidades || []), ...r.nodos.map(nd => clave(r, nd))])]; KR.guardar();
     return true;
   }
-  let nodoSel = null;
-  function abrirArbol() {
-    const p = prog(), cx = 480, cy = 540, n = RAMAS.length;
-    const nodos = [];
-    RAMAS.forEach((r, i) => {
-      const a = Math.PI + Math.PI * (.09 + .82 * i / (n - 1));
-      r.nodos.forEach((nd, j) => {
-        const rr = 118 + j * 62, k = clave(r, nd), prev = j ? clave(r, r.nodos[j - 1]) : null;
-        const hecho = p.arbol.includes(k), disp = !hecho && (!prev || p.arbol.includes(prev));
-        nodos.push({ r, ri: i, nd, j, k, x: cx + Math.cos(a) * rr, y: cy + Math.sin(a) * rr * .98, hecho, disp, a });
-      });
-    });
-    const completo = p.arbol.length >= TOTAL;
-    const ramaSvg = RAMAS.map((r, i) => {
-      const suyos = nodos.filter(x => x.r === r), ult = suyos[suyos.length - 1], lx = cx + Math.cos(ult.a) * (ult.j * 62 + 160), ly = cy + Math.sin(ult.a) * (ult.j * 62 + 160) * .98;
-      const tramo = suyos.map((x, j) => { const o = j ? suyos[j - 1] : { x: cx, y: cy - 70 }; return `<line x1="${o.x}" y1="${o.y}" x2="${x.x}" y2="${x.y}" class="rama-linea ${x.hecho ? 'viva' : ''}"/>`; }).join('');
-      const bono = BONO_RAMA[i] || { ico: '', nombre: '' };
-      return tramo + `<text x="${lx}" y="${ly}" text-anchor="middle" class="rama-nombre">${r.ico} ${r.nombre}</text><text x="${lx}" y="${ly + 16}" text-anchor="middle" class="rama-bono">${bono.ico} ${bono.nombre}</text>`;
+  function abrirArbol(aviso) {
+    const p = prog(), r = ramaDe(p);
+    if (!r) return elegirEspecialidad(() => abrirArbol());
+    // al llegar al Gremio recibes los puntos justos para terminar tu rama
+    if (p.etapa === 3 && !p.premios.gremio) { p.premios.gremio = true; p.ph += r.nodos.length - aprendidas(p); KR.guardar(); }
+    const e = ESPECIALIDADES[p.esp], lvl = nivelEsp(p), completa = ramaCompleta(p);
+    const sig = r.nodos.findIndex(nd => !p.arbol.includes(clave(r, nd)));
+    const filas = r.nodos.map((nd, j) => {
+      const hecho = p.arbol.includes(clave(r, nd)), esSig = j === sig;
+      return `<li class="hab-fila ${hecho ? 'hecha' : esSig ? 'sig' : 'bloq'}"><span class="hab-estado" aria-hidden="true">${hecho ? '✓' : esSig ? '+' : '·'}</span>
+        <div><b>${nd[0]}</b> <span class="hab-estrellas" aria-label="Dominio ${nd[1]} de 5">${estrellas(nd[1])}</span>${hecho || esSig ? `<p>${nd[2]}</p>` : ''}</div>
+        ${esSig ? (p.ph > 0 ? '<button type="button" class="btn btn-oro btn-mini" data-aprender>Aprender (1 PH)</button>' : '<button type="button" class="btn btn-linea btn-mini" data-entrenar>Ganar PH en la arena</button>') : ''}</li>`;
     }).join('');
-    const nodosSvg = nodos.map(x => `<g class="nd ${x.hecho ? 'hecho' : x.disp ? 'disp' : 'bloq'}" data-k="${x.k}" tabindex="0" role="button" aria-label="${x.nd[0]}${x.hecho ? ', desbloqueada' : x.disp ? ', disponible' : ', bloqueada'}">
-      <circle cx="${x.x}" cy="${x.y}" r="16"/><text x="${x.x}" y="${x.y + 4}" text-anchor="middle">${x.hecho ? '★'.repeat(1) : x.disp ? '+' : '·'}</text></g>`).join('');
-    panel('arbol', `<div class="arbol-mapa">
-      <div class="arbol-cab"><div><p class="pn-kicker">Misión 4 · Gremio</p><h2 class="pn-titulo">Mapa del árbol de habilidades</h2></div>
-        <div class="arbol-marcador"><span class="ph">PH <b>${p.ph}</b></span><span>${p.arbol.length}/${TOTAL} habilidades</span><button type="button" class="btn btn-mini" data-cerrar>Cerrar (H)</button></div></div>
-      <svg viewBox="0 0 960 560" class="arbol-svg" role="group" aria-label="Árbol de habilidades">
-        <defs><radialGradient id="aura"><stop offset="0" stop-color="rgba(157,255,192,.25)"/><stop offset="1" stop-color="rgba(157,255,192,0)"/></radialGradient></defs>
-        <circle cx="${cx}" cy="${cy - 60}" r="${completo ? 300 : 120}" fill="url(#aura)"/>
-        <path d="M${cx - 18},560 C${cx - 10},520 ${cx - 8},500 ${cx},${cy - 70} C${cx + 8},500 ${cx + 10},520 ${cx + 18},560Z" class="tronco"/>
-        ${ramaSvg}${nodosSvg}
-      </svg>
-      <div class="arbol-detalle" aria-live="polite">${completo ? `<b>¡Todas las ramas florecieron!</b><p>Dominas el árbol completo de Kevin y tu personaje está al máximo:</p>${resumenBonos()}<button type="button" class="btn btn-oro" data-seguir>Continuar la aventura ▶</button>` : `<b>Elige una habilidad disponible (+)</b><p>Cada habilidad cuesta 1 PH y además mejora a tu personaje en combate. Tus estadísticas:</p>${resumenBonos()}`}</div></div>`);
-    const detalle = capa.querySelector('.arbol-detalle');
-    const ver = x => {
-      const est = `${'★'.repeat(x.nd[1])}${'☆'.repeat(5 - x.nd[1])}`;
-      const bono = BONO_RAMA[x.ri];
-      detalle.innerHTML = `<b>${x.r.ico} ${x.nd[0]}</b><p class="estrellas-detalle">Dominio ${x.nd[1]} de 5 · ${est}</p><p>${x.nd[2]}</p>${bono ? `<p class="bono">${bono.ico} Bonus en combate: ${bono.txt(x.j)}</p>` : ''}${x.hecho ? '<p class="ok">✓ Desbloqueada</p>' : x.disp ? (p.ph > 0 ? '<p class="ok">Pulsa otra vez o Enter para desbloquear (1 PH)</p>' : '<p class="falta">Sin puntos de habilidad.</p><button type="button" class="btn btn-mini" data-entrenar>Entrenar en la Arena del Dato (+PH)</button>') : '<p class="falta">Bloqueada: desbloquea primero la habilidad anterior de esta rama.</p>'}`;
-    };
-    capa.querySelectorAll('.nd').forEach(el => {
-      const x = nodos.find(z => z.k === el.dataset.k);
-      const accion = () => {
-        if (nodoSel === x.k && x.disp && p.ph > 0) {
-          p.arbol.push(x.k); p.ph--; KR.guardar(); KR.sumarXP(10); KR.beep([[523, .05], [784, .09]]); revisarArbol();
-          nodoSel = x.k; abrirArbol();
-          if (prog().arbol.length >= TOTAL) KR.beep([[523, .1], [659, .1], [784, .1], [1047, .3]]);
-          return;
-        }
-        nodoSel = x.k; capa.querySelectorAll('.nd.sel').forEach(z => z.classList.remove('sel')); el.classList.add('sel'); ver(x);
-      };
-      el.addEventListener('click', accion);
-      el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); accion(); } });
-      if (nodoSel === x.k) { el.classList.add('sel'); ver(x); }
-    });
-    capa.onclick = e => {
-      if (e.target.closest('[data-cerrar]')) volverAldea();
-      if (e.target.closest('[data-entrenar]')) iniciarBatalla(false);
-      if (e.target.closest('[data-seguir]')) { revisarArbol(); volverAldea(); }
+    panel('arbol', `<div class="pn pn-rama">
+      <div class="pn-cab"><div><p class="pn-kicker">${p.etapa === 3 ? 'Misión 4 · Gremio' : 'Tu especialidad'}</p><h2 class="pn-titulo">${r.ico} ${r.nombre}</h2></div>
+        <div class="arbol-marcador"><span class="ph">PH <b>${p.ph}</b></span><span>${aprendidas(p)}/${r.nodos.length}</span><button type="button" class="btn btn-mini" data-cerrar>Cerrar (H)</button></div></div>
+      ${aviso ? `<p class="subida-nivel" aria-live="polite">${aviso}</p>` : ''}
+      ${completa ? '<div class="rama-dominada"><p><b>Rama dominada.</b> Tu especialidad está al máximo.</p><button type="button" class="btn btn-oro" data-seguir>Continuar la aventura ▶</button></div>' : ''}
+      <div class="rama-grid"><ol class="hab-lista">${filas}</ol>
+        <aside class="esp-caja"><p class="esp-hab">✦ ${e.hab}</p><p>${e.desc}</p>
+          <ol class="esp-niveles">${e.niveles.map((t, k) => `<li class="${k < lvl ? 'activo' : ''}">Nivel ${k + 1}: ${t}</li>`).join('')}</ol>
+          <p class="bono">${BONO_RAMA[p.esp].ico} Cada habilidad: ${BONO_RAMA[p.esp].txt}</p>
+          ${resumenBonos()}
+        </aside></div></div>`);
+    capa.onclick = ev => {
+      if (ev.target.closest('[data-cerrar]') || ev.target.closest('[data-seguir]')) { revisarArbol(); volverAldea(); return; }
+      if (ev.target.closest('[data-entrenar]')) { iniciarBatalla(false); return; }
+      if (ev.target.closest('[data-aprender]')) {
+        const antes = nivelEsp(p), nd = aprender(p); if (!nd) return;
+        p.ph--; KR.guardar(); KR.sumarXP(10); KR.beep([[523, .05], [784, .09]]);
+        const ahora = nivelEsp(p);
+        if (ramaCompleta(p)) KR.beep([[523, .1], [659, .1], [784, .1], [1047, .3]]);
+        revisarArbol();
+        abrirArbol(`Aprendiste <b>${nd[0]}</b>.${ahora > antes ? ` ✦ ${e.hab} sube a nivel ${ahora}: ${e.niveles[ahora - 1]}.` : ''}`);
+      }
     };
   }
 
@@ -287,7 +303,7 @@
     const p = prog();
     panel('final', `<div class="pn pn-final">
       <p class="fin-titulo grande">FIN DEL JUEGO</p>
-      <p class="fin-stats"><span>Misiones <b>5/5</b></span><span>Habilidades <b>${p.arbol.length}/${TOTAL}</b></span><span>Experiencia <b>${KR.estado().xp} XP</b></span><span>Récord <b>${p.record || 0} oleadas</b></span></p>
+      <p class="fin-stats"><span>Misiones <b>5/5</b></span><span>Especialidad <b>${ramaDe(p) ? ESPECIALIDADES[p.esp].hab + ' nv. ' + nivelEsp(p) : '-'}</b></span><span>Experiencia <b>${KR.estado().xp} XP</b></span><span>Récord <b>${p.record || 0} oleadas</b></span></p>
       <div class="fin-infinito"><p><b>Desbloqueaste las oleadas infinitas.</b> Lleva tus habilidades al límite y descubre hasta dónde llegas.</p><button type="button" class="btn btn-oro" data-infinito>∞ Jugar oleadas infinitas</button></div>
       <h2 class="pn-titulo">¿Conversamos?</h2>
       <p class="pn-texto">Disponible para proyectos de análisis de datos, Business Intelligence y desarrollo de videojuegos.</p>
@@ -316,7 +332,7 @@
       ${pausaDe !== 'aldea' ? '<button type="button" class="btn btn-linea" data-aldea>Volver a la aldea</button>' : ''}
       <button type="button" class="btn btn-linea" data-nueva>Reiniciar partida</button>
       <button type="button" class="btn btn-linea" data-clasico>Ir al portafolio clásico</button></div>
-      <p class="pn-texto">Controles: A/D o flechas para moverte · Espacio para saltar o atacar · E para hablar o entrar · K o B: onda de energía en la arena · H árbol · P hoja de personaje</p></div>`);
+      <p class="pn-texto">Controles: A/D o flechas para moverte · Espacio para saltar o atacar · E para hablar o entrar · K o B: onda de energía en la arena · H especialidad · P hoja de personaje</p></div>`);
     capa.onclick = e => {
       if (e.target.closest('[data-continuar]')) continuar();
       if (e.target.closest('[data-aldea]')) volverAldea();
@@ -410,7 +426,7 @@
     revisarArbol(); pendiente = null;
     const p = prog(); KRAldea.fijar({ etapa: p.etapa, fragmentos: p.fragmentos, x: p.x });
     pantalla.classList.add('encendido'); setTimeout(() => pantalla.classList.remove('encendido'), 700);
-    mostrar('aldea');
+    volverAldea();                                          // pide la especialidad si una partida guardada aún no la tiene
     if (p.etapa === 0 && !p.fragmentos.some(Boolean)) KRAldea.avisar('Habla con Lumi, la guía, para comenzar tu aventura', 240);
   }
   function abrirMaquina() {

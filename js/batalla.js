@@ -2,8 +2,16 @@
    Arena del Dato (modo arcade): combate top-down por oleadas.
    Cada acción queda registrada como un evento (telemetría) para que el
    informe de jugabilidad la analice al terminar. Las habilidades del árbol
-   llegan como "bonos" (ataque, vida, energía, rapidez, dron, escudo, curación)
-   y existe un modo de oleadas infinitas. API: window.KRBatalla.
+   llegan como "bonos" (ataque, vida, energía, rapidez, escudo, curación) más
+   la habilidad de la especialidad elegida (B.esp, con nivel 1 a 3):
+     0 Datos y BI          gráficos de torta que orbitan y golpean
+     1 Videojuegos         compañero pixel art que pelea contigo
+     2 Software            escudo de código que absorbe golpes
+     3 IA y automatización robot que dispara proyectiles
+     4 Gestión             el ataque invoca esqueletos en vez de golpear
+     5 Infraestructura     aura periódica que confunde: los enemigos se golpean entre ellos
+     6 Liderazgo           toma el mando de un enemigo, que pelea de tu lado
+   Existe un modo de oleadas infinitas. API: window.KRBatalla.
    ========================================================================== */
 (function () {
   'use strict';
@@ -28,9 +36,11 @@
     ['golem', 'arquero', 'slime', 'murcielago', 'arquero', 'golem', 'slime', 'arquero', 'slime', 'murcielago'],
   ];
 
-  const BASE = { ataque: 1, vidaMax: 8, cd: 18, vel: 1.45, energiaMax: 60, regen: .12, dron: 0, bloqueo: 0, invul: 0, cura: .14, regenVida: false };
+  const BASE = { ataque: 1, vidaMax: 8, cd: 18, vel: 1.45, energiaMax: 60, regen: .12, bloqueo: 0, invul: 0, cura: .14, regenVida: false, esp: -1, nivel: 0 };
+  const ESP = ['Gráfico de torta', 'Compañero pixel', 'Escudo de código', 'Robot de IA', 'Invocar esqueletos', 'Aura de interferencia', 'Toma de mando'];
+  const nv = arr => arr[Math.min(3, B.nivel)];            // valor según el nivel de la especialidad (índice 1 a 3)
   let B = BASE, infinito = false, record = 0;
-  let estado = 'intro', f = 0, P, enemigos, flechas, items, efectos, ola, cola, pausa = 0, T, alTerminar = null, activo = false, raf = 0, pedido = false, finT = 0;
+  let estado = 'intro', f = 0, P, enemigos, aliados, flechas, items, efectos, ola, cola, pausa = 0, T, alTerminar = null, activo = false, raf = 0, pedido = false, finT = 0;
   const K = {};
   const MAPA = { w: 'arriba', arrowup: 'arriba', s: 'abajo', arrowdown: 'abajo', a: 'izq', arrowleft: 'izq', d: 'der', arrowright: 'der', ' ': 'atk', j: 'atk', k: 'esp', e: 'esp', shift: 'esp' };
   let pedidoEsp = false;
@@ -39,8 +49,9 @@
   function registrar(tipo, datos) { T.eventos.push(Object.assign({ t: seg(), ola: ola + 1, tipo }, datos)); }
 
   function reiniciar() {
-    f = 0; ola = 0; enemigos = []; flechas = []; items = []; efectos = []; cola = []; pausa = 0; finT = 0;
-    P = { x: WW / 2, y: (LIM.y0 + LIM.y1) / 2 + 10, r: 5, v: B.vel, hp: B.vidaMax, max: B.vidaMax, inv: 0, fx: 0, fy: 1, cd: 0, atk: 0, en: B.energiaMax, esp: 0, dronA: 0, dronCd: 60 };
+    f = 0; ola = 0; enemigos = []; aliados = []; flechas = []; items = []; efectos = []; cola = []; pausa = 0; finT = 0;
+    P = { x: WW / 2, y: (LIM.y0 + LIM.y1) / 2 + 10, r: 5, v: B.vel, hp: B.vidaMax, max: B.vidaMax, inv: 0, fx: 0, fy: 1, cd: 0, atk: 0, en: B.energiaMax, esp: 0, dronA: 0, dronCd: 60, orb: 0, escudo: nv([0, 1, 2, 3]), escudoT: 0, auraT: 240, mandoT: 300, invocaCd: 0 };
+    if (B.esp === 1) aliados.push({ tipo: 'companero', x: P.x - 14, y: P.y + 4, r: 4, v: 1.35, cd: 0, atk: 0, vida: Infinity });
     T = { inicio: 0, fin: 0, resultado: '', modo: infinito ? 'infinito' : 'mision', eventos: [], vida: [], pos: [], olas: [], distancia: 0, hpMax: B.vidaMax, bonos: B };
     balas.length = 0;
     empezarOla();
@@ -68,7 +79,7 @@
     } while (Math.hypot(x - P.x, y - P.y) < 90 && ++n < 20);
     const b = TIPOS[tipo];
     const esc = infinito ? 1 + .15 * ola : 1;
-    enemigos.push({ tipo, x, y, r: b.r, hp: b.hp * esc, hpMax: b.hp * esc, v: b.v * (infinito ? 1 + Math.min(.5, .03 * ola) : 1), kx: 0, ky: 0, fase: Math.random() * 6, portal: 36, t0: seg(), cd: 90 + Math.random() * 50, modo: 'camina', mt: 150 + Math.random() * 60, dx: 0, dy: 0, golpes: 0 });
+    enemigos.push({ tipo, x, y, r: b.r, hp: b.hp * esc, hpMax: b.hp * esc, v: b.v * (infinito ? 1 + Math.min(.5, .03 * ola) : 1), kx: 0, ky: 0, fase: Math.random() * 6, portal: 36, t0: seg(), cd: 90 + Math.random() * 50, modo: 'camina', mt: 150 + Math.random() * 60, dx: 0, dy: 0, golpes: 0, conf: 0, golpeCd: 0 });
     registrar('aparicion', { enemigo: tipo });
   }
 
@@ -94,6 +105,11 @@
   const limitar = o => { o.x = Math.max(LIM.x0 + o.r, Math.min(LIM.x1 - o.r, o.x)); o.y = Math.max(LIM.y0 + o.r, Math.min(LIM.y1 - o.r, o.y)); };
   function recibir(n, origen, via) {
     if (P.inv > 0 || estado !== 'jugando') return;
+    if (B.esp === 2 && P.escudo > 0) {                       // escudo de código: absorbe el golpe completo
+      P.escudo--; P.escudoT = 0; P.inv = 40; registrar('bloqueo', { enemigo: origen, via, fuente: 'codigo' });
+      efectos.push({ tipo: 'txt', x: P.x, y: P.y - 14, txt: 'ABSORBIDO', col: '#4ade80', t: 40 }); window.KR && KR.beep([[988, .04], [1319, .05]]);
+      return;
+    }
     if (Math.random() < B.bloqueo) {
       P.inv = 30; registrar('bloqueo', { enemigo: origen, via });
       efectos.push({ tipo: 'txt', x: P.x, y: P.y - 14, txt: 'BLOQUEO', col: '#7ec8ff', t: 40 }); window.KR && KR.beep([[880, .05]]);
@@ -122,8 +138,16 @@
     // jugador
     let dx = (K.der ? 1 : 0) - (K.izq ? 1 : 0), dy = (K.abajo ? 1 : 0) - (K.arriba ? 1 : 0);
     if (dx || dy) { const n = Math.hypot(dx, dy), x0 = P.x, y0 = P.y; P.x += dx / n * P.v; P.y += dy / n * P.v; P.fx = dx / n; P.fy = dy / n; limitar(P); T.distancia += Math.hypot(P.x - x0, P.y - y0); }
-    if (P.inv > 0) P.inv--; if (P.cd > 0) P.cd--; if (P.atk > 0) P.atk--;
-    if ((K.atk || pedido) && P.cd === 0) {
+    if (P.inv > 0) P.inv--; if (P.cd > 0) P.cd--; if (P.atk > 0) P.atk--; if (P.invocaCd > 0) P.invocaCd--;
+    if ((K.atk || pedido) && B.esp === 4) {                  // Gestión: en vez de pegar, invoca esqueletos que pelean por ti
+      pedido = false;
+      if (P.invocaCd <= 0) {
+        const vivos = aliados.filter(a => a.tipo === 'esqueleto');
+        if (vivos.length >= nv([0, 2, 3, 4])) vivos[0].vida = 0;   // el más antiguo deja su lugar
+        aliados.push({ tipo: 'esqueleto', x: P.x + P.fx * 12, y: P.y + P.fy * 12, r: 4, v: 1.1, cd: 10, atk: 0, vida: 660, sube: 16 });
+        P.invocaCd = 50; P.atk = 8; registrar('invocacion', { fuente: 'esqueleto' }); window.KR && KR.beep([[262, .05], [392, .07]]);
+      }
+    } else if ((K.atk || pedido) && P.cd === 0) {
       pedido = false; P.cd = B.cd; P.atk = 8;
       let golpes = 0;
       enemigos.forEach(e => {
@@ -151,8 +175,9 @@
         registrar('especial', { golpes }); window.KR && KR.beep([[330, .06], [660, .1]]);
       } else efectos.push({ tipo: 'txt', x: P.x, y: P.y - 14, txt: 'SIN ENERGÍA', col: '#7ec8ff', t: 30 });
     }
-    // dron de datos (habilidad de IA y automatización)
-    if (B.dron > 0) {
+    especialidad();
+    // robot de IA (especialidad IA y automatización)
+    if (B.esp === 3) {
       P.dronA += .05;
       if (--P.dronCd <= 0) {
         const dx0 = P.x + Math.cos(P.dronA) * 14, dy0 = P.y - 10 + Math.sin(P.dronA) * 6;
@@ -160,14 +185,14 @@
         if (obj && Math.hypot(obj.x - dx0, obj.y - dy0) < 140) {
           const d = Math.hypot(obj.x - dx0, obj.y - dy0) || 1;
           balas.push({ x: dx0, y: dy0, vx: (obj.x - dx0) / d * 3.2, vy: (obj.y - dy0) / d * 3.2, t: 60 });
-          P.dronCd = B.dron >= 2 ? 55 : 85;
+          P.dronCd = nv([0, 85, 60, 42]);
         } else P.dronCd = 10;
       }
     }
     balas.forEach(bl => {
       bl.x += bl.vx; bl.y += bl.vy; bl.t--;
       const e = enemigos.find(x => x.portal <= 0 && Math.hypot(x.x - bl.x, x.y - bl.y) < x.r + 2);
-      if (e) { const dn = B.dron >= 3 ? 1.5 : 1; e.hp -= dn; e.kx += bl.vx * .6; e.ky += bl.vy * .6; bl.t = 0; registrar('golpe', { enemigo: e.tipo, dano: dn, fuente: 'dron' }); efectos.push({ tipo: 'chispa', x: e.x, y: e.y, t: 8 }); }
+      if (e) { const dn = B.nivel >= 3 ? 1.5 : 1; e.hp -= dn; e.kx += bl.vx * .6; e.ky += bl.vy * .6; bl.t = 0; registrar('golpe', { enemigo: e.tipo, dano: dn, fuente: 'robot' }); efectos.push({ tipo: 'chispa', x: e.x, y: e.y, t: 8 }); }
     });
     for (let i = balas.length - 1; i >= 0; i--) if (balas[i].t <= 0) balas.splice(i, 1);
     if (B.regenVida && f % 1200 === 0 && P.hp < P.max) { P.hp++; registrar('curacion', { fuente: 'regeneracion' }); efectos.push({ tipo: 'txt', x: P.x, y: P.y - 14, txt: '+1', col: '#f472b6', t: 40 }); }
@@ -176,8 +201,21 @@
     // enemigos
     enemigos.forEach(e => {
       if (e.portal > 0) { e.portal--; return; }
+      e.fase += .12; if (e.golpeCd > 0) e.golpeCd--;
+      if (e.conf > 0) {                                       // confundido: persigue y golpea a otro enemigo, no a ti
+        e.conf--;
+        const otro = enemigos.filter(o => o !== e && o.portal <= 0).sort((a, b) => dist(a, e) - dist(b, e))[0];
+        if (otro) {
+          const d2 = dist(otro, e) || 1; e.x += (otro.x - e.x) / d2 * e.v * 1.2; e.y += (otro.y - e.y) / d2 * e.v * 1.2;
+          if (d2 < e.r + otro.r + 2 && e.golpeCd <= 0) {
+            const dn = TIPOS[e.tipo].dano; otro.hp -= dn; otro.kx = (otro.x - e.x) / d2 * 3; otro.ky = (otro.y - e.y) / d2 * 3; e.golpeCd = 36;
+            efectos.push({ tipo: 'chispa', x: otro.x, y: otro.y, t: 8 }); registrar('golpe', { enemigo: otro.tipo, dano: dn, fuente: 'confusion' });
+          }
+        } else { e.x += Math.cos(e.fase * .4) * e.v; e.y += Math.sin(e.fase * .3) * e.v; }
+        e.x += e.kx; e.y += e.ky; e.kx *= .78; e.ky *= .78; limitar(e);
+        return;
+      }
       const d = dist(e, P) || 1, ux = (P.x - e.x) / d, uy = (P.y - e.y) / d;
-      e.fase += .12;
       if (e.tipo === 'slime') { e.x += ux * e.v; e.y += uy * e.v; }
       if (e.tipo === 'murcielago') { const s = Math.sin(f * .09 + e.fase) * 1.3; e.x += (ux - uy * s) * e.v; e.y += (uy + ux * s) * e.v; }
       if (e.tipo === 'arquero') {
@@ -194,6 +232,7 @@
       e.x += e.kx; e.y += e.ky; e.kx *= .78; e.ky *= .78; limitar(e);
       if (d < e.r + P.r) recibir(TIPOS[e.tipo].dano, e.tipo, e.tipo === 'golem' && e.modo === 'embiste' ? 'embestida' : 'contacto');
     });
+    aliadosActualizar();
     for (let i = 0; i < enemigos.length; i++) for (let j = i + 1; j < enemigos.length; j++) {           // separación
       const a = enemigos[i], b = enemigos[j], d = dist(a, b), m = a.r + b.r;
       if (d > 0 && d < m) { const p = (m - d) / 2, ux = (b.x - a.x) / d, uy = (b.y - a.y) / d; a.x -= ux * p; a.y -= uy * p; b.x += ux * p; b.y += uy * p; }
@@ -225,6 +264,68 @@
     }
   }
 
+  // ---------------------------------------------------------- especialidades
+  function especialidad() {
+    if (B.esp === 0) {                                        // gráficos de torta en órbita
+      P.orb += nv([0, .055, .065, .08]);
+      const n = nv([0, 1, 2, 3]), dn = B.nivel >= 3 ? 1.25 : .75;
+      for (let i = 0; i < n; i++) {
+        const a = P.orb + i * Math.PI * 2 / n, tx = P.x + Math.cos(a) * 24, ty = P.y - 4 + Math.sin(a) * 16;
+        enemigos.forEach(e => {
+          if (e.portal > 0 || e.golpeCd > 0 || Math.hypot(e.x - tx, e.y - ty) > e.r + 5) return;
+          e.hp -= dn; e.golpeCd = 26; const d = Math.hypot(e.x - P.x, e.y - P.y) || 1; e.kx = (e.x - P.x) / d * 3; e.ky = (e.y - P.y) / d * 3;
+          efectos.push({ tipo: 'chispa', x: e.x, y: e.y, t: 8 }); registrar('golpe', { enemigo: e.tipo, dano: dn, fuente: 'torta' });
+        });
+      }
+    }
+    if (B.esp === 2 && P.escudo < nv([0, 1, 2, 3]) && ++P.escudoT >= nv([0, 420, 360, 300])) {   // el escudo se recarga
+      P.escudo++; P.escudoT = 0; efectos.push({ tipo: 'txt', x: P.x, y: P.y - 14, txt: '+ESCUDO', col: '#4ade80', t: 30 });
+    }
+    if (B.esp === 5 && --P.auraT <= 0) {                      // aura de interferencia
+      P.auraT = nv([0, 600, 480, 360]); let n = 0;
+      enemigos.forEach(e => { if (e.portal <= 0 && dist(e, P) < 72 + e.r) { e.conf = nv([0, 240, 300, 380]); n++; } });
+      efectos.push({ tipo: 'aura', x: P.x, y: P.y - 3, t: 26 });
+      if (n) { registrar('aura', { afectados: n, fuente: 'aura' }); efectos.push({ tipo: 'txt', x: P.x, y: P.y - 16, txt: 'INTERFERENCIA', col: '#5eead4', t: 40 }); window.KR && KR.beep([[196, .06], [294, .06], [392, .08]]); }
+    }
+    if (B.esp === 6 && --P.mandoT <= 0) {                     // toma de mando: un enemigo cercano pasa a tu lado
+      const obj = enemigos.filter(e => e.portal <= 0 && dist(e, P) < 120).sort((a, b) => dist(a, P) - dist(b, P))[0];
+      if (!obj) { P.mandoT = 30; return; }
+      P.mandoT = nv([0, 660, 540, 420]);
+      enemigos.splice(enemigos.indexOf(obj), 1);
+      registrar('derrota', { enemigo: obj.tipo, ttk: Math.max(.1, +(seg() - obj.t0 - .6).toFixed(1)), via: 'mando' });
+      aliados.push({ tipo: 'convertido', et: obj.tipo, x: obj.x, y: obj.y, r: obj.r, v: Math.max(.8, TIPOS[obj.tipo].v * 1.2), cd: 20, atk: 0, vida: nv([0, 480, 600, 720]), dano: TIPOS[obj.tipo].dano, fase: obj.fase });
+      efectos.push({ tipo: 'txt', x: obj.x, y: obj.y - 14, txt: 'A TUS ÓRDENES', col: '#fb923c', t: 44 }); window.KR && KR.beep([[392, .06], [523, .06], [659, .1]]);
+    }
+  }
+  function aliadosActualizar() {
+    aliados.forEach(a => {
+      a.vida--; if (a.cd > 0) a.cd--; if (a.atk > 0) a.atk--; if (a.sube > 0) a.sube--;
+      a.fase = (a.fase || 0) + .12;
+      const obj = enemigos.filter(e => e.portal <= 0).sort((x, y) => dist(x, a) - dist(y, a))[0];
+      const dObj = obj ? dist(obj, a) : Infinity;
+      if (obj && (a.tipo !== 'companero' || dObj < 150)) {
+        const alcance = a.r + obj.r + 3;
+        if (dObj > alcance) { a.x += (obj.x - a.x) / dObj * a.v; a.y += (obj.y - a.y) / dObj * a.v; }
+        else if (a.cd <= 0) {
+          const dn = a.tipo === 'companero' ? (B.nivel >= 3 ? 1.5 : 1) : a.tipo === 'esqueleto' ? 1 : a.dano;
+          obj.hp -= dn; obj.kx = (obj.x - a.x) / (dObj || 1) * 3; obj.ky = (obj.y - a.y) / (dObj || 1) * 3;
+          a.cd = a.tipo === 'companero' ? nv([0, 40, 30, 24]) : 36; a.atk = 8;
+          efectos.push({ tipo: 'chispa', x: obj.x, y: obj.y, t: 8 });
+          registrar('golpe', { enemigo: obj.tipo, dano: dn, fuente: a.tipo === 'companero' ? 'companero' : a.tipo === 'esqueleto' ? 'esqueleto' : 'mando' });
+        }
+      } else if (a.tipo === 'companero') {                    // sin enemigos cerca: vuelve a tu lado
+        const d = Math.hypot(P.x - 14 - a.x, P.y + 4 - a.y);
+        if (d > 3) { a.x += (P.x - 14 - a.x) / d * Math.min(a.v, d); a.y += (P.y + 4 - a.y) / d * Math.min(a.v, d); }
+      }
+      limitar(a);
+    });
+    aliados = aliados.filter(a => {
+      if (a.vida > 0) return true;
+      for (let k = 0; k < 6; k++) efectos.push({ tipo: 'polvo', x: a.x, y: a.y, vx: Math.cos(k) * 1, vy: Math.sin(k) * 1, t: 16, col: a.tipo === 'esqueleto' ? '#e6e0d0' : '#f3d27f' });
+      return false;
+    });
+  }
+
   // ---------------------------------------------------------- dibujo
   const suelo = document.createElement('canvas'); suelo.width = WW; suelo.height = WH;
   (function () {
@@ -254,7 +355,30 @@
     R(x - 3, y - 12, 6, 6, '#f1c9a0'); R(x - 4, y - 14, 8, 3, '#c9ced8');
     if (P.fy >= 0) { R(x - 2, y - 9, 1, 1, '#071428'); R(x + 1, y - 9, 1, 1, '#071428'); }
     if (P.esp > 0) { const k = 1 - P.esp / 18; g.strokeStyle = `rgba(126,200,255,${1 - k})`; g.lineWidth = 3; g.beginPath(); g.ellipse(x, y - 3, 10 + k * 30, 6 + k * 18, 0, 0, 7); g.stroke(); }
-    if (B.dron > 0) { const dx0 = x + Math.cos(P.dronA) * 14, dy0 = y - 10 + Math.sin(P.dronA) * 6; R(dx0 - 2, dy0 - 1, 5, 3, '#9aa3b5'); R(dx0 - 1, dy0 - 2, 3, 1, '#cad6e5'); R(dx0, dy0, 1, 1, (f >> 3) % 2 ? '#7ec8ff' : '#e6f7ff'); }
+    if (B.esp === 3) {                                        // robot de IA
+      const rx = Math.round(x + Math.cos(P.dronA) * 14), ry = Math.round(y - 12 + Math.sin(P.dronA) * 6);
+      R(rx, ry - 6, 1, 2, '#9aa3b5'); R(rx, ry - 7, 1, 1, (f >> 4) % 2 ? '#f87171' : '#fecaca');
+      R(rx - 3, ry - 4, 7, 5, '#b8c0cf'); R(rx - 3, ry - 4, 7, 1, '#e2e8f0'); R(rx - 2, ry - 3, 5, 2, '#1e293b');
+      R(rx - 1, ry - 3, 1, 1, '#a78bfa'); R(rx + 1, ry - 3, 1, 1, '#a78bfa');
+      R(rx - 2, ry + 1, 5, 3, '#8a93a5'); R(rx - 4, ry + 1, 1, 2, '#8a93a5'); R(rx + 4, ry + 1, 1, 2, '#8a93a5');
+    }
+    if (B.esp === 0) {                                        // gráficos de torta en órbita
+      const n = nv([0, 1, 2, 3]), cols = ['#e0b756', '#7ec8ff', '#f472b6'];
+      for (let i = 0; i < n; i++) {
+        const a = P.orb + i * Math.PI * 2 / n, tx = x + Math.cos(a) * 24, ty = y - 4 + Math.sin(a) * 16, giro = f * .12;
+        elipse(Math.round(tx), Math.round(ty) + 6, 4, 1, 'rgba(0,0,0,.3)');
+        cols.forEach((c, j) => { g.fillStyle = c; g.beginPath(); g.moveTo(tx, ty); g.arc(tx, ty, 5, giro + j * 2.1, giro + j * 2.1 + (j === 0 ? 2.6 : 1.8)); g.closePath(); g.fill(); });
+        g.strokeStyle = '#0b111d'; g.lineWidth = 1; g.beginPath(); g.arc(tx, ty, 5, 0, 7); g.stroke();
+      }
+    }
+    if (B.esp === 2 && P.escudo > 0) {                        // escudo de código tipo Matrix
+      const n = 10 + P.escudo * 4;
+      for (let i = 0; i < n; i++) {
+        const a = f * .025 + i * Math.PI * 2 / n, cx = Math.round(x + Math.cos(a) * 12), cy = Math.round(y - 4 + Math.sin(a) * 10);
+        const cae = (f + i * 7) % 6;
+        R(cx, cy - 3, 1, 5, 'rgba(34,197,94,.45)'); R(cx, cy - 3 + cae % 5, 1, 1, '#bbf7d0');
+      }
+    }
     if (P.atk > 0) {
       const a = Math.atan2(P.fy, P.fx), pr = 1 - P.atk / 8;
       g.strokeStyle = `rgba(243,210,127,${.9 - pr * .5})`; g.lineWidth = 3; g.beginPath(); g.arc(x, y - 3, 20, a - 1 + pr * .4, a + 1 - pr * .4); g.stroke();
@@ -291,7 +415,34 @@
       R(xx - 5, y - 12, 3, 2, rojo ? '#ff5a5a' : '#7ec8ff'); R(xx + 2, y - 12, 3, 2, rojo ? '#ff5a5a' : '#7ec8ff');
       if (e.modo === 'recupera') R(xx - 2, y - 22, 4, 2, 'rgba(243,210,127,.8)');
     }
+    if (e.conf > 0) { for (let k = 0; k < 3; k++) { const a = f * .2 + k * 2.1; R(x + Math.cos(a) * 5, y - e.r * 2 - 6 + Math.sin(a) * 2, 2, 2, (e.conf >> 3) % 2 ? '#5eead4' : '#a78bfa'); } }
     if (e.hp < e.hpMax) { const w = e.r * 2; R(x - e.r, y - e.r * 2 - 8, w, 2, 'rgba(0,0,0,.6)'); R(x - e.r, y - e.r * 2 - 8, w * Math.max(0, e.hp) / e.hpMax, 2, '#f87171'); }
+  }
+  function aliado(a) {
+    const x = Math.round(a.x), y = Math.round(a.y);
+    if (a.tipo === 'convertido') {                            // enemigo bajo tu mando: su sprite con una corona dorada
+      enemigo({ tipo: a.et, x: a.x, y: a.y, r: a.r, hp: 1, hpMax: 1, fase: a.fase, portal: 0, modo: 'camina', cd: 60, conf: 0 });
+      const alto = a.et === 'golem' ? 26 : a.et === 'murcielago' ? 14 : 16;
+      R(x - 3, y - alto, 7, 2, '#f3d27f'); R(x - 3, y - alto - 2, 1, 2, '#f3d27f'); R(x, y - alto - 3, 1, 3, '#f3d27f'); R(x + 3, y - alto - 2, 1, 2, '#f3d27f');
+      if (a.vida < 90 && (a.vida >> 3) % 2) R(x - 3, y - alto, 7, 2, '#fff5c4');
+      return;
+    }
+    elipse(x, y + 5, 4, 2, 'rgba(0,0,0,.35)');
+    if (a.tipo === 'companero') {                             // compañero pixel art
+      R(x - 3, y - 4, 6, 7, '#22c55e'); R(x - 3, y - 1, 6, 1, '#14532d'); R(x - 2, y + 3, 2, 2, '#3f2a1d'); R(x + 1, y + 3, 2, 2, '#3f2a1d');
+      R(x - 3, y - 9, 6, 5, '#f1c9a0'); R(x - 4, y - 11, 8, 3, '#f472b6'); R(x - 4, y - 9, 1, 3, '#f472b6');
+      R(x - 2, y - 7, 1, 1, '#071428'); R(x + 1, y - 7, 1, 1, '#071428');
+      if (a.atk > 0) { R(x + 3, y - 6 + (8 - a.atk), 5, 1, '#e2e8f0'); R(x + 3, y - 5 + (8 - a.atk), 1, 2, '#e0b756'); }
+      else R(x + 3, y - 3, 1, 5, '#e2e8f0');
+      return;
+    }
+    // esqueleto invocado (Gestión): sale del suelo, ojos verdes para distinguirlo de los arqueros
+    const s = a.sube > 0 ? a.sube : 0, yy = y + s * .5;
+    R(x - 2, yy - 4, 4, 6, '#e6e0d0'); R(x - 2, yy - 3, 4, 1, '#9a9484'); R(x - 2, yy - 1, 4, 1, '#9a9484');
+    R(x - 2, yy + 2, 1, 3, '#e6e0d0'); R(x + 1, yy + 2, 1, 3, '#e6e0d0');
+    R(x - 3, yy - 10, 6, 6, '#f5f1e6'); R(x - 2, yy - 8, 1, 2, '#22c55e'); R(x + 1, yy - 8, 1, 2, '#22c55e');
+    R(x + 3, yy - 6 + (a.atk > 0 ? 2 : 0), 1, 6, '#cbd5e1');
+    if (a.vida < 90 && (a.vida >> 3) % 2) R(x - 3, yy - 10, 6, 6, 'rgba(255,255,255,.5)');
   }
   function dibujarMundo() {
     g.drawImage(suelo, 0, 0);
@@ -301,13 +452,14 @@
       const gr = g.createRadialGradient(x, 16, 0, x, 16, 40); gr.addColorStop(0, 'rgba(255,180,90,.22)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(x - 40, 0, 80, 60);
     });
     items.forEach(it => { if (it.t > 120 || (it.t >> 3) % 2) { R(it.x - 2, it.y - 3, 2, 2, '#f472b6'); R(it.x + 1, it.y - 3, 2, 2, '#f472b6'); R(it.x - 3, it.y - 2, 7, 2, '#f472b6'); R(it.x - 2, it.y, 5, 1, '#f472b6'); R(it.x - 1, it.y + 1, 3, 1, '#f472b6'); } });
-    const orden = [...enemigos.map(e => ({ y: e.y, d: () => enemigo(e) })), { y: P.y, d: heroe }].sort((a, b) => a.y - b.y);
+    const orden = [...enemigos.map(e => ({ y: e.y, d: () => enemigo(e) })), ...aliados.map(a => ({ y: a.y, d: () => aliado(a) })), { y: P.y, d: heroe }].sort((a, b) => a.y - b.y);
     orden.forEach(o => o.d());
     balas.forEach(bl => { R(bl.x - 1, bl.y - 1, 3, 3, '#7ec8ff'); R(bl.x, bl.y, 1, 1, '#ffffff'); });
     flechas.forEach(a => { const n = Math.hypot(a.vx, a.vy); g.strokeStyle = '#e6e0d0'; g.lineWidth = 1; g.beginPath(); g.moveTo(a.x, a.y); g.lineTo(a.x - a.vx / n * 6, a.y - a.vy / n * 6); g.stroke(); R(a.x - 1, a.y - 1, 2, 2, '#cad6e5'); });
     efectos.forEach(e => {
       if (e.tipo === 'chispa') for (let i = 0; i < 6; i++) { const a = i * 1.05; R(e.x + Math.cos(a) * (12 - e.t), e.y - 4 + Math.sin(a) * (12 - e.t), 2, 2, '#fff'); }
       if (e.tipo === 'polvo') R(e.x, e.y - 4, 2, 2, e.col);
+      if (e.tipo === 'aura') { const k = 1 - e.t / 26; g.strokeStyle = `rgba(94,234,212,${e.t / 26})`; g.lineWidth = 2; g.beginPath(); g.ellipse(e.x, e.y, 8 + k * 66, 5 + k * 42, 0, 0, 7); g.stroke(); }
     });
   }
   function texto(txt, x, y, tam, col, alin) { ctx.font = `${tam}px "Press Start 2P", monospace`; ctx.fillStyle = col; ctx.textAlign = alin || 'center'; ctx.textBaseline = 'middle'; ctx.fillText(txt, x, y); }
@@ -321,7 +473,7 @@
       ctx.fillText(infinito ? `¿Hasta qué oleada llegas? Tu récord: ${record} oleada(s) superada(s).` : 'Cada golpe que des o recibas se registrará como un dato.', W / 2, 132);
       ctx.fillText(infinito ? 'Cada oleada trae más enemigos y más resistentes. Tus habilidades del árbol te acompañan.' : 'Sobrevive a 3 oleadas y luego analiza tu desempeño como un analista.', W / 2, 158);
       ctx.font = '13px Geist, sans-serif'; ctx.fillStyle = '#9dffc0';
-      ctx.fillText(`⚔ Ataque ${B.ataque.toFixed(2).replace('.', ',')} · ❤ Vida ${B.vidaMax} · ⚡ Energía ${B.energiaMax} · 💨 Cadencia ${B.cd} · 🤖 Dron ${B.dron ? 'nv. ' + B.dron : 'no'} · 🛡 Bloqueo ${Math.round(B.bloqueo * 100)}% · ✚ Curación ${Math.round(B.cura * 100)}%`, W / 2, 182);
+      ctx.fillText(`⚔ Ataque ${B.ataque.toFixed(2).replace('.', ',')} · ❤ Vida ${B.vidaMax} · ⚡ Energía ${B.energiaMax} · 💨 Cadencia ${B.cd} · ✦ ${B.esp >= 0 ? ESP[B.esp] + ' nv. ' + B.nivel : 'Sin especialidad'} · 🛡 Bloqueo ${Math.round(B.bloqueo * 100)}% · ✚ Curación ${Math.round(B.cura * 100)}%`, W / 2, 182);
       const tipos = Object.keys(TIPOS);
       tipos.forEach((k, i) => {
         const cx = W / 2 - 270 + i * 180;
@@ -332,7 +484,7 @@
         ctx.font = '600 13px Geist, sans-serif'; ctx.fillStyle = '#f3d27f'; ctx.fillText(TIPOS[k].nombre, cx, 300);
         ctx.font = '12px Geist, sans-serif'; ctx.fillStyle = '#cad6e5'; ctx.fillText(['Lento, en grupo', 'Rápido y errático', 'Dispara a distancia', 'Embiste (2 de daño)'][i], cx, 318);
       });
-      ctx.font = '14px Geist, sans-serif'; ctx.fillStyle = '#cad6e5'; ctx.fillText('Mover: WASD o flechas · Atacar: Espacio o J · Onda de energía: K o botón B (40 de energía)', W / 2, 372);
+      ctx.font = '14px Geist, sans-serif'; ctx.fillStyle = '#cad6e5'; ctx.fillText(B.esp === 4 ? 'Mover: WASD o flechas · Invocar esqueleto: Espacio o J · Onda de energía: K o botón B' : 'Mover: WASD o flechas · Atacar: Espacio o J · Onda de energía: K o botón B (40 de energía)', W / 2, 372);
       if ((f >> 5) % 2) texto('PRESIONA ENTER PARA COMENZAR', W / 2, 430, 12, '#f3d27f');
       f++;
       return;
@@ -376,6 +528,6 @@
     pausar() { activo = false; Object.keys(K).forEach(k => K[k] = false); },
     reanudar() { if (!activo) { activo = true; if (!raf) raf = requestAnimationFrame(bucle); cv.focus({ preventScroll: true }); } },
     detener() { activo = false; estado = 'intro'; },
-    TIPOS, COLS, FILAS, BASE,
+    TIPOS, COLS, FILAS, BASE, ESP,
   };
 })();

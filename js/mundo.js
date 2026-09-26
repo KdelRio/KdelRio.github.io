@@ -201,12 +201,12 @@
       'Sobrevive a las tres oleadas y te enseñaré a convertir esos datos en decisiones. Entra con E.'] },
     { id: 'gamer', tipo: 'gamer', x: 744, nombre: 'Tomi, campeón del arcade', lineas: [
       '¡Eh! El Arcade del Dragón guarda los juegos que creó el estudio.',
-      'Primero encuentra los pares de cada juego en el Memorize.',
+      'Primero encuentra los pares de habilidades en el Memorize.',
       'Si lo logras, te espera Ritmo Resonancia. ¡Sube el volumen y entra con E!'] },
     { id: 'sylva', tipo: 'elfa', x: 1172, nombre: 'Sylva, maestra del gremio', lineas: [
-      'Tus batallas te dieron puntos de habilidad. Aquí se invierten.',
-      'Presiona H para abrir el mapa del árbol y sube cada rama con tus puntos.',
-      'Cuando todas las ramas florezcan, se abrirá el camino a la Biblioteca.'] },
+      'Aquí se forjan las especialidades del reino. Cada misión te enseñó algo de la tuya.',
+      'Entra al Gremio y aprende las habilidades que te faltan de tu rama. También puedes verla con H.',
+      'Cuando domines tu especialidad, se abrirá el camino a la Biblioteca.'] },
     { id: 'buho', tipo: 'buho', x: 1356, nombre: 'Profesor Búho', lineas: [
       'Llegaste al final del camino, viajero. Shhh, esta es la Biblioteca.',
       'Presiona P para abrir la hoja de personaje de Kevin: trayectoria, formación y logros.',

@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Geist:wght@400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/estilos.css?v=20260926g">
+  <link rel="stylesheet" href="css/estilos.css?v=20260926j">
 </head>
 <body>
 <a class="saltar" href="#contenido">Saltar al contenido</a>
@@ -59,7 +59,7 @@
         <button type="button" data-tecla="ArrowDown" aria-label="Abajo">▼</button>
       </div>
       <div class="consola-centro">
-        <button type="button" class="bt-chico" data-tecla="h">H<small>Árbol</small></button>
+        <button type="button" class="bt-chico" data-tecla="h">H<small>Rama</small></button>
         <button type="button" class="bt-chico" data-tecla="p">P<small>Ficha</small></button>
         <button type="button" class="bt-chico" data-tecla="Escape">ESC<small>Pausa</small></button>
       </div>
@@ -121,7 +121,7 @@
       <div>
         <p class="kicker">Modo arcade</p>
         <h2 class="titulo">La aventura del reino</h2>
-        <p class="bajada">Recorre este portafolio como un videojuego: cinco misiones, una arena de combate que genera datos para analizarlos, un memorize con los juegos del estudio, ritmo, un árbol de habilidades y la hoja de personaje.</p>
+        <p class="bajada">Recorre este portafolio como un videojuego: cinco misiones, una arena de combate que genera datos para analizarlos, un memorize de habilidades, ritmo, un árbol de habilidades y la hoja de personaje.</p>
         <button type="button" class="btn btn-oro" data-abrir-arcade>▶ Jugar modo arcade</button>
       </div>
       <ol class="invitacion-misiones">
@@ -288,17 +288,12 @@
     <h3 class="subtitulo">Salón de juegos</h3>
     <p class="bajada">Dos minijuegos hechos para esta página, inspirados en mis proyectos. Se juegan aquí mismo.</p>
     <div class="salon-tabs" role="tablist">
-      <button class="salon-tab activo" data-juego="mazmorra" role="tab" aria-selected="true">Mini Mazmorra</button>
+      <button class="salon-tab activo" data-juego="memoria" role="tab" aria-selected="true">Memorize</button>
       <button class="salon-tab" data-juego="ritmo" role="tab" aria-selected="false">Ritmo Resonancia</button>
     </div>
     <div class="salon panel">
-      <div class="salon-juego" id="juego-mazmorra">
-        <canvas id="mazmorra-canvas" width="768" height="480" tabindex="0" aria-label="Minijuego de mazmorra"></canvas>
-        <p class="salon-ayuda">Moverse: <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> · Atacar: <kbd>J</kbd> o <kbd>Espacio</kbd> · Sobrevive a dos oleadas y derrota al Rey Slime.</p>
-        <div class="tactil" data-para="mazmorra">
-          <div class="dpad"><button data-k="arriba">▲</button><button data-k="izquierda">◀</button><button data-k="abajo">▼</button><button data-k="derecha">▶</button></div>
-          <button class="tactil-accion" data-k="accion">⚔</button>
-        </div>
+      <div class="salon-juego" id="juego-memoria">
+        <div class="mem" id="memoria-salon"></div>
       </div>
       <div class="salon-juego" id="juego-ritmo" hidden>
         <canvas id="ritmo-canvas" width="768" height="480" tabindex="0" aria-label="Minijuego de ritmo"></canvas>
@@ -394,14 +389,14 @@
 
 <script src="js/escena.js?v=20260926c"></script>
 <script src="js/mascota.js?v=20260926b"></script>
-<script src="js/nucleo.js?v=20260926b"></script>
+<script src="js/nucleo.js?v=20260926c"></script>
 <script src="js/laboratorio.js?v=20260926b"></script>
 <script src="js/gremio.js?v=20260926b"></script>
-<script src="js/mazmorra.js?v=20260926b"></script>
-<script src="js/ritmo.js?v=20260926b"></script>
-<script src="js/mundo.js?v=20260926b"></script>
-<script src="js/batalla.js?v=20260926b"></script>
-<script src="js/informe.js?v=20260926b"></script>
-<script src="js/arcade.js?v=20260926b"></script>
+<script src="js/ritmo.js?v=20260926c"></script>
+<script src="js/mundo.js?v=20260926d"></script>
+<script src="js/batalla.js?v=20260926d"></script>
+<script src="js/informe.js?v=20260926d"></script>
+<script src="js/memoria.js?v=20260926"></script>
+<script src="js/arcade.js?v=20260926e"></script>
 </body>
 </html>

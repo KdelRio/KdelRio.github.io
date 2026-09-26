@@ -194,9 +194,8 @@
   document.querySelectorAll('.salon-tab').forEach(b => b.addEventListener('click', () => {
     document.querySelectorAll('.salon-tab').forEach(x => { x.classList.toggle('activo', x === b); x.setAttribute('aria-selected', x === b); });
     const juego = b.dataset.juego;
-    document.getElementById('juego-mazmorra').hidden = juego !== 'mazmorra';
-    document.getElementById('juego-ritmo').hidden = juego !== 'ritmo';
-    if (juego === 'ritmo') { visible = true; salon.arrancar(); window.KRMazmorra && KRMazmorra.pausar(); }
-    else { if (salon.estado === 'jugando') salon.detener(); window.KRMazmorra && KRMazmorra.arrancar(); }
+    document.querySelectorAll('.salon-juego').forEach(j => { j.hidden = j.id !== 'juego-' + juego; });
+    if (juego === 'ritmo') { visible = true; salon.arrancar(); }
+    else if (salon.estado === 'jugando') salon.detener();
   }));
 })();

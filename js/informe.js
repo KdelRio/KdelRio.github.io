@@ -36,7 +36,7 @@
       const e2 = T.eventos.filter(e => e.ola === o.n), d2 = e2.filter(e => e.tipo === 'recibido').reduce((a, e) => a + e.dano, 0), dur = ((o.t1 ?? T.fin) - o.t0) || .1;
       return { n: o.n, dano: d2, dur, dpm: d2 / dur * 60, derrotas: e2.filter(e => e.tipo === 'derrota').length };
     });
-    return { especiales: c('especial').length, bloqueos: c('bloqueo').length, dron: c('golpe').filter(e => e.fuente === 'dron').length, ev, ataques: ataques.length, aciertos, precision: pct(aciertos, ataques.length), golpes: c('golpe').length, recibidos: recibidos.length, dano, derrotados: derrotas.length, generados: apariciones.length, curaciones: c('curacion').length, disparos: c('disparo').length, tiempo, porTipo, vida, pos, porOla, via: recibidos.reduce((a, e) => (a[e.via] = (a[e.via] || 0) + e.dano, a), {}) };
+    return { especiales: c('especial').length, bloqueos: c('bloqueo').length, dron: c('golpe').filter(e => e.fuente && !['espada', 'especial'].includes(e.fuente)).length, ev, ataques: ataques.length, aciertos, precision: pct(aciertos, ataques.length), golpes: c('golpe').length, recibidos: recibidos.length, dano, derrotados: derrotas.length, generados: apariciones.length, curaciones: c('curacion').length, disparos: c('disparo').length, tiempo, porTipo, vida, pos, porOla, via: recibidos.reduce((a, e) => (a[e.via] = (a[e.via] || 0) + e.dano, a), {}) };
   }
 
   // ---------------------------------------------------------- gráficos SVG
@@ -154,7 +154,7 @@
           ['Daño recibido', M.dano, 'Suma del daño de cada golpe recibido'], ['Enemigos derrotados', `${M.derrotados}/${M.generados}`, 'Derrotas ÷ apariciones'], ['Enemigos distintos', M.porTipo.filter(t => t.generados).length, 'Tipos con al menos una aparición'],
           ['Tiempo', num(M.tiempo) + ' s', 'Suma de la duración de las oleadas'], ['Derrotas por minuto', num(M.derrotados / M.tiempo * 60), 'Derrotas ÷ minutos'], ['Ratio de combate', num(M.golpes / Math.max(1, M.recibidos)), 'Golpes dados ÷ golpes recibidos'],
           ['Curaciones', M.curaciones, 'Corazones recogidos o regenerados'],
-        ].concat(M.especiales ? [['Ondas de energía', M.especiales, 'Ataques especiales lanzados']] : [], M.dron ? [['Golpes del dron', M.dron, 'Golpes con fuente «dron»']] : [], M.bloqueos ? [['Bloqueos', M.bloqueos, 'Golpes anulados por el escudo']] : []);
+        ].concat(M.especiales ? [['Ondas de energía', M.especiales, 'Ataques especiales lanzados']] : [], M.dron ? [['Golpes de tu especialidad', M.dron, 'Torta, compañero, robot, esqueletos, confusión o aliados']] : [], M.bloqueos ? [['Bloqueos', M.bloqueos, 'Golpes anulados por el escudo']] : []);
         return `<p class="inf-explica">Un indicador (KPI) resume muchas filas en un número que responde una pregunta. Pasa el cursor por cada tarjeta para ver cómo se calcula.</p>
           <div class="inf-kpis">${k.map(([n, v, f]) => `<div class="inf-kpi" title="${esc(f)}"><span>${n}</span><b>${v}</b><small>${f}</small></div>`).join('')}</div>`;
       }
