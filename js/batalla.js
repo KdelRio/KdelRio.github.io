@@ -17,8 +17,8 @@
   const COLS = 16, FILAS = 9;
 
   const TIPOS = {
-    slime: { nombre: 'Slime', hp: 2, v: .5, r: 6, dano: 1, col: '#6bd49a' },
-    murcielago: { nombre: 'Murciélago', hp: 1, v: 1.1, r: 5, dano: 1, col: '#a78bfa' },
+    slime: { nombre: 'Slime', hp: 2, v: .42, r: 6, dano: 1, col: '#6bd49a' },
+    murcielago: { nombre: 'Murciélago', hp: 1, v: .95, r: 5, dano: 1, col: '#a78bfa' },
     arquero: { nombre: 'Arquero esqueleto', hp: 2, v: .55, r: 6, dano: 1, col: '#e6e0d0' },
     golem: { nombre: 'Gólem de piedra', hp: 6, v: .32, r: 10, dano: 2, col: '#8a8f9a' },
   };
@@ -28,7 +28,7 @@
     ['golem', 'arquero', 'slime', 'murcielago', 'arquero', 'golem', 'slime', 'arquero', 'slime', 'murcielago'],
   ];
 
-  const BASE = { ataque: 1, vidaMax: 6, cd: 18, vel: 1.45, energiaMax: 60, regen: .12, dron: 0, bloqueo: 0, invul: 0, cura: .14, regenVida: false };
+  const BASE = { ataque: 1, vidaMax: 8, cd: 18, vel: 1.45, energiaMax: 60, regen: .12, dron: 0, bloqueo: 0, invul: 0, cura: .14, regenVida: false };
   let B = BASE, infinito = false, record = 0;
   let estado = 'intro', f = 0, P, enemigos, flechas, items, efectos, ola, cola, pausa = 0, T, alTerminar = null, activo = false, raf = 0, pedido = false, finT = 0;
   const K = {};
@@ -182,7 +182,7 @@
       if (e.tipo === 'murcielago') { const s = Math.sin(f * .09 + e.fase) * 1.3; e.x += (ux - uy * s) * e.v; e.y += (uy + ux * s) * e.v; }
       if (e.tipo === 'arquero') {
         const m = d < 70 ? -1 : d > 125 ? 1 : 0; e.x += ux * e.v * m - uy * e.v * .5 * Math.sin(e.fase * .3); e.y += uy * e.v * m + ux * e.v * .5 * Math.sin(e.fase * .3);
-        if (--e.cd <= 0) { flechas.push({ x: e.x, y: e.y - 3, vx: ux * 2.1, vy: uy * 2.1, t: 200 }); e.cd = 110 + Math.random() * 40; registrar('disparo', { enemigo: 'arquero' }); }
+        if (--e.cd <= 0) { flechas.push({ x: e.x, y: e.y - 3, vx: ux * 1.8, vy: uy * 1.8, t: 220 }); e.cd = 130 + Math.random() * 50; registrar('disparo', { enemigo: 'arquero' }); }
       }
       if (e.tipo === 'golem') {
         e.mt--;
@@ -214,7 +214,7 @@
     });
     items = items.filter(it => {
       it.t--;
-      if (Math.hypot(it.x - P.x, it.y - P.y) < 10) { P.hp = Math.min(P.max, P.hp + 1); registrar('curacion', {}); efectos.push({ tipo: 'txt', x: P.x, y: P.y - 14, txt: '+1', col: '#f472b6', t: 40 }); window.KR && KR.beep([[784, .06], [988, .08]]); return false; }
+      if (Math.hypot(it.x - P.x, it.y - P.y) < 10) { P.hp = Math.min(P.max, P.hp + 1); registrar('curacion', { fuente: 'corazon' }); efectos.push({ tipo: 'txt', x: P.x, y: P.y - 14, txt: '+1', col: '#f472b6', t: 40 }); window.KR && KR.beep([[784, .06], [988, .08]]); return false; }
       return it.t > 0;
     });
     efectos = efectos.filter(e => { if (e.vx !== undefined) { e.x += e.vx; e.y += e.vy; } return --e.t > 0; });

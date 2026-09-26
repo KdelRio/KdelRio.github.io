@@ -189,11 +189,13 @@
         <div class="inf-cuerpo">${cuerpo()}</div>
         <footer class="inf-pie">
           ${paso < 4 ? `<button type="button" class="btn btn-linea" data-sig>Siguiente paso ▶</button>` : ''}
+          ${paso < 4 && !op.visto ? `<button type="button" class="btn btn-mini" data-saltar>Saltar al final</button>` : ''}
           ${op.puntos ? `<span class="inf-ph">+${op.puntos} puntos de habilidad</span>` : ''}
           ${paso === 4 || op.visto ? `<div class="inf-final">
             <p><b>¿Te gustó convertir datos en decisiones?</b> Revisa el análisis de datos de Magic Foods, proyecto de una empresa manufacturera de alimentos.</p>
             <div class="fila-botones"><button type="button" class="btn btn-oro" data-magic>Revisar análisis de datos de Magic Foods ↗</button>
-            ${op.infinito ? '<button type="button" class="btn btn-linea" data-reintentar>∞ Otra partida</button><button type="button" class="btn btn-linea" data-continuar>Volver a la aldea</button>' : gano ? '<button type="button" class="btn btn-linea" data-continuar>Continuar la aventura ▶</button>' : '<button type="button" class="btn btn-linea" data-reintentar>Reintentar la batalla</button>'}</div>
+            ${op.infinito ? '<button type="button" class="btn btn-linea" data-reintentar>∞ Otra partida</button><button type="button" class="btn btn-linea" data-continuar>Volver a la aldea</button>' : '<button type="button" class="btn btn-linea" data-continuar>Continuar la aventura ▶</button><button type="button" class="btn btn-mini" data-reintentar>Reintentar la batalla</button>'}</div>
+            ${!op.infinito && !gano ? '<p class="inf-nota">Aunque caíste, cumpliste la misión: generaste datos y los analizaste. ¡Ganar da puntos extra!</p>' : ''}
           </div>` : ''}
         </footer></div>`;
     }
@@ -201,6 +203,7 @@
       const b = e.target.closest('button'); if (!b) return;
       if (b.dataset.ola !== undefined) { ola = +b.dataset.ola; pintar(); }
       else if (b.dataset.paso !== undefined) { paso = +b.dataset.paso; pintar(); if (paso === 4) op.visto = true; }
+      else if (b.hasAttribute('data-saltar')) { paso = 4; op.visto = true; pintar(); }
       else if (b.hasAttribute('data-sig')) { paso++; if (paso === 4) op.visto = true; pintar(); cont.scrollTop = 0; }
       else if (b.hasAttribute('data-magic')) op.alMagic();
       else if (b.hasAttribute('data-continuar')) op.alContinuar();

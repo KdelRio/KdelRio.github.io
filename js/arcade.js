@@ -24,7 +24,7 @@
   ];
   function bonos() {
     const p = prog(), n = RAMAS.map(r => r.nodos.filter(nd => p.arbol.includes(clave(r, nd))).length).concat([0, 0, 0, 0, 0, 0, 0]);
-    return { ataque: 1 + n[0] * .25, energiaMax: 60 + n[1] * 10, regen: .12 * (1 + n[1] * .08), cd: 18 - n[2] * 2, vel: 1.45 * (1 + n[2] * .03), dron: n[3], vidaMax: 6 + n[4], bloqueo: n[5] * .12, invul: n[5] * 10, cura: .14 + n[6] * .06, regenVida: n[6] >= 4 };
+    return { ataque: 1 + n[0] * .25, energiaMax: 60 + n[1] * 10, regen: .12 * (1 + n[1] * .08), cd: 18 - n[2] * 2, vel: 1.45 * (1 + n[2] * .03), dron: n[3], vidaMax: 8 + n[4], bloqueo: n[5] * .12, invul: n[5] * 10, cura: .14 + n[6] * .06, regenVida: n[6] >= 4 };
   }
   function resumenBonos() {
     const b = bonos();
@@ -128,7 +128,7 @@
         nuevo = T.olasSuperadas > (p.record || 0); if (nuevo) p.record = T.olasSuperadas; KR.guardar();
         KR.sumarXP(10 + T.olasSuperadas * 10, nuevo ? `Nuevo récord: ${T.olasSuperadas} oleadas superadas` : `Oleadas infinitas: ${T.olasSuperadas} superadas`);
       } else {
-        if (gano && !p.premios[1]) { puntos = 22; completar(1, 22, 'datos'); }
+        if (!p.premios[1]) { puntos = gano ? 25 : 22; completar(1, puntos, 'datos'); }
         else { puntos = Math.floor(derrotas / (gano ? 4 : 6)); p.ph += puntos; KR.guardar(); }
         KR.sumarXP(gano ? 40 : 15, gano ? 'Arena del Dato superada' : 'Datos de combate registrados');
       }
