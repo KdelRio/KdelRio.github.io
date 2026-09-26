@@ -28,7 +28,7 @@
   }
   function resumenBonos() {
     const b = bonos();
-    return `<ul class="stats-juego"><li>⚔️ Ataque <b>${b.ataque.toFixed(2).replace('.', ',')}</b></li><li>❤️ Vida <b>${b.vidaMax}</b></li><li>⚡ Energía <b>${b.energiaMax}</b></li><li>💨 Cadencia <b>${b.cd}</b></li><li>🤖 Dron <b>${b.dron ? 'nv. ' + b.dron : '—'}</b></li><li>🛡️ Bloqueo <b>${Math.round(b.bloqueo * 100)}%</b></li><li>✚ Curación <b>${Math.round(b.cura * 100)}%${b.regenVida ? ' + regen.' : ''}</b></li></ul>`;
+    return `<ul class="stats-juego"><li>⚔️ Ataque <b>${b.ataque.toFixed(2).replace('.', ',')}</b></li><li>❤️ Vida <b>${b.vidaMax}</b></li><li>⚡ Energía <b>${b.energiaMax}</b></li><li>💨 Cadencia <b>${b.cd}</b></li><li>🤖 Dron <b>${b.dron ? 'nv. ' + b.dron : '-'}</b></li><li>🛡️ Bloqueo <b>${Math.round(b.bloqueo * 100)}%</b></li><li>✚ Curación <b>${Math.round(b.cura * 100)}%${b.regenVida ? ' + regen.' : ''}</b></li></ul>`;
   }
 
   // ---------------------------------------------------------- progreso de la partida (persistente)

@@ -734,7 +734,7 @@
     if (e.logo.complete && e.logo.naturalWidth) ctx.drawImage(e.logo, x + 5, y + 3, 18, 18);
     ctx.fillStyle = cerca === e ? '#f3d27f' : '#f4f7fd'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText(e.nombre, x + 27, cy + 1);
     const bx = x + w - 12;
-    if (visitada) { ctx.fillStyle = '#e0b756'; ctx.font = '11px Inter, sans-serif'; ctx.fillText('✓', bx - 4, cy + 1); }
+    if (visitada) { ctx.fillStyle = '#e0b756'; ctx.font = '11px Geist, sans-serif'; ctx.fillText('✓', bx - 4, cy + 1); }
     else { const p = 1 + Math.sin(t / 8) * .15; ctx.fillStyle = '#f3d27f'; ctx.beginPath(); ctx.arc(bx, cy, 6 * p, 0, 7); ctx.fill(); ctx.fillStyle = '#1b1405'; ctx.font = '8px "Press Start 2P", monospace'; ctx.textAlign = 'center'; ctx.fillText('!', bx + .5, cy + 1); }
   }
   function lineasTexto(txt, ancho) {
@@ -753,7 +753,7 @@
     ctx.imageSmoothingEnabled = false; ctx.drawImage(retrato, x + 20, y + 9, 28 * 2.4, 34 * 2.4);
     ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
     ctx.fillStyle = '#f3d27f'; ctx.font = '700 15px Cinzel, Georgia, serif'; ctx.fillText(d.npc.nombre, x + 110, y + 32);
-    ctx.fillStyle = '#f4f7fd'; ctx.font = '15px Inter, system-ui, sans-serif';
+    ctx.fillStyle = '#f4f7fd'; ctx.font = '15px Geist, system-ui, sans-serif';
     lineasTexto(d.npc.lineas[d.linea].slice(0, d.chars | 0), w - 150).forEach((ln, i) => ctx.fillText(ln, x + 110, y + 56 + i * 21));
     ctx.font = '8px "Press Start 2P", monospace'; ctx.fillStyle = 'rgba(202,214,229,.7)'; ctx.textAlign = 'right';
     ctx.fillText(`${d.linea + 1}/${d.npc.lineas.length}`, x + w - 18, y + 26);
@@ -785,19 +785,19 @@
     if (!dialogo || dialogo.cerrado) {                                   // misión, gemas, puntos y controles
       const info = API.al.hud(), n = GEMAS.filter(g => g.tomada).length;
       ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
-      ctx.font = '600 14px Inter, sans-serif';
+      ctx.font = '600 14px Geist, sans-serif';
       const mw = Math.min(W - 250, ctx.measureText(info.mision).width + 36);
       ctx.fillStyle = 'rgba(5,14,29,.84)'; ctx.strokeStyle = 'rgba(224,183,86,.6)'; ctx.lineWidth = 1; redondo(14, 12, mw, 50, 10); ctx.fill(); ctx.stroke();
       ctx.fillStyle = '#f3d27f'; ctx.font = '8px "Press Start 2P", monospace'; ctx.fillText(info.titulo, 28, 28);
-      ctx.fillStyle = '#f4f7fd'; ctx.font = '600 14px Inter, sans-serif'; ctx.fillText(info.mision, 28, 47, mw - 28);
+      ctx.fillStyle = '#f4f7fd'; ctx.font = '600 14px Geist, sans-serif'; ctx.fillText(info.mision, 28, 47, mw - 28);
       ctx.textAlign = 'right'; ctx.font = '10px "Press Start 2P", monospace';
       ctx.fillStyle = 'rgba(5,14,29,.84)'; redondo(W - 150, 12, 136, 50, 10); ctx.fill();
       ctx.fillStyle = '#f3d27f'; ctx.fillText(`◆ ${n}/${GEMAS.length}`, W - 26, 29);
       ctx.fillStyle = '#9dffc0'; ctx.fillText(`PH ${info.ph}`, W - 26, 49);
-      if (document.activeElement === cv) { ctx.textAlign = 'left'; ctx.font = '12px Inter, sans-serif'; ctx.fillStyle = 'rgba(244,247,253,.7)'; ctx.fillText('A/D mover · Espacio saltar (x2) · S bajar · E hablar/entrar · Esc pausa', 16, 78); }
+      if (document.activeElement === cv) { ctx.textAlign = 'left'; ctx.font = '12px Geist, sans-serif'; ctx.fillStyle = 'rgba(244,247,253,.7)'; ctx.fillText('A/D mover · Espacio saltar (x2) · S bajar · E hablar/entrar · Esc pausa', 16, 78); }
     }
     if (aviso && aviso.t > 0) {
-      ctx.globalAlpha = Math.min(1, aviso.t / 30); ctx.font = '600 15px Inter, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.globalAlpha = Math.min(1, aviso.t / 30); ctx.font = '600 15px Geist, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       const w = ctx.measureText(aviso.txt).width + 40;
       ctx.fillStyle = 'rgba(5,14,29,.92)'; ctx.strokeStyle = '#7ec8ff'; ctx.lineWidth = 2; redondo(W / 2 - w / 2, 150, w, 38, 19); ctx.fill(); ctx.stroke();
       ctx.fillStyle = '#e6f7ff'; ctx.fillText(aviso.txt, W / 2, 170); ctx.globalAlpha = 1;

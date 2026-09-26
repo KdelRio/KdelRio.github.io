@@ -317,10 +317,10 @@
       ctx.imageSmoothingEnabled = false; ctx.drawImage(buf, 0, 0, W, H);
       ctx.fillStyle = 'rgba(4,10,22,.8)'; ctx.fillRect(0, 0, W, H);
       texto(infinito ? 'OLEADAS INFINITAS' : 'ARENA DEL DATO', W / 2, 84, 26, infinito ? '#ffd400' : '#f3d27f');
-      ctx.font = '16px Inter, sans-serif'; ctx.fillStyle = '#e6eefc'; ctx.textAlign = 'center';
+      ctx.font = '16px Geist, sans-serif'; ctx.fillStyle = '#e6eefc'; ctx.textAlign = 'center';
       ctx.fillText(infinito ? `¿Hasta qué oleada llegas? Tu récord: ${record} oleada(s) superada(s).` : 'Cada golpe que des o recibas se registrará como un dato.', W / 2, 132);
       ctx.fillText(infinito ? 'Cada oleada trae más enemigos y más resistentes. Tus habilidades del árbol te acompañan.' : 'Sobrevive a 3 oleadas y luego analiza tu desempeño como un analista.', W / 2, 158);
-      ctx.font = '13px Inter, sans-serif'; ctx.fillStyle = '#9dffc0';
+      ctx.font = '13px Geist, sans-serif'; ctx.fillStyle = '#9dffc0';
       ctx.fillText(`⚔ Ataque ${B.ataque.toFixed(2).replace('.', ',')} · ❤ Vida ${B.vidaMax} · ⚡ Energía ${B.energiaMax} · 💨 Cadencia ${B.cd} · 🤖 Dron ${B.dron ? 'nv. ' + B.dron : 'no'} · 🛡 Bloqueo ${Math.round(B.bloqueo * 100)}% · ✚ Curación ${Math.round(B.cura * 100)}%`, W / 2, 182);
       const tipos = Object.keys(TIPOS);
       tipos.forEach((k, i) => {
@@ -329,10 +329,10 @@
         g.clearRect(0, 0, 40, 40); const e = { tipo: k, x: 20, y: 30, r: TIPOS[k].r, hp: TIPOS[k].hp, hpMax: TIPOS[k].hp, fase: f / 10, portal: 0, modo: 'camina', cd: 60 };
         g.save(); g.fillStyle = '#1f283c'; g.fillRect(0, 0, 40, 40); enemigo(e); g.restore();
         ctx.drawImage(buf, 0, 0, 40, 40, cx - 40, 208, 80, 80);
-        ctx.font = '600 13px Inter, sans-serif'; ctx.fillStyle = '#f3d27f'; ctx.fillText(TIPOS[k].nombre, cx, 300);
-        ctx.font = '12px Inter, sans-serif'; ctx.fillStyle = '#cad6e5'; ctx.fillText(['Lento, en grupo', 'Rápido y errático', 'Dispara a distancia', 'Embiste (2 de daño)'][i], cx, 318);
+        ctx.font = '600 13px Geist, sans-serif'; ctx.fillStyle = '#f3d27f'; ctx.fillText(TIPOS[k].nombre, cx, 300);
+        ctx.font = '12px Geist, sans-serif'; ctx.fillStyle = '#cad6e5'; ctx.fillText(['Lento, en grupo', 'Rápido y errático', 'Dispara a distancia', 'Embiste (2 de daño)'][i], cx, 318);
       });
-      ctx.font = '14px Inter, sans-serif'; ctx.fillStyle = '#cad6e5'; ctx.fillText('Mover: WASD o flechas · Atacar: Espacio o J · Onda de energía: K o botón B (40 de energía)', W / 2, 372);
+      ctx.font = '14px Geist, sans-serif'; ctx.fillStyle = '#cad6e5'; ctx.fillText('Mover: WASD o flechas · Atacar: Espacio o J · Onda de energía: K o botón B (40 de energía)', W / 2, 372);
       if ((f >> 5) % 2) texto('PRESIONA ENTER PARA COMENZAR', W / 2, 430, 12, '#f3d27f');
       f++;
       return;
@@ -347,7 +347,7 @@
     const ev = T.eventos;
     const cuenta = tipo => ev.filter(x => x.tipo === tipo).length;
     ctx.fillStyle = 'rgba(5,14,29,.75)'; ctx.fillRect(W - 300, 10, 290, 50);
-    ctx.font = '12px Inter, sans-serif'; ctx.textAlign = 'left'; ctx.fillStyle = '#e6eefc';
+    ctx.font = '12px Geist, sans-serif'; ctx.textAlign = 'left'; ctx.fillStyle = '#e6eefc';
     ctx.fillText(`Golpes dados ${cuenta('golpe')} · Recibidos ${cuenta('recibido')}`, W - 290, 28);
     ctx.fillText(`Derrotados ${cuenta('derrota')} · Eventos ${ev.length}`, W - 290, 47);
     if ((f >> 4) % 2) { ctx.fillStyle = '#f87171'; ctx.beginPath(); ctx.arc(W - 318, 24, 6, 0, 7); ctx.fill(); }

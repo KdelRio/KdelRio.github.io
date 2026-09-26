@@ -145,7 +145,7 @@
         return `<p class="inf-explica">Todo análisis parte de datos crudos. Durante el combate se registró cada acción como una fila, igual que cada factura de Magic Foods era una fila de ventas. Aquí ves <b>${M.ev.length} eventos</b>${ola ? ` de la oleada ${ola}` : ''}.</p>
           <div class="inf-conteo">${conteo}</div>
           <div class="inf-tabla-caja"><table class="inf-tabla"><thead><tr><th>Tiempo</th><th>Oleada</th><th>Evento</th><th>Enemigo</th><th>Detalle</th></tr></thead><tbody>
-          ${filas.map(e => `<tr><td>${num(e.t)} s</td><td>${e.ola}</td><td>${e.tipo}</td><td>${e.enemigo ? NOMBRE[e.enemigo] : '—'}</td><td>${e.tipo === 'ataque' ? (e.acierto ? `acierto ×${e.golpes}` : 'fallo') : e.dano ? `daño ${e.dano}${e.via ? ' · ' + e.via : ''}` : e.ttk ? `derrotado en ${num(e.ttk)} s` : ''}</td></tr>`).join('')}
+          ${filas.map(e => `<tr><td>${num(e.t)} s</td><td>${e.ola}</td><td>${e.tipo}</td><td>${e.enemigo ? NOMBRE[e.enemigo] : '-'}</td><td>${e.tipo === 'ataque' ? (e.acierto ? `acierto ×${e.golpes}` : 'fallo') : e.dano ? `daño ${e.dano}${e.via ? ' · ' + e.via : ''}` : e.ttk ? `derrotado en ${num(e.ttk)} s` : ''}</td></tr>`).join('')}
           </tbody></table></div><p class="inf-nota">Se muestran los 60 eventos más recientes, sin contar las apariciones.</p>`;
       }
       if (paso === 1) {

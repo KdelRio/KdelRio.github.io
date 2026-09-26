@@ -95,7 +95,7 @@
       el('title', {}, path).textContent = `${fam}: ${fmt(v / suma * 100, 1)}%`;
       ang = a2;
     });
-    const t = el('text', { x: cx, y: cy + 5, 'text-anchor': 'middle', style: 'font: 700 15px Inter; fill: #f4f7fd' }, s);
+    const t = el('text', { x: cx, y: cy + 5, 'text-anchor': 'middle', style: 'font: 700 15px Geist; fill: #f4f7fd' }, s);
     t.textContent = fmt(suma / 1e6) + ' M';
     cont.appendChild(s);
     const ley = document.createElement('div'); ley.className = 'leyenda-mix';
@@ -124,14 +124,14 @@
     const sel = M.filter(r => pasa(r));
     const v = sel.reduce((a, r) => a + r.v, 0), c = sel.reduce((a, r) => a + r.c, 0), p = PED.filter(r => pasa(r)).reduce((a, r) => a + r.p, 0);
     $('#k-ventas').textContent = mill(v);
-    $('#k-margen').textContent = v ? fmt((1 - c / v) * 100, 1) + '%' : '—';
+    $('#k-margen').textContent = v ? fmt((1 - c / v) * 100, 1) + '%' : 'n/d';
     $('#k-pedidos').textContent = fmt(p);
-    $('#k-ticket').textContent = p ? '$' + fmt(v / p) : '—';
+    $('#k-ticket').textContent = p ? '$' + fmt(v / p) : 'n/d';
     const ref = F.anio ? +F.anio : 2024;
     const sumA = a => M.filter(r => r.anio === a && pasa(r, true)).reduce((s, r) => s + r.v, 0);
     const act = sumA(ref), ant = sumA(ref - 1), kv = $('#k-var');
     if (ant) { const x = (act - ant) / ant * 100; kv.textContent = (x >= 0 ? '+' : '') + fmt(x, 1) + '%'; kv.className = x >= 0 ? 'pos' : 'neg'; }
-    else { kv.textContent = '—'; kv.className = ''; }
+    else { kv.textContent = 'n/d'; kv.className = ''; }
 
     const series = lineas($('#g-linea'));
     const zonas = barrasZonas($('#g-zonas'));

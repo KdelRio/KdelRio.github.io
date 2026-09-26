@@ -122,7 +122,7 @@
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && !modal.hidden) cerrarLogros(); });
 
   // ---------------------------------------------------------- rol rotativo tipo máquina de escribir
-  const ROLES = ['Business Intelligence · Power BI · Tableau', 'Lead Programmer · Godot Engine', 'Análisis de datos y toma de decisiones', 'Socio fundador · Studios Conari SpA', 'Modelos de datos · ETL · DAX · SQL'];
+  const ROLES = ['Business Intelligence, Power BI y Tableau', 'Lead Programmer en Godot Engine', 'Análisis de datos y toma de decisiones', 'Socio fundador de Studios Conari SpA', 'Modelos de datos, ETL, DAX y SQL'];
   const elRol = $('#rol-rotativo');
   if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
     let ri = 0, ci = ROLES[0].length, borrando = true;
