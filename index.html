@@ -12,9 +12,22 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/estilos.css?v=20260926">
+  <link rel="stylesheet" href="css/estilos.css?v=20260926b">
 </head>
 <body>
+
+<!-- ============================================================ ESCENA DE FONDO (capas con profundidad) -->
+<div class="escena" id="escena" aria-hidden="true">
+  <div class="escena-marco">
+    <div class="plano plano-lejano" data-prof="lejano"><img src="assets/img/fondo/lejano-2.jpg" alt="" class="plano-img" fetchpriority="high"></div>
+    <canvas class="plano plano-estrellas" id="escena-estrellas"></canvas>
+    <div class="plano plano-dragon" data-prof="dragon"><img src="assets/img/fondo/dragon.webp" alt="" class="dragon-img"></div>
+    <div class="plano plano-bruma" data-prof="bruma"><i></i><i></i></div>
+    <div class="plano plano-frente" data-prof="frente"><img src="assets/img/fondo/frente.webp" alt="" class="frente-img"></div>
+  </div>
+  <canvas class="escena-petalos" id="escena-petalos"></canvas>
+  <div class="escena-velo" id="escena-velo"></div>
+</div>
 
 <!-- ============================================================ MÁQUINA ARCADE -->
 <div id="maquina" class="maquina" role="dialog" aria-modal="true" aria-label="Portafolio en modo arcade">
@@ -371,6 +384,7 @@
 </div>
 <div class="toasts" id="toasts" aria-live="polite"></div>
 
+<script src="js/escena.js?v=20260926b"></script>
 <script src="js/nucleo.js?v=20260926"></script>
 <script src="js/laboratorio.js?v=20260926"></script>
 <script src="js/gremio.js?v=20260926"></script>
