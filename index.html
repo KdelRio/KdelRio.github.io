@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Geist:wght@400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/estilos.css?v=20260926j">
+  <link rel="stylesheet" href="css/estilos.css?v=20260926k">
 </head>
 <body>
 <a class="saltar" href="#contenido">Saltar al contenido</a>
@@ -172,6 +172,27 @@
   <div class="contenedor">
     <p class="kicker">Zona 2 · Torre del Dato</p>
     <h2 class="titulo">Laboratorio de análisis en vivo</h2>
+    <p class="bajada">Primero genera tus propios datos: elige una especialidad y sobrevive a tres oleadas en la Arena del Dato. Cada golpe queda registrado y al terminar lo analizas paso a paso, de los datos crudos a las decisiones.</p>
+
+    <div class="arena panel" id="arena-clasica">
+      <div class="arena-elegir">
+        <h3 class="arena-h">Elige tu especialidad</h3>
+        <p class="bajada-chica">Cada una es una rama de mi árbol de habilidades y trae una habilidad de combate propia. Juegas con la rama dominada (nivel 3).</p>
+        <div class="esp-grilla" id="arena-especialidades"></div>
+      </div>
+      <div class="arena-juego" hidden>
+        <div class="arena-barra"><p class="arena-rotulo" id="arena-rotulo"></p><button type="button" class="btn btn-mini" id="arena-cambiar">Cambiar especialidad</button></div>
+        <canvas id="arena-canvas" width="960" height="540" tabindex="0" aria-label="Arena del Dato: combate por oleadas"></canvas>
+        <p class="salon-ayuda">Mover: <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> o flechas · Atacar: <kbd>Espacio</kbd> o <kbd>J</kbd> · Onda de energía: <kbd>K</kbd></p>
+        <div class="arena-tactil" aria-label="Controles táctiles">
+          <div class="arena-cruz"><button type="button" data-tecla="w" aria-label="Arriba">▲</button><button type="button" data-tecla="a" aria-label="Izquierda">◀</button><button type="button" data-tecla="s" aria-label="Abajo">▼</button><button type="button" data-tecla="d" aria-label="Derecha">▶</button></div>
+          <div class="arena-acciones"><button type="button" class="bt bt-a" data-tecla=" "><b>A</b></button><button type="button" class="bt bt-b" data-tecla="k"><b>B</b></button></div>
+        </div>
+      </div>
+    </div>
+    <div class="arena-informe panel" id="arena-informe" hidden></div>
+
+    <h3 class="subtitulo" id="magic-foods">Magic Foods S.A.: el mismo proceso con datos de negocio</h3>
     <p class="bajada">Durante más de tres años implementé la plataforma de BI de una empresa manufacturera de alimentos. Como esos datos son confidenciales, reconstruí el trabajo con <strong>Magic Foods S.A.</strong>, una empresa ficticia con clientes en las 16 regiones de Chile. Este tablero usa esos datos: <strong>filtra y analiza tú mismo</strong>.</p>
 
     <div class="lab panel">
@@ -391,12 +412,13 @@
 <script src="js/mascota.js?v=20260926b"></script>
 <script src="js/nucleo.js?v=20260926c"></script>
 <script src="js/laboratorio.js?v=20260926b"></script>
-<script src="js/gremio.js?v=20260926b"></script>
+<script src="js/gremio.js?v=20260926e"></script>
 <script src="js/ritmo.js?v=20260926c"></script>
 <script src="js/mundo.js?v=20260926d"></script>
-<script src="js/batalla.js?v=20260926d"></script>
-<script src="js/informe.js?v=20260926d"></script>
+<script src="js/batalla.js?v=20260926e"></script>
+<script src="js/informe.js?v=20260926e"></script>
 <script src="js/memoria.js?v=20260926"></script>
-<script src="js/arcade.js?v=20260926e"></script>
+<script src="js/arena.js?v=20260926"></script>
+<script src="js/arcade.js?v=20260926f"></script>
 </body>
 </html>

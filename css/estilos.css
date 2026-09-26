@@ -520,6 +520,24 @@ kbd {
 .capa-panel .mem-frente b { font-size: .7rem; }
 .capa-panel .mem-frente small { font-size: .54rem; }
 
+/* Arena del Dato en la página clásica (js/arena.js) */
+.arena { padding: 22px; margin-bottom: 18px; }
+.arena-h { margin: 0 0 4px; font: 700 1.3rem/1.2 var(--titulo); color: var(--oro-2); }
+.arena-barra { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+.arena-rotulo { margin: 0; color: var(--suave); }
+.arena-rotulo b { color: #9dffc0; }
+#arena-canvas { display: block; width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--linea-oro); background: #0b111d; touch-action: none; }
+.arena-tactil { display: none; justify-content: space-between; align-items: center; max-width: 520px; margin: 14px auto 0; }
+.arena-cruz { display: grid; grid-template-columns: repeat(3, 52px); grid-template-rows: repeat(2, 52px); gap: 6px; }
+.arena-cruz button { border: 1px solid var(--linea-oro); border-radius: 12px; background: rgba(224, 183, 86, .14); color: var(--texto); font-size: 1.1rem; touch-action: none; }
+.arena-cruz [data-tecla=w] { grid-column: 2; } .arena-cruz [data-tecla=a] { grid-column: 1; grid-row: 2; }
+.arena-cruz [data-tecla=s] { grid-column: 2; grid-row: 2; } .arena-cruz [data-tecla=d] { grid-column: 3; grid-row: 2; }
+.arena-acciones { display: flex; gap: 14px; }
+.arena-acciones .bt { touch-action: none; }
+@media (pointer: coarse) { .arena-tactil { display: flex; } .arena .salon-ayuda { display: none; } }
+.arena-informe { padding: 22px; margin-bottom: 18px; }
+.arena .esp-grilla { margin-top: 12px; }
+
 /* especialidad (modo arcade): elección, tarjeta de habilidad nueva y rama del Gremio */
 .panel-arbol, .panel-especialidad, .panel-subida { background: radial-gradient(ellipse at 50% 100%, #10301f, #040a18 72%); }
 .arbol-marcador { display: flex; align-items: center; gap: 12px; font: .6rem/1.4 var(--pixel); color: var(--suave); }

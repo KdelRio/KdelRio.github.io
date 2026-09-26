@@ -192,10 +192,12 @@
           ${paso < 4 && !op.visto ? `<button type="button" class="btn btn-mini" data-saltar>Saltar al final</button>` : ''}
           ${op.puntos ? `<span class="inf-ph">+${op.puntos} puntos de habilidad</span>` : ''}
           ${paso === 4 || op.visto ? `<div class="inf-final">
-            <p><b>¿Te gustó convertir datos en decisiones?</b> Revisa el análisis de datos de Magic Foods, proyecto de una empresa manufacturera de alimentos.</p>
-            <div class="fila-botones"><button type="button" class="btn btn-oro" data-magic>Revisar análisis de datos de Magic Foods ↗</button>
-            ${op.infinito ? '<button type="button" class="btn btn-linea" data-reintentar>∞ Otra partida</button><button type="button" class="btn btn-linea" data-continuar>Volver a la aldea</button>' : '<button type="button" class="btn btn-linea" data-continuar>Continuar la aventura ▶</button><button type="button" class="btn btn-mini" data-reintentar>Reintentar la batalla</button>'}</div>
-            ${!op.infinito && !gano ? '<p class="inf-nota">Aunque caíste, cumpliste la misión: generaste datos y los analizaste. ¡Ganar da puntos extra!</p>' : ''}
+            <p><b>¿Te gustó convertir datos en decisiones?</b> ${op.clasico ? 'Justo abajo está el mismo proceso aplicado a datos de negocio: Magic Foods, una empresa manufacturera de alimentos.' : 'Revisa el análisis de datos de Magic Foods, proyecto de una empresa manufacturera de alimentos.'}</p>
+            <div class="fila-botones">${op.clasico
+              ? '<button type="button" class="btn btn-oro" data-magic>Ver el análisis de Magic Foods ↓</button><button type="button" class="btn btn-linea" data-reintentar>Jugar otra vez</button><button type="button" class="btn btn-linea" data-continuar>Cambiar especialidad</button>'
+              : `<button type="button" class="btn btn-oro" data-magic>Revisar análisis de datos de Magic Foods ↗</button>
+            ${op.infinito ? '<button type="button" class="btn btn-linea" data-reintentar>∞ Otra partida</button><button type="button" class="btn btn-linea" data-continuar>Volver a la aldea</button>' : '<button type="button" class="btn btn-linea" data-continuar>Continuar la aventura ▶</button><button type="button" class="btn btn-mini" data-reintentar>Reintentar la batalla</button>'}`}</div>
+            ${!op.infinito && !op.clasico && !gano ? '<p class="inf-nota">Aunque caíste, cumpliste la misión: generaste datos y los analizaste. ¡Ganar da puntos extra!</p>' : ''}
           </div>` : ''}
         </footer></div>`;
     }

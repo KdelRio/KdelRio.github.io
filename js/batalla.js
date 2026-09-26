@@ -15,7 +15,8 @@
    ========================================================================== */
 (function () {
   'use strict';
-  const cv = document.getElementById('batalla-canvas'); if (!cv) return;
+  // KRCrearBatalla(canvas) monta una arena independiente: la del modo arcade y la de la página clásica
+  function crear(cv) {
   const ctx = cv.getContext('2d'), W = cv.width, H = cv.height, S = 2, WW = W / S, WH = H / S;
   const buf = document.createElement('canvas'); buf.width = WW; buf.height = WH;
   const g = buf.getContext('2d');
@@ -523,11 +524,16 @@
     dibujar();
     raf = activo ? requestAnimationFrame(bucle) : 0;
   }
-  window.KRBatalla = {
+  return {
     iniciar(cb, op) { op = op || {}; B = Object.assign({}, BASE, op.bonos || {}); infinito = !!op.infinito; record = op.record || 0; alTerminar = cb; estado = 'intro'; f = 0; activo = true; if (!raf) raf = requestAnimationFrame(bucle); cv.focus({ preventScroll: true }); },
     pausar() { activo = false; Object.keys(K).forEach(k => K[k] = false); },
-    reanudar() { if (!activo) { activo = true; if (!raf) raf = requestAnimationFrame(bucle); cv.focus({ preventScroll: true }); } },
+    reanudar(sinFoco) { if (!activo) { activo = true; if (!raf) raf = requestAnimationFrame(bucle); if (!sinFoco) cv.focus({ preventScroll: true }); } },
+    get estado() { return estado; },
     detener() { activo = false; estado = 'intro'; },
     TIPOS, COLS, FILAS, BASE, ESP,
   };
+  }
+  window.KRCrearBatalla = crear;
+  const cvArcade = document.getElementById('batalla-canvas');
+  if (cvArcade) window.KRBatalla = crear(cvArcade);
 })();

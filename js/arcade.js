@@ -11,37 +11,15 @@
   const CV = { portada: $('#portada-canvas'), aldea: $('#aldea-canvas'), batalla: $('#batalla-canvas'), ritmo: $('#ritmo-arcade-canvas') };
   const RAMAS = window.KR_HABILIDADES ? KR_HABILIDADES.RAMAS : [];
   const clave = (r, n) => r.nombre + '·' + n[0];
-  // cada rama del árbol es una especialidad: sus habilidades suben una estadística
-  // y el nivel (1 a 3) de una habilidad de combate propia (mismo orden que en gremio.js)
-  const BONO_RAMA = [
-    { ico: '⚔️', nombre: 'Ataque', txt: '+0,25 de daño en cada golpe' },
-    { ico: '⚡', nombre: 'Energía', txt: '+10 de energía máxima y recarga 8% más rápida' },
-    { ico: '💨', nombre: 'Rapidez', txt: 'ataques más seguidos y +3% de velocidad' },
-    { ico: '⚡', nombre: 'Energía', txt: '+10 de energía máxima y recarga 8% más rápida' },
-    { ico: '❤️', nombre: 'Vida', txt: '+1 corazón de vida máxima' },
-    { ico: '🛡️', nombre: 'Bloqueo', txt: '+12% de probabilidad de bloquear un golpe' },
-    { ico: '✚', nombre: 'Curación', txt: '+6% de probabilidad de que los enemigos suelten corazones' },
-  ];
-  const ESPECIALIDADES = [
-    { hab: 'Gráfico de torta', desc: 'Gráficos de torta giran a tu alrededor y golpean a los enemigos que tocan.', niveles: ['1 gráfico en órbita', '2 gráficos y giro más rápido', '3 gráficos con más daño'] },
-    { hab: 'Compañero pixel', desc: 'Un compañero pixel art pelea a tu lado desde el primer segundo.', niveles: ['ataca cada 0,7 s', 'ataca cada 0,5 s', 'ataca cada 0,4 s con más daño'] },
-    { hab: 'Escudo de código', desc: 'Líneas de código verde te rodean y absorben golpes completos. Se recargan solas.', niveles: ['1 carga de escudo', '2 cargas y recarga más rápida', '3 cargas, recarga cada 5 s'] },
-    { hab: 'Robot de IA', desc: 'Un robot vuela contigo y dispara al enemigo más cercano.', niveles: ['dispara cada 1,4 s', 'dispara cada 1 s', 'dispara cada 0,7 s con más daño'] },
-    { hab: 'Invocar esqueletos', desc: 'No usas espada: cada ataque invoca un esqueleto que pelea por ti durante 11 s.', niveles: ['hasta 2 esqueletos', 'hasta 3 esqueletos', 'hasta 4 esqueletos'] },
-    { hab: 'Aura de interferencia', desc: 'Cada pocos segundos emites un aura que confunde a los enemigos cercanos: se golpean entre ellos.', niveles: ['cada 10 s, confunde 4 s', 'cada 8 s, confunde 5 s', 'cada 6 s, confunde 6 s'] },
-    { hab: 'Toma de mando', desc: 'Cada cierto tiempo, el enemigo más cercano pasa a tu lado y pelea por ti.', niveles: ['cada 11 s, durante 8 s', 'cada 9 s, durante 10 s', 'cada 7 s, durante 12 s'] },
-  ];
+  // especialidades, bonos por rama y cálculo de estadísticas: compartidos con la arena de la página clásica (gremio.js)
+  const { BONO_RAMA, ESPECIALIDADES } = window.KR_HABILIDADES;
   const ramaDe = p => (p.esp === null || p.esp === undefined) ? null : RAMAS[p.esp];
   const aprendidas = p => { const r = ramaDe(p); return r ? r.nodos.filter(nd => p.arbol.includes(clave(r, nd))).length : 0; };
   const ramaCompleta = p => { const r = ramaDe(p); return !!r && aprendidas(p) >= r.nodos.length; };
-  function nivelEsp(p) {
-    const r = ramaDe(p), n = aprendidas(p); if (!r || !n) return 0;
-    return n >= r.nodos.length ? 3 : n >= Math.ceil(r.nodos.length / 2) ? 2 : 1;
-  }
+  const nivelEsp = p => ramaDe(p) ? KR_HABILIDADES.nivel(p.esp, aprendidas(p)) : 0;
   function bonos() {
-    const p = prog(), n = [0, 0, 0, 0, 0, 0, 0]; if (ramaDe(p)) n[p.esp] = aprendidas(p);
-    const en = n[1] + n[3];
-    return { ataque: 1 + n[0] * .25, energiaMax: 60 + en * 10, regen: .12 * (1 + en * .08), cd: 18 - n[2] * 2, vel: 1.45 * (1 + n[2] * .03), vidaMax: 8 + n[4], bloqueo: n[5] * .12, invul: n[5] * 10, cura: .14 + n[6] * .06, regenVida: n[6] >= 4, esp: ramaDe(p) ? p.esp : -1, nivel: nivelEsp(p) };
+    const p = prog();
+    return KR_HABILIDADES.bonos(ramaDe(p) ? p.esp : -1, aprendidas(p));
   }
   function resumenBonos() {
     const b = bonos(), e = ESPECIALIDADES[b.esp];
