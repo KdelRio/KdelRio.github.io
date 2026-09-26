@@ -33,6 +33,10 @@ body {
 }
 body.bloqueado { overflow: hidden; }
 
+::selection { background: rgba(224, 183, 86, .35); color: #fff; }
+html { scrollbar-color: rgba(224, 183, 86, .45) #050d1c; }
+input, textarea { caret-color: var(--oro-2); }
+
 /* --------------------------------------------------------------- escena de fondo con profundidad
    Cuatro planos recortados de la misma ilustración (lejano, dragón, bruma, frente) que se separan
    al bajar desde el inicio. js/escena.js escribe --p (0 a 1 durante el hero) y --mx/--my (puntero). */
@@ -66,12 +70,17 @@ body.bloqueado { overflow: hidden; }
 .plano-bruma i:last-child { top: 70%; height: 26%; left: -30%; animation-duration: 52s; animation-direction: alternate-reverse; opacity: .8; }
 @keyframes bruma { from { transform: translateX(-4%); } to { transform: translateX(6%); } }
 
+/* con JS la cámara (js/escena.js) fija ancho y transform del marco en px */
+.escena.viva .escena-marco { left: 0; top: 0; transform-origin: 0 0; will-change: transform; }
 .escena-petalos { position: absolute; inset: 0; width: 100%; height: 100%; }
+.escena-petalos, .plano-estrellas { transition: opacity .6s ease-out; }
+/* tinte de la zona: el color ambiente cambia con el lugar del reino que se está recorriendo */
+.escena-tinte { position: absolute; inset: 0; background: radial-gradient(ellipse 80% 70% at 50% 45%, transparent 30%, var(--tinte, transparent)); mix-blend-mode: soft-light; }
 /* velo: scrim a la izquierda donde vive el texto del inicio; al bajar se vuelve un fondo parejo y oscuro */
 .escena-velo {
-  position: absolute; inset: 0;
+  position: absolute; inset: 0; opacity: calc(1 - var(--claro, 0) * .55);
   background:
-    linear-gradient(90deg, rgba(3, 11, 26, calc(.78 - var(--p) * .1)) 0%, rgba(3, 11, 26, calc(.42 + var(--p) * .3)) 42%, rgba(3, 11, 26, calc(.04 + var(--p) * .66)) 72%),
+    linear-gradient(90deg, rgba(3, 11, 26, calc(.78 - var(--p) * .1)) 0%, rgba(3, 11, 26, calc(.42 + var(--p) * .3)) 42%, rgba(3, 11, 26, calc(.04 + var(--p) * .5)) 72%),
     linear-gradient(180deg, rgba(3, 11, 26, calc(.2 + var(--p) * .3)) 0%, transparent 30%, rgba(4, 14, 27, calc(.35 + var(--p) * .45)) 100%);
 }
 @media (max-width: 820px) and (orientation: portrait) {
@@ -110,7 +119,8 @@ kbd {
   padding: .72em 1.25em; border-radius: 999px; cursor: pointer; text-decoration: none;
   font: 600 .95rem/1 "Inter", sans-serif; border: 1px solid transparent; transition: transform .15s, box-shadow .15s, background .15s;
 }
-.btn:hover { transform: translateY(-2px); }
+@media (hover: hover) and (pointer: fine) { .btn:hover { transform: translateY(-2px); } }
+.btn:active { transform: scale(.97); }
 .btn:focus-visible, button:focus-visible, a:focus-visible, select:focus-visible, canvas:focus-visible { outline: 2px solid var(--oro-2); outline-offset: 3px; }
 .btn-oro { color: #1b1405; background: linear-gradient(180deg, var(--oro-2), var(--oro)); box-shadow: 0 8px 22px rgba(224, 183, 86, .28); }
 .btn-linea { color: var(--texto); background: rgba(255, 255, 255, .04); border-color: var(--linea-oro); }
@@ -160,13 +170,14 @@ kbd {
 .estudio-lema { font: 600 1.2rem/1.4 var(--titulo); color: var(--oro-2) !important; }
 .estudio-roles h3 { margin: 0 0 12px; font: 700 1.2rem/1.2 var(--titulo); }
 .rol { display: flex; gap: 16px; padding: 18px 20px; margin-bottom: 12px; }
-.rol-icono { font-size: 1.8rem; }
+.rol-icono { flex: none; width: 46px; height: 46px; margin-top: 2px; filter: brightness(1.7) drop-shadow(0 3px 8px rgba(224, 183, 86, .3)); }
 .rol h4 { margin: 0 0 4px; font-size: 1.02rem; }
 .rol p { margin: 0; color: var(--suave); font-size: .93rem; }
-.disciplinas { list-style: none; padding: 0; margin: 28px 0 0; display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
-.disciplinas li { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 18px 10px; border-radius: var(--radio); background: var(--panel); border: 1px solid var(--linea); transition: transform .2s, border-color .2s; }
-.disciplinas li:hover { transform: translateY(-4px); border-color: var(--linea-oro); }
-.disciplinas img { width: 54px; height: 54px; }
+/* las cinco disciplinas como una franja de emblemas sobre la escena, sin cajas */
+.disciplinas { list-style: none; padding: 26px 0 0; margin: 40px 0 0; display: grid; grid-template-columns: repeat(5, 1fr); border-top: 1px solid var(--linea-oro); }
+.disciplinas li { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 6px 10px; }
+.disciplinas li + li { border-left: 1px solid var(--linea); }
+.disciplinas img { width: 50px; height: 50px; filter: brightness(1.6) drop-shadow(0 4px 10px rgba(224, 183, 86, .3)); }
 .disciplinas b { font: 600 .95rem/1 var(--titulo); letter-spacing: .06em; }
 
 /* --------------------------------------------------------------- laboratorio */
@@ -230,7 +241,7 @@ kbd {
 .juego-banner { aspect-ratio: 20 / 7; object-fit: cover; width: 100%; }
 .juego-cuerpo { padding: 20px 22px 22px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
 .juego-cuerpo > .btn { align-self: flex-start; margin-top: auto; }
-.juego-tipo { margin: 0; font: .56rem/1.6 var(--pixel); color: var(--oro); }
+.juego-tipo { margin: 0 0 4px; color: var(--oro); font: 700 .74rem/1.5 "Inter", sans-serif; letter-spacing: .12em; text-transform: uppercase; }
 .juego h3 { margin: 0; font: 700 1.35rem/1.2 var(--titulo); }
 .juego h3 small { font: 500 .85rem "Inter", sans-serif; color: var(--tenue); }
 .juego p { margin: 0; color: var(--suave); font-size: .95rem; }
@@ -241,7 +252,7 @@ kbd {
 .galeria-mini { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
 .galeria-mini img { aspect-ratio: 16 / 9; object-fit: cover; border-radius: 6px; border: 1px solid var(--linea); cursor: zoom-in; }
 .salon-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
-.salon-tab { padding: 10px 16px; border-radius: 10px 10px 0 0; cursor: pointer; color: var(--suave); background: var(--panel); border: 1px solid var(--linea); font: .66rem/1.4 var(--pixel); }
+.salon-tab { padding: 10px 16px; border-radius: 10px 10px 0 0; cursor: pointer; color: var(--suave); background: var(--panel); border: 1px solid var(--linea); font: .62rem/1.4 var(--pixel); }
 .salon-tab.activo { color: #1b1405; background: var(--oro); border-color: var(--oro); }
 .salon { padding: 18px; }
 .salon canvas { display: block; width: 100%; max-width: 768px; height: auto; margin: 0 auto; border-radius: 10px; border: 1px solid var(--linea-oro); background: #05101f; touch-action: none; }
@@ -304,8 +315,12 @@ kbd {
 /* --------------------------------------------------------------- contacto y pie */
 .contactos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 10px; }
 .contacto { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 22px 12px; text-decoration: none; color: var(--texto); transition: transform .2s, border-color .2s; }
-.contacto:hover { transform: translateY(-4px); border-color: var(--linea-oro); }
-.contacto span { font-size: 2rem; }
+@media (hover: hover) and (pointer: fine) { .contacto:hover { transform: translateY(-4px); border-color: var(--linea-oro); } }
+/* cierre: la cámara vuelve a la vista completa del reino y la sección se queda quieta sobre ella */
+#contacto { min-height: calc(100vh - var(--hud)); display: flex; align-items: center; }
+#contacto .contenedor { padding-block: 40px; }
+#contacto .titulo { font-size: clamp(2.2rem, 5vw, 3.6rem); }
+.contacto-ico { width: 30px; height: 30px; fill: var(--oro-2); }
 .contacto small { color: var(--tenue); word-break: break-all; }
 .pie { padding: 34px 16px 44px; text-align: center; color: var(--tenue); border-top: 1px solid var(--linea); font-size: .9rem; }
 .pie p { margin: 4px 0; }
@@ -339,7 +354,7 @@ kbd {
 .visor img { max-height: 90vh; border-radius: 10px; }
 
 /* --------------------------------------------------------------- aparición al hacer scroll */
-.revelar { opacity: 0; transform: translateY(24px); transition: opacity .7s ease, transform .7s ease; }
+.revelar { opacity: 0; transform: translateY(24px); transition: opacity .7s cubic-bezier(.23, 1, .32, 1), transform .7s cubic-bezier(.23, 1, .32, 1); }
 .revelar.visible { opacity: 1; transform: none; }
 
 /* --------------------------------------------------------------- máquina arcade */
@@ -597,7 +612,8 @@ kbd {
   .hud-xp { margin-left: auto; }
   .lab-kpis { grid-template-columns: repeat(3, 1fr); }
   .lab-graficos { grid-template-columns: 1fr 1fr; }
-  .disciplinas { grid-template-columns: repeat(3, 1fr); }
+  .disciplinas { grid-template-columns: repeat(3, 1fr); row-gap: 22px; }
+  .disciplinas li + li { border-left: 0; }
 }
 @media (max-width: 820px) {
   .hero-grid, .estudio-grid, .juegos, .cv-grid { grid-template-columns: 1fr; }
