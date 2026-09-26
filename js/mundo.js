@@ -573,21 +573,19 @@
   }
 
   // ---------------------------------------------------------- dibujo: escena
+  // héroe del equipo en scroll lateral: idle, caminar (8 cuadros) y salto (6); la hoja mira a la derecha
+  const LAT = ['lat-idle', 'lat-camina', 'lat-salta'].map(n => { const i = new Image(); i.src = `assets/img/personajes/${n}.png`; return i; });
+  const LW = 36, LH = 32, LPIES = 28;
   function heroe(g) {
-    const x = Math.round(P.x - cam), y = Math.round(P.y), aire = !P.suelo, fr = !aire && P.paso > 0 ? Math.floor(P.paso) % 4 : -1;
-    const b = fr === 1 || fr === 3 ? -1 : 0;
+    const x = Math.round(P.x - cam), y = Math.round(P.y), aire = !P.suelo;
     sombra(g, x, G, P.y === G ? 5 : Math.max(2, Math.round(5 - (G - P.y) / 12)), 1);
+    let hoja, fr;
+    if (aire) { hoja = LAT[2]; fr = P.vy < -2.5 ? 1 : P.vy < -.5 ? 2 : P.vy < 1.5 ? 3 : 4; }
+    else if (Math.abs(P.vx) > .3) { hoja = LAT[1]; fr = Math.floor(P.paso * 2) % 8; }
+    else { hoja = LAT[0]; fr = [0, 1, 2, 1][(t >> 4) % 4]; }
+    if (!hoja.complete || !hoja.naturalWidth) return;
     g.save(); g.translate(x, y); g.scale(P.dir, 1);
-    const ondea = aire ? 2 : Math.abs(P.vx) > .5 ? 1 + (t >> 3) % 2 : 0;
-    R(g, -5 - ondea, -12 + b, 2 + ondea, 9, '#1d3366'); R(g, -5 - ondea, -4 + b, 2 + ondea, 1, '#e0b756');
-    if (aire) { R(g, -3, -6, 2, 4, '#223a5e'); R(g, 1, -5, 2, 3, '#223a5e'); R(g, -3, -2, 2, 1, '#3a2412'); R(g, 1, -2, 3, 1, '#3a2412'); }
-    else {
-      const l1 = fr === 0 ? -1 : fr === 2 ? 1 : 0;
-      R(g, -3 + l1, -5, 2, 4, '#223a5e'); R(g, 1 - l1, -5, 2, 4, '#223a5e'); R(g, -3 + l1, -1, 3, 1, '#3a2412'); R(g, 1 - l1, -1, 3, 1, '#3a2412');
-    }
-    R(g, -4, -12 + b, 8, 7, '#15294a'); R(g, -4, -7 + b, 8, 1, '#e0b756'); R(g, 1, -12 + b, 1, 5, '#e0b756');
-    R(g, 2, -11 + b + (aire ? -2 : 0), 2, 4, '#15294a'); R(g, 3, -7 + b + (aire ? -2 : 0), 1, 1, '#f1c9a0');
-    R(g, -3, -18 + b, 6, 6, '#f1c9a0'); R(g, -3, -19 + b, 6, 2, '#3a2412'); R(g, -3, -18 + b, 2, 4, '#3a2412'); R(g, 1, -15 + b, 1, 1, '#071428');
+    g.drawImage(hoja, fr * LW, 0, LW, LH, -LW / 2, -LPIES, LW, LH);
     g.restore();
   }
   function farol(g, wx) {

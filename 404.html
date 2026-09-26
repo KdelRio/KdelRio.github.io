@@ -15,10 +15,10 @@
     body {
       margin: 0; min-height: 100vh; min-height: 100dvh; display: grid; align-items: center;
       color: var(--texto); font: 16px/1.6 "Geist", system-ui, sans-serif;
-      background: #06122a url("/assets/img/fondo/lejano-2.jpg") center / cover no-repeat;
+      background: #06122a url("/assets/img/fondo/px-fondo.webp") center / cover no-repeat; image-rendering: pixelated;
     }
     /* el acantilado con los personajes, a la derecha, igual que en el inicio */
-    body::before { content: ""; position: fixed; inset: 0; background: url("/assets/img/fondo/frente.webp") right bottom / auto 100% no-repeat; pointer-events: none; }
+    body::before { content: ""; position: fixed; inset: 0; background: url("/assets/img/fondo/px-frente.webp") right bottom / auto 100% no-repeat; pointer-events: none; }
     body::after { content: ""; position: fixed; inset: 0; background: linear-gradient(90deg, rgba(3, 11, 26, .85), rgba(3, 11, 26, .45) 55%, rgba(3, 11, 26, .1)); pointer-events: none; }
     main { position: relative; z-index: 1; width: min(1180px, 100% - 32px); margin-inline: auto; }
     .codigo { margin: 0; font: .8rem/1.6 "Press Start 2P", monospace; color: var(--oro); }

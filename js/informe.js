@@ -193,7 +193,11 @@
           <div class="inf-conteo">${conteo}</div>
           <div class="inf-tabla-caja"><table class="inf-tabla"><thead><tr><th>Tiempo</th><th>Oleada</th><th>Evento</th><th>Enemigo</th><th>Detalle</th></tr></thead><tbody>
           ${filas.map(e => `<tr><td>${num(e.t)} s</td><td>${e.ola}</td><td>${e.tipo}</td><td>${e.enemigo ? NOMBRE[e.enemigo] : '-'}</td><td>${e.tipo === 'ataque' ? (e.acierto ? `acierto ×${e.golpes}` : 'fallo') : e.tipo === 'golpe' ? `daño ${num(e.dano)} · ${nombreFuente(e.fuente)}` : e.tipo === 'bloqueo' ? `absorbido ${e.dano || 1}${e.fuente === 'codigo' ? ' · escudo de código' : ''}` : e.dano ? `daño ${e.dano}${e.via ? ' · ' + e.via : ''}` : e.ttk ? `derrotado en ${num(e.ttk)} s por ${nombreFuente(e.fuente || 'espada')}` : ''}</td></tr>`).join('')}
-          </tbody></table></div><p class="inf-nota">Se muestran los 60 eventos más recientes, sin contar las apariciones.</p>`;
+          </tbody></table></div><p class="inf-nota">Se muestran los 60 eventos más recientes, sin contar las apariciones.</p>
+          <div class="inf-resumen">
+            <figure><figcaption>¿Cómo causaste el daño?</figcaption>${fuentes(M)}<p class="inf-lee">Cómo leerlo: daño total por fuente y su porcentaje. Las filas con ✦ son tu especialidad.</p></figure>
+            <figure><figcaption>¿Qué enemigo te costó más derrotar?</figcaption>${ttk(M)}<p class="inf-lee">Cómo leerlo: tiempo promedio entre la aparición de un enemigo y su derrota.</p></figure>
+          </div>`;
       }
       if (paso === 1) {
         const k = [
@@ -210,13 +214,11 @@
       }
       if (paso === 2) {
         return `<p class="inf-explica">Un buen gráfico responde una sola pregunta. Pasa el cursor sobre barras, sectores y celdas para ver el detalle.</p>
-          <div class="inf-graficos">
+          <div class="inf-graficos inf-cuatro">
             <figure><figcaption>¿A quiénes enfrentaste y a cuántos derrotaste?</figcaption>${barras(M)}<p class="inf-lee">Cómo leerlo: la barra clara son los enemigos que aparecieron y la sólida los que derrotaste. Si son iguales, limpiaste ese tipo.</p></figure>
             <figure><figcaption>¿De dónde vino el daño?</figcaption>${dona(M)}<p class="inf-lee">Cómo leerlo: cada sector es la proporción del daño total causado por un tipo de enemigo.</p></figure>
             <figure><figcaption>¿Cómo evolucionó tu vida?</figcaption>${linea(T, M)}<p class="inf-lee">Cómo leerlo: las bajadas son golpes recibidos y las subidas, curaciones. El punto marca tu momento más crítico.</p></figure>
             <figure><figcaption>¿Dónde te moviste?</figcaption>${calor(M)}<p class="inf-lee">Cómo leerlo: la arena vista desde arriba. Mientras más cálido el color, más tiempo estuviste ahí.</p></figure>
-            <figure><figcaption>¿Cómo causaste el daño?</figcaption>${fuentes(M)}<p class="inf-lee">Cómo leerlo: daño total por fuente y su porcentaje. Las filas con ✦ son tu especialidad.</p></figure>
-            <figure><figcaption>¿Qué enemigo te costó más derrotar?</figcaption>${ttk(M)}<p class="inf-lee">Cómo leerlo: tiempo promedio entre la aparición de un enemigo y su derrota.</p></figure>
           </div>`;
       }
       if (paso === 3) {
@@ -242,7 +244,7 @@
           ${paso < 4 ? `<button type="button" class="btn btn-linea" data-sig>Siguiente paso ▶</button>` : ''}
           ${paso < 4 && !op.visto ? `<button type="button" class="btn btn-mini" data-saltar>Saltar al final</button>` : ''}
           ${op.puntos ? `<span class="inf-ph">+${op.puntos} puntos de habilidad</span>` : ''}
-          ${paso === 4 || op.visto ? `<div class="inf-final">
+          ${paso === 4 ? `<div class="inf-final">
             <p><b>¿Te gustó convertir datos en decisiones?</b> ${op.clasico ? 'Justo abajo está el mismo proceso aplicado a datos de negocio: Magic Foods, una empresa manufacturera de alimentos.' : 'Revisa el análisis de datos de Magic Foods, proyecto de una empresa manufacturera de alimentos.'}</p>
             <div class="fila-botones">${op.clasico
               ? '<button type="button" class="btn btn-oro" data-magic>Ver el análisis de Magic Foods ↓</button><button type="button" class="btn btn-linea" data-reintentar>Jugar otra vez</button><button type="button" class="btn btn-linea" data-continuar>Cambiar especialidad</button>'

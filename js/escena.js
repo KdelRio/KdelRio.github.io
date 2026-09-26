@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Escena de fondo: planos con profundidad, cámara por zonas, estrellas y pétalos
+   Escena de fondo: planos pixel art con profundidad, cámara por zonas, estrellas y pétalos
    --p      avance del scroll dentro del inicio (0 a 1); separa los planos (CSS)
    --mx/my  puntero suavizado (-1 a 1), solo con mouse
    cámara   al bajar, el encuadre viaja al hito de la ilustración que corresponde a
@@ -21,11 +21,11 @@
   const TOMAS = {
     inicio:   { f: null, z: 1 },
     mundo:    { f: null, z: 1 },
-    estudio:  { f: [.61, .56], z: 1.5,  tinte: [224, 183, 86], t: .2 },   // castillo
-    datos:    { f: [.33, .43], z: 1.4,  tinte: [126, 200, 255], t: .16 }, // cumbres
-    arcade:   { f: [.26, .12], z: 1.35, tinte: [90, 170, 255], t: .22 },  // dragón
-    gremio:   { f: [.9, .3],   z: 1.45, tinte: [200, 120, 255], t: .2 },  // árbol
-    cv:       { f: [.77, .46], z: 1.4,  tinte: [243, 190, 120], t: .16 }, // personajes
+    estudio:  { f: [.53, .54], z: 1.5,  tinte: [224, 183, 86], t: .2 },   // castillo
+    datos:    { f: [.24, .5],  z: 1.5,  tinte: [126, 200, 255], t: .16 }, // mago sobre su báculo
+    arcade:   { f: [.29, .2],  z: 1.35, tinte: [90, 170, 255], t: .22 },  // dragón
+    gremio:   { f: [.9, .25],  z: 1.4,  tinte: [200, 120, 255], t: .2 },  // árbol
+    cv:       { f: [.73, .52], z: 1.4,  tinte: [243, 190, 120], t: .16 }, // pareja
     contacto: { f: null, z: 1, claro: 1, tinte: [150, 175, 255], t: .1 }, // de vuelta al reino completo
   };
 
@@ -51,7 +51,7 @@
   function medirCamara() {
     vw = innerWidth; vh = innerHeight;
     vertical = vw <= 820 && vh > vw;
-    W = Math.max(vw * 1.06, vh * (vertical ? 1.04 : 1.1) * 16 / 9); H = W * 9 / 16;
+    W = Math.max(vw * 1.06, vh * (vertical ? 1.04 : 1.1) * 1660 / 948); H = W * 948 / 1660;
     marco.style.width = W + 'px';
     llaves = [];
     document.querySelectorAll('main > section').forEach(s => {
@@ -145,8 +145,9 @@
     cE.clearRect(0, 0, estrellas.width, estrellas.height);
     for (const s of listaE) {
       const b = .35 + .65 * Math.max(0, Math.sin(t * s.v + s.f));
+      const lado = Math.round(s.r * (.7 + b * .5)) * 2 || 2;       // estrellas como píxeles cuadrados
       cE.fillStyle = `rgba(225, 235, 255, ${b * .8})`;
-      cE.beginPath(); cE.arc(s.x, s.y, s.r * (.7 + b * .5), 0, 6.283); cE.fill();
+      cE.fillRect(Math.round(s.x), Math.round(s.y), lado, lado);
     }
 
     const Wc = petalos.width, Hc = petalos.height, atenua = Math.max(1 - p * .45, cam.claro);
@@ -154,10 +155,10 @@
     listaP.forEach((q, i) => {
       q.x += q.vx + Math.sin(t * 1.3 + q.fase) * .5 * dpr; q.y += q.vy; q.a += q.va;
       if (q.y > Hc + 20 || q.x < -30) { listaP[i] = nuevoPetalo(false); return; }
-      cP.save(); cP.translate(q.x, q.y); cP.rotate(q.a); cP.scale(1, .45 + .35 * Math.sin(t * 2 + q.fase));
+      // pétalo pixel art: bloque de 2 x 1 píxeles de 3 px que alterna horizontal y vertical al girar
+      const px = 3 * dpr, x0 = Math.round(q.x / px) * px, y0 = Math.round(q.y / px) * px, gira = Math.sin(t * 2 + q.fase) > 0;
       cP.fillStyle = `rgba(${q.color}, ${q.alfa * atenua})`;
-      cP.beginPath(); cP.ellipse(0, 0, q.s, q.s * .55, 0, 0, 6.283); cP.fill();
-      cP.restore();
+      cP.fillRect(x0, y0, px, px); cP.fillRect(x0 + (gira ? px : 0), y0 + (gira ? 0 : px), px, px);
     });
   }
 

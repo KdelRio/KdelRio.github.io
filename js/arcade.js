@@ -58,10 +58,53 @@
     if (nombre === 'portada') arrancarPortada();
     CV[nombre].focus({ preventScroll: true });
   }
+  // los paneles se arman sobre un lienzo virtual de 1400 px de ancho y se reducen a la pantalla real,
+  // así su densidad es la de una pantalla de juego y no la de una página web (las diapositivas ya usan cqw)
+  const ANCHO_VIRTUAL = 1400;
+  function escalarPanel() {
+    const st = capa.style;
+    if (capa.querySelector('.dia')) { st.width = st.height = st.transform = st.transformOrigin = st.right = st.bottom = ''; return; }
+    const z = pantalla.clientWidth / ANCHO_VIRTUAL;
+    st.width = ANCHO_VIRTUAL + 'px'; st.height = (pantalla.clientHeight / z) + 'px'; st.right = st.bottom = 'auto';
+    st.transform = `scale(${z.toFixed(4)})`; st.transformOrigin = '0 0';
+  }
+  addEventListener('resize', () => { if (!capa.hidden) escalarPanel(); });
   function panel(tipo, html) {
     KRAldea.pausar(); KRBatalla.pausar();
-    panelTipo = tipo; capa.onclick = null; capa.className = 'capa-panel panel-' + tipo; capa.innerHTML = html; capa.hidden = false; capa.scrollTop = 0;
+    flotante.hidden = true;                                   // un aviso flotante (p. ej. fin de canción) no queda encima del panel
+    panelTipo = tipo; capa.onclick = null; navDia = null; capa.className = 'capa-panel panel-' + tipo; capa.innerHTML = html; capa.hidden = false; capa.scrollTop = 0;
+    escalarPanel();
     const b = capa.querySelector('button'); b && b.focus({ preventScroll: true });
+  }
+  // ---------------------------------------------------------- diapositivas: se deslizan a la derecha, con puntos abajo
+  // (amarillo = actual, gris = las demás). ← → / A D, palanca, flechas en pantalla, puntos o deslizar el dedo.
+  let navDia = null;
+  function diapositivas(tipo, hojas, alTerminar) {
+    panel(tipo, `<div class="dia" role="region" aria-roledescription="carrusel">
+      <div class="dia-ventana"><div class="dia-pista">${hojas.map((h, i) => `<section class="dia-hoja" aria-label="Diapositiva ${i + 1} de ${hojas.length}">${h}</section>`).join('')}</div></div>
+      <button type="button" class="dia-flecha dia-izq" aria-label="Anterior">◀</button><button type="button" class="dia-flecha dia-der" aria-label="Siguiente">▶</button>
+      <div class="dia-puntos">${hojas.map((_, i) => `<button type="button" class="dia-punto" data-i="${i}" aria-label="Ir a la diapositiva ${i + 1}"></button>`).join('')}</div>
+      <p class="dia-ayuda"><span>← →</span> para avanzar</p></div>`);
+    const pista = capa.querySelector('.dia-pista'), puntos = [...capa.querySelectorAll('.dia-punto')];
+    let i = 0;
+    const ir = n => {
+      if (n >= hojas.length || n < 0) return;                      // en la última se sale con "Continuar" o Enter
+      i = Math.max(0, n);
+      pista.style.transform = `translateX(${-i * 100}%)`;
+      puntos.forEach((p, j) => { p.classList.toggle('activo', j === i); p.setAttribute('aria-current', j === i ? 'true' : 'false'); });
+      capa.querySelector('.dia-izq').disabled = i === 0;
+      capa.querySelector('.dia-der').classList.toggle('dia-fin', i === hojas.length - 1);
+      KR.beep([[587, .03]]);
+    };
+    navDia = d => ir(i + d);
+    capa.querySelector('.dia-izq').onclick = () => ir(i - 1);
+    capa.querySelector('.dia-der').onclick = () => ir(i + 1);
+    puntos.forEach(p => p.onclick = () => ir(+p.dataset.i));
+    let x0 = null;
+    pista.addEventListener('pointerdown', e => { x0 = e.clientX; });
+    pista.addEventListener('pointerup', e => { if (x0 !== null && Math.abs(e.clientX - x0) > 40) ir(i + (e.clientX < x0 ? 1 : -1)); x0 = null; });
+    ir(0);
+    return capa;
   }
   function limpiarClon(n) { n.querySelectorAll('.revelar').forEach(x => x.classList.remove('revelar')); n.classList.remove('revelar'); return n; }
   let pendiente = null;                                     // barrera a abrir al volver (misión completada en un panel)
@@ -115,12 +158,20 @@
 
   // ---------------------------------------------------------- misión 1: Studios Conari
   function abrirEstudio() {
-    panel('estudio', `<div class="pn">
-      <p class="pn-kicker">Misión 1 · Castillo Conari</p><h2 class="pn-titulo">Studios Conari SpA</h2>
-      <p class="pn-logro">✓ Emblema restaurado · +1 punto de habilidad</p>
-      <div class="pn-contenido"></div>
-      <div class="fila-botones centro"><button type="button" class="btn btn-oro" data-seguir>Continuar la aventura ▶</button></div></div>`);
-    capa.querySelector('.pn-contenido').append(limpiarClon($('#estudio .estudio-grid').cloneNode(true)), limpiarClon($('#estudio .disciplinas').cloneNode(true)));
+    const roles = [...document.querySelectorAll('#estudio .rol')].map(r => ({ ico: r.querySelector('img').getAttribute('src'), t: r.querySelector('h4').textContent, d: r.querySelector('p').textContent }));
+    const disc = [...document.querySelectorAll('#estudio .disciplinas li')].map(li => ({ ico: li.querySelector('img').getAttribute('src'), t: li.querySelector('b').textContent }));
+    const lema = document.querySelector('#estudio .estudio-lema').textContent, desc = document.querySelector('#estudio .estudio-marca > p:not(.estudio-lema)').textContent;
+    diapositivas('estudio', [
+      `<div class="dia-centro"><p class="pn-kicker">Misión 1 · Castillo Conari</p>
+        <img class="dia-logo" src="assets/img/conari-wordmark.png" alt="Studios Conari">
+        <p class="dia-lema">${lema}</p><p class="pn-logro">✓ Emblema restaurado · +1 punto de habilidad</p></div>`,
+      `<div class="dia-centro dia-angosto"><h2 class="dia-h">El estudio</h2><p class="dia-p">${desc}</p>
+        <div class="fila-botones centro"><a class="btn btn-oro" href="https://studiosconari.github.io/" target="_blank" rel="noopener">Sitio oficial</a>
+        <a class="btn btn-linea" href="https://github.com/StudiosConari" target="_blank" rel="noopener">GitHub del estudio</a></div></div>`,
+      `<h2 class="dia-h">Mi rol en el estudio</h2><div class="dia-roles">${roles.map(r => `<article class="dia-rol"><img src="${r.ico}" alt=""><h3>${r.t}</h3><p>${r.d}</p></article>`).join('')}</div>`,
+      `<h2 class="dia-h">Nuestras disciplinas</h2><ul class="dia-disc">${disc.map(d => `<li><img src="${d.ico}" alt=""><b>${d.t}</b></li>`).join('')}</ul>
+        <div class="fila-botones centro"><button type="button" class="btn btn-oro" data-seguir>Continuar la aventura ▶</button></div>`,
+    ], () => volverAldea());
     if (prog().etapa === 0) pendiente = 0;
     completar(0, 1, 'estudio');
     capa.querySelector('[data-seguir]').onclick = () => volverAldea();
@@ -267,14 +318,29 @@
 
   // ---------------------------------------------------------- misión 5: hoja de personaje y final
   function abrirFicha() {
-    panel('ficha', `<div class="pn">
-      <p class="pn-kicker">Misión 5 · Biblioteca</p><h2 class="pn-titulo">Hoja de personaje</h2>
-      <div class="pn-contenido"></div>
-      <div class="fin-juego"><p class="fin-titulo">FIN DEL JUEGO</p><p>Completaste las cinco misiones del reino de Kevin del Río.</p>
-      <button type="button" class="btn btn-oro" data-conversar>¿Conversamos? ▶</button></div></div>`);
-    const c = limpiarClon($('#cv .cv-grid').cloneNode(true));
-    c.querySelectorAll('.barra-attr i').forEach(i => { i.style.width = i.dataset.v + '%'; });
-    capa.querySelector('.pn-contenido').append(c);
+    const cv = $('#cv'), txt = sel => (cv.querySelector(sel) || {}).textContent || '';
+    const exp = [...cv.querySelectorAll('.linea-tiempo li')].map(li => ({ f: li.querySelector('.fecha').textContent, t: li.querySelector('h4').textContent, l: li.querySelector('.lugar').textContent, d: li.querySelector('p:not(.lugar)').textContent }));
+    const logros = [...cv.querySelectorAll('.logros-cv > div')].map(d => ({ t: d.querySelector('b').textContent, s: d.querySelector('span').textContent }));
+    const certs = [...cv.querySelectorAll('.cert-duoc li')].map(li => li.textContent);
+    const attrs = (KR_HABILIDADES.ATRIBUTOS || []);
+    const experiencia = (lista) => `<ol class="dia-exp">${lista.map(e => `<li><span class="dia-fecha">${e.f}</span><h3>${e.t}</h3><p class="dia-lugar">${e.l}</p><p>${e.d}</p></li>`).join('')}</ol>`;
+    diapositivas('ficha', [
+      `<div class="dia-perfil"><div class="dia-centro">
+          <p class="pn-kicker">Misión 5 · Biblioteca</p>
+          <img class="dia-avatar" src="assets/img/logo-estrella.png" alt="">
+          <h2 class="dia-h">${txt('.ficha h3')}</h2><p class="dia-clase">${txt('.ficha-clase')}</p>
+          <p class="dia-p">${txt('.ficha-origen')}</p><p class="dia-p">${txt('.ficha-idiomas')}</p>
+          <a class="btn btn-oro" href="assets/CV_Kevin_del_Rio.pdf" download data-logro="cv">Descargar CV</a></div>
+        <ul class="dia-attrs">${attrs.map(([n, v]) => `<li><span>${n}</span><b>${v}</b><i><em style="width:${v}%"></em></i></li>`).join('')}</ul></div>`,
+      `<h2 class="dia-h">Misiones completadas</h2>${experiencia(exp.slice(0, 2))}`,
+      `<h2 class="dia-h">Misiones anteriores</h2>${experiencia(exp.slice(2))}`,
+      `<h2 class="dia-h">Logros y formación</h2>
+        <div class="dia-logros">${logros.map(l => `<div><b>${l.t}</b><span>${l.s}</span></div>`).join('')}</div>
+        <p class="dia-sub">Certificaciones de especialidad Duoc UC</p>
+        <ul class="dia-chips">${certs.map(c => `<li>${c}</li>`).join('')}</ul>`,
+      `<div class="dia-centro"><p class="fin-titulo grande">FIN DEL JUEGO</p><p class="dia-p">Completaste las cinco misiones del reino de Kevin del Río.</p>
+        <button type="button" class="btn btn-oro" data-conversar>¿Conversamos? ▶</button></div>`,
+    ]);
     completar(4, 0, 'cv');
     capa.querySelector('[data-conversar]').onclick = abrirFinal;
   }
@@ -337,7 +403,8 @@
   const pc = CV.portada.getContext('2d'), PW = CV.portada.width, PH = CV.portada.height;
   const logo = new Image(); logo.src = 'assets/img/conari-wordmark.png';
   const ESTRELLAS = Array.from({ length: 140 }, () => ({ x: Math.random() * PW, y: Math.random() * PH, v: .2 + Math.random() * 1.3, b: Math.random() }));
-  let tp = 0, creditos = 0, arranque = 0, rechazo = 0, rafP = 0;
+  let tp = 0, creditos = 0, arranque = 0, rechazo = 0, rafP = 0, destino = 'interactivo', opcion = 0;
+  const OPCIONES = [['1', 'PORTAFOLIO INTERACTIVO', 'interactivo'], ['2', 'PORTAFOLIO CLÁSICO', 'clasico']];
   const monedas = [];
   function txt(t, x, y, tam, col, brillo) {
     pc.font = `${tam}px "Press Start 2P", monospace`; pc.textAlign = 'center'; pc.textBaseline = 'middle';
@@ -355,15 +422,17 @@
     const sacude = rechazo > 0 ? Math.sin(rechazo * 1.7) * 8 : 0; if (rechazo > 0) rechazo--;
     if (arranque > 0) {
       arranque--;
-      if ((arranque >> 3) % 2) txt('PLAYER 1 START', PW / 2, 318, 34, '#ffd400', 18);
+      const eleg = OPCIONES.find(o => o[2] === destino);
+      if ((arranque >> 3) % 2) txt(destino === 'clasico' ? 'CARGANDO...' : 'PLAYER 1 START', PW / 2, 318, 34, '#ffd400', 18);
+      txt(eleg[1], PW / 2, 372, 14, '#e6eefc');
       if (arranque === 0) acercar();
     } else if (creditos === 0) {
       if ((tp >> 5) % 2 === 0 || rechazo > 0) txt('INSERT COIN', PW / 2 + sacude, 318, 46, '#ffd400', 22);
       txt('PRESIONA  F  PARA METER UNA FICHA', PW / 2, 392, 15, '#e6eefc');
     } else {
-      txt('INSERT COIN', PW / 2, 300, 22, '#ffd400', 10);
-      if ((tp >> 4) % 2 === 0) txt('PRESIONA ENTER PARA INICIAR', PW / 2, 356, 22, '#ffd400', 16);
-      txt('F · OTRA FICHA', PW / 2, 404, 12, '#cad6e5');
+      // con ficha: dos cuadros para elegir (← → y ENTER, o tocar el cuadro)
+      CUADROS.forEach((c, i) => cuadroOpcion(c, i === opcion));
+      txt('← →  ELEGIR   ·   ENTER  CONFIRMAR', PW / 2, 470, 11, '#8fa3bd');
     }
     for (let i = monedas.length - 1; i >= 0; i--) {                         // ficha cayendo
       const m = monedas[i]; m.t++; const y = -20 + m.t * m.t * .5, ancho = Math.abs(Math.cos(m.t * .35)) * 16 + 3;
@@ -372,16 +441,59 @@
       if (y > 300) { monedas.splice(i, 1); creditos = Math.min(9, creditos + 1); KR.beep([[988, .05], [1319, .16]]); }
     }
     txt(`CREDITS ${creditos}`, PW - 130, PH - 34, 13, '#f4f7fd');
-    txt('C · PORTAFOLIO CLÁSICO', 180, PH - 34, 10, '#8fa3bd');
     txt('© 2026 STUDIOS CONARI', PW / 2, PH - 34, 10, '#8fa3bd');
+  }
+  // ---------------------------------------------------------- cuadros de selección en pixel art
+  const CUADROS = [{ x: PW / 2 - 330, y: 284, w: 300, h: 162, nombre: 'INTERACTIVO', sub: 'MODO ARCADE', ico: 'control' },
+                   { x: PW / 2 + 30, y: 284, w: 300, h: 162, nombre: 'CLÁSICO', sub: 'PORTAFOLIO WEB', ico: 'hoja' }];
+  const B = (x, y, w, h, c) => { pc.fillStyle = c; pc.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); };
+  function marco(x, y, w, h, u, borde, fondo) {            // rectángulo con esquinas escalonadas de 2 peldaños
+    B(x + 2 * u, y, w - 4 * u, h, borde); B(x + u, y + u, w - 2 * u, h - 2 * u, borde); B(x, y + 2 * u, w, h - 4 * u, borde);
+    B(x + 3 * u, y + u, w - 6 * u, h - 2 * u, fondo); B(x + 2 * u, y + 2 * u, w - 4 * u, h - 4 * u, fondo); B(x + u, y + 3 * u, w - 2 * u, h - 6 * u, fondo);
+  }
+  function icono(tipo, cx, cy, c, sombra) {
+    const u = 4;                                                                  // cada "píxel" del ícono mide 4 px
+    const pinta = (filas, col) => filas.forEach((f, j) => [...f].forEach((ch, i) => { if (ch !== '.') B(cx + (i - f.length / 2) * u, cy + (j - filas.length / 2) * u, u, u, ch === 'o' ? sombra : col); }));
+    if (tipo === 'control') pinta([
+      '..#########..',
+      '.###########.',
+      '##.#######oo#',
+      '#...#####o##o',
+      '##.#######oo#',
+      '#############',
+      '###.......###',
+      '.##.......##.'], c);
+    else pinta([
+      '#######...',
+      '#.....##..',
+      '#.ooo.#.#.',
+      '#.....####',
+      '#.oooooo.#',
+      '#........#',
+      '#.oooooo.#',
+      '#........#',
+      '#.oooo...#',
+      '##########'], c);
+  }
+  function cuadroOpcion(c, sel) {
+    const late = sel && (tp >> 4) % 2 === 0, u = 5;
+    if (sel) B(c.x + 8, c.y + 8, c.w, c.h, 'rgba(255,212,0,.18)');                // sombra dura dorada
+    marco(c.x, c.y, c.w, c.h, u, sel ? (late ? '#fff1a8' : '#ffd400') : '#3a4668', sel ? '#1a1a08' : '#0b1020');
+    marco(c.x + 3 * u, c.y + 3 * u, c.w - 6 * u, c.h - 6 * u, u, sel ? '#9a7a2c' : '#1d2440', sel ? '#221f0a' : '#0d1428');
+    icono(c.ico, c.x + c.w / 2, c.y + 54, sel ? '#ffd400' : '#6b7ba0', sel ? '#fff1a8' : '#3a4668');
+    txt(c.nombre, c.x + c.w / 2, c.y + 98, 18, sel ? '#ffd400' : '#cad6e5', sel ? 8 : 0);
+    txt(c.sub, c.x + c.w / 2, c.y + 122, 9, sel ? '#f3d27f' : '#6b7ba0');
+    if (sel && (tp >> 4) % 2 === 0) { txt('▼', c.x + c.w / 2, c.y - 16, 16, '#ffd400'); }
   }
   function bucleP() { dibujarPortada(); rafP = (actual === 'portada' && !maquina.hidden) ? requestAnimationFrame(bucleP) : 0; }
   function arrancarPortada() { if (!rafP) rafP = requestAnimationFrame(bucleP); }
   function meterFicha() { if (arranque) return; monedas.push({ t: 0 }); KR.beep([[660, .03]]); }
-  function pulsarStart() {
+  function elegir(i) { if (arranque || !creditos || opcion === i) return; opcion = i; KR.beep([[660, .03]]); }
+  function pulsarStart(eleccion = opcion) {
     if (arranque || fase !== 'attract') return;
     if (creditos === 0 && !monedas.length) { rechazo = 30; KR.beep([[150, .15]]); return; }
     if (creditos === 0) return;
+    destino = OPCIONES[eleccion][2];
     creditos--; arranque = 100; KR.beep([[523, .08], [659, .08], [784, .08], [1047, .08], [1319, .25]]);
   }
 
@@ -400,9 +512,12 @@
   }
   function acercar() {
     fase = 'acercando';
-    if (tactil) { fase = 'juego'; iniciarJuego(); return; }
+    if (tactil) { if (destino === 'clasico') return cerrarMaquina(); fase = 'juego'; iniciarJuego(); return; }
     maquina.classList.add('enfocada'); enfocar(true);
-    setTimeout(() => { fase = 'juego'; iniciarJuego(); }, 1650);
+    setTimeout(() => {
+      if (destino === 'clasico') { pantalla.classList.add('encendido'); setTimeout(() => { pantalla.classList.remove('encendido'); cerrarMaquina(); }, 450); return; }
+      fase = 'juego'; iniciarJuego();
+    }, 1650);
   }
   function iniciarJuego() {
     KR.desbloquear('start');
@@ -435,11 +550,18 @@
     if (fase === 'attract') {
       if (k === 'f') { e.preventDefault(); meterFicha(); }
       else if (k === 'enter' || k === ' ') { e.preventDefault(); pulsarStart(); }
-      else if (k === 'c') cerrarMaquina();
+      else if (['arrowleft', 'arrowup', 'a', 'w'].includes(k)) { e.preventDefault(); elegir(0); }
+      else if (['arrowright', 'arrowdown', 'd', 's'].includes(k)) { e.preventDefault(); elegir(1); }
+      else if (k === 'c') { e.preventDefault(); if (creditos) pulsarStart(1); }        // atajo al clásico
       return;
     }
     if (fase !== 'juego') return;
     if (k === 'escape') { e.preventDefault(); escape(); return; }
+    if (navDia && !capa.hidden) {
+      if (['arrowright', 'd'].includes(k)) { e.preventDefault(); navDia(1); return; }
+      if (['arrowleft', 'a'].includes(k)) { e.preventDefault(); navDia(-1); return; }
+      if (k === 'enter' && capa.querySelector('.dia-punto:last-child.activo')) { e.preventDefault(); const c = capa.querySelector('.dia-hoja:last-child [data-seguir], .dia-hoja:last-child [data-conversar]'); c && c.click(); return; }
+    }
     if (e.target.classList && e.target.classList.contains('capa-juego')) return;
     if ((panelTipo === 'arbol' && k === 'h') || (panelTipo === 'ficha' && k === 'p')) { e.preventDefault(); volverAldea(); }
   });
@@ -451,9 +573,14 @@
     b.addEventListener('pointerdown', e => { e.preventDefault(); b.classList.add('pulsado'); disparar('keydown'); });
     ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => b.addEventListener(ev, () => { if (b.classList.contains('pulsado')) { b.classList.remove('pulsado'); disparar('keyup'); } }));
   });
-  $('#maquina-salir').addEventListener('click', cerrarMaquina);
   $$('[data-abrir-arcade]').forEach(b => b.addEventListener('click', abrirMaquina));
-  CV.portada.addEventListener('pointerdown', () => { if (fase === 'attract') { if (creditos || monedas.length) pulsarStart(); else meterFicha(); } });
+  CV.portada.addEventListener('pointerdown', e => {
+    if (fase !== 'attract') return;
+    if (!creditos) { if (!monedas.length) meterFicha(); return; }
+    const r = CV.portada.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * PW, y = (e.clientY - r.top) / r.height * PH;
+    const i = CUADROS.findIndex(c => x >= c.x && x <= c.x + c.w && y >= c.y && y <= c.y + c.h);   // tocar un cuadro lo elige
+    if (i >= 0) { opcion = i; pulsarStart(i); }
+  });
 
   // ---------------------------------------------------------- arranque: la página comienza en la máquina
   const q = new URLSearchParams(location.search);

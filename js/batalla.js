@@ -15,8 +15,25 @@
    ========================================================================== */
 (function () {
   'use strict';
+  // sprites del equipo (assets/img/personajes): filas = abajo, izquierda, derecha, arriba; 3 cuadros por fila.
+  // Cada celda está alineada por la cabeza; "pies" es la fila de la celda donde se apoyan los pies.
+  const HOJA = (src, w, h, pies) => { const i = new Image(); i.src = 'assets/img/personajes/' + src; return { i, w, h, pies }; };
+  const SPR = {
+    idle: HOJA('td-hombre-idle.png', 48, 44, 37), camina: HOJA('td-hombre-camina.png', 48, 44, 37),
+    espada: HOJA('td-hombre-espada.png', 64, 56, 45), onda: HOJA('td-hombre-onda.png', 88, 72, 51),
+    mIdle: HOJA('td-mujer-idle.png', 48, 44, 37), mCamina: HOJA('td-mujer-camina.png', 48, 44, 37), mDaga: HOJA('td-mujer-daga.png', 56, 48, 39),
+  };
+  const direccion = (fx, fy) => Math.abs(fx) > Math.abs(fy) ? (fx < 0 ? 1 : 2) : (fy < 0 ? 3 : 0);
+  const CICLO = [0, 1, 2, 1];
+
   // KRCrearBatalla(canvas) monta una arena independiente: la del modo arcade y la de la página clásica
   function crear(cv) {
+  // dibuja el cuadro (fila, col) de una hoja con los pies en (x, y) del mundo
+  function sprite(h, fila, col, x, y) {
+    if (!h.i.complete || !h.i.naturalWidth) return false;
+    g.drawImage(h.i, col * h.w, fila * h.h, h.w, h.h, Math.round(x - h.w / 2), Math.round(y - h.pies), h.w, h.h);
+    return true;
+  }
   const ctx = cv.getContext('2d'), W = cv.width, H = cv.height, S = 2, WW = W / S, WH = H / S;
   const buf = document.createElement('canvas'); buf.width = WW; buf.height = WH;
   const g = buf.getContext('2d');
@@ -144,6 +161,7 @@
     }
     // jugador
     let dx = (K.der ? 1 : 0) - (K.izq ? 1 : 0), dy = (K.abajo ? 1 : 0) - (K.arriba ? 1 : 0);
+    P.mueve = !!(dx || dy);
     if (dx || dy) { const n = Math.hypot(dx, dy), x0 = P.x, y0 = P.y; P.x += dx / n * P.v; P.y += dy / n * P.v; P.fx = dx / n; P.fy = dy / n; limitar(P); T.distancia += Math.hypot(P.x - x0, P.y - y0); }
     if (P.inv > 0) P.inv--; if (P.cd > 0) P.cd--; if (P.atk > 0) P.atk--; if (P.invocaCd > 0) P.invocaCd--;
     if ((K.atk || pedido) && B.esp === 4) {                  // Gestión: en vez de pegar, invoca esqueletos que pelean por ti
@@ -315,6 +333,7 @@
       const dObj = obj ? dist(obj, a) : Infinity;
       if (obj && (a.tipo !== 'companero' || dObj < 150)) {
         const alcance = a.r + obj.r + 3;
+        a.fx = obj.x - a.x; a.fy = obj.y - a.y; a.mueve = dObj > alcance;
         if (dObj > alcance) { a.x += (obj.x - a.x) / dObj * a.v; a.y += (obj.y - a.y) / dObj * a.v; }
         else if (a.cd <= 0) {
           const dn = a.tipo === 'companero' ? (B.nivel >= 3 ? 1.5 : 1) : a.tipo === 'esqueleto' ? 1 : a.dano;
@@ -325,6 +344,7 @@
         }
       } else if (a.tipo === 'companero') {                    // sin enemigos cerca: vuelve a tu lado
         const d = Math.hypot(P.x - 14 - a.x, P.y + 4 - a.y);
+        a.mueve = d > 3; if (d > 3) { a.fx = P.x - 14 - a.x; a.fy = P.y + 4 - a.y; }
         if (d > 3) { a.x += (P.x - 14 - a.x) / d * Math.min(a.v, d); a.y += (P.y + 4 - a.y) / d * Math.min(a.v, d); }
       }
       limitar(a);
@@ -359,12 +379,14 @@
 
   function heroe() {
     if (P.inv > 0 && Math.floor(P.inv / 5) % 2) return;
-    const x = Math.round(P.x), y = Math.round(P.y);
-    elipse(x, y + 5, 5, 2, 'rgba(0,0,0,.35)');
-    R(x - 4, y - 6, 8, 10, '#15294a'); R(x - 4, y, 8, 1, '#e0b756'); R(x - 3, y + 4, 2, 2, '#223a5e'); R(x + 1, y + 4, 2, 2, '#223a5e');
-    R(x - 3, y - 12, 6, 6, '#f1c9a0'); R(x - 4, y - 14, 8, 3, '#c9ced8');
-    if (P.fy >= 0) { R(x - 2, y - 9, 1, 1, '#071428'); R(x + 1, y - 9, 1, 1, '#071428'); }
-    if (P.esp > 0) { const k = 1 - P.esp / 18; g.strokeStyle = `rgba(126,200,255,${1 - k})`; g.lineWidth = 3; g.beginPath(); g.ellipse(x, y - 3, 10 + k * 30, 6 + k * 18, 0, 0, 7); g.stroke(); }
+    const x = Math.round(P.x), y = Math.round(P.y), pies = y + 5, d = direccion(P.fx, P.fy);
+    elipse(x, pies, 6, 2, 'rgba(0,0,0,.35)');
+    let ok;
+    if (P.esp > 0) ok = sprite(SPR.onda, 0, Math.min(5, Math.floor((18 - P.esp) / 3)), x, pies);                  // onda expansiva
+    else if (P.atk > 0 && B.esp !== 4) ok = sprite(SPR.espada, d, Math.min(2, Math.floor((8 - P.atk) / 8 * 3)), x, pies);
+    else if (P.mueve) ok = sprite(SPR.camina, d, CICLO[(f >> 3) % 4], x, pies);
+    else ok = sprite(SPR.idle, d, CICLO[(f >> 4) % 4], x, pies);
+    if (!ok) { R(x - 4, y - 6, 8, 10, '#15294a'); R(x - 3, y - 12, 6, 6, '#f1c9a0'); }                           // mientras cargan las imágenes
     if (B.esp === 3) {                                        // robot de IA
       const rx = Math.round(x + Math.cos(P.dronA) * 14), ry = Math.round(y - 12 + Math.sin(P.dronA) * 6);
       R(rx, ry - 6, 1, 2, '#9aa3b5'); R(rx, ry - 7, 1, 1, (f >> 4) % 2 ? '#f87171' : '#fecaca');
@@ -388,11 +410,6 @@
         const cae = (f + i * 7) % 6;
         R(cx, cy - 3, 1, 5, 'rgba(34,197,94,.45)'); R(cx, cy - 3 + cae % 5, 1, 1, '#bbf7d0');
       }
-    }
-    if (P.atk > 0) {
-      const a = Math.atan2(P.fy, P.fx), pr = 1 - P.atk / 8;
-      g.strokeStyle = `rgba(243,210,127,${.9 - pr * .5})`; g.lineWidth = 3; g.beginPath(); g.arc(x, y - 3, 20, a - 1 + pr * .4, a + 1 - pr * .4); g.stroke();
-      g.strokeStyle = '#f4f7fd'; g.lineWidth = 2; g.beginPath(); g.moveTo(x, y - 3); g.lineTo(x + Math.cos(a) * 18, y - 3 + Math.sin(a) * 18); g.stroke();
     }
   }
   function enemigo(e) {
@@ -439,11 +456,11 @@
     }
     elipse(x, y + 5, 4, 2, 'rgba(0,0,0,.35)');
     if (a.tipo === 'companero') {                             // compañero pixel art
-      R(x - 3, y - 4, 6, 7, '#22c55e'); R(x - 3, y - 1, 6, 1, '#14532d'); R(x - 2, y + 3, 2, 2, '#3f2a1d'); R(x + 1, y + 3, 2, 2, '#3f2a1d');
-      R(x - 3, y - 9, 6, 5, '#f1c9a0'); R(x - 4, y - 11, 8, 3, '#f472b6'); R(x - 4, y - 9, 1, 3, '#f472b6');
-      R(x - 2, y - 7, 1, 1, '#071428'); R(x + 1, y - 7, 1, 1, '#071428');
-      if (a.atk > 0) { R(x + 3, y - 6 + (8 - a.atk), 5, 1, '#e2e8f0'); R(x + 3, y - 5 + (8 - a.atk), 1, 2, '#e0b756'); }
-      else R(x + 3, y - 3, 1, 5, '#e2e8f0');
+      // la compañera del equipo: daga al atacar, camina o espera mirando a su objetivo
+      const d = direccion(a.fx || 0, a.fy || 1), pies = y + 5;
+      if (a.atk > 0) sprite(SPR.mDaga, d, Math.min(2, Math.floor((8 - a.atk) / 8 * 3)), x, pies);
+      else if (a.mueve) sprite(SPR.mCamina, d, CICLO[(f >> 3) % 4], x, pies);
+      else sprite(SPR.mIdle, d, CICLO[(f >> 4) % 4], x, pies);
       return;
     }
     // esqueleto invocado (Gestión): sale del suelo, ojos verdes para distinguirlo de los arqueros

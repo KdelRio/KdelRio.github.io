@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Geist:wght@400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/estilos.css?v=20260927b">
+  <link rel="stylesheet" href="css/estilos.css?v=20260927inf">
 </head>
 <body>
 <a class="saltar" href="#contenido">Saltar al contenido</a>
@@ -23,11 +23,12 @@
 <!-- ============================================================ ESCENA DE FONDO (capas con profundidad) -->
 <div class="escena" id="escena" aria-hidden="true">
   <div class="escena-marco">
-    <div class="plano plano-lejano" data-prof="lejano"><img src="assets/img/fondo/lejano-2.jpg" alt="" class="plano-img" fetchpriority="high"></div>
+    <div class="plano plano-lejano"><img src="assets/img/fondo/px-fondo.webp" alt="" class="plano-img" fetchpriority="high"></div>
     <canvas class="plano plano-estrellas" id="escena-estrellas"></canvas>
-    <div class="plano plano-dragon" data-prof="dragon"><img src="assets/img/fondo/dragon.webp" alt="" class="dragon-img"></div>
-    <div class="plano plano-bruma" data-prof="bruma"><i></i><i></i></div>
-    <div class="plano plano-frente" data-prof="frente"><img src="assets/img/fondo/frente.webp" alt="" class="frente-img"></div>
+    <div class="plano plano-dragon"><img src="assets/img/fondo/px-dragon.webp" alt="" class="px-dragon"></div>
+    <div class="plano plano-mago"><img src="assets/img/fondo/px-mago.webp" alt="" class="px-mago"></div>
+    <div class="plano plano-bosque"><img src="assets/img/fondo/px-bosque.webp" alt="" class="px-bosque"></div>
+    <div class="plano plano-frente"><img src="assets/img/fondo/px-frente.webp" alt="" class="px-frente"></div>
   </div>
   <canvas class="escena-petalos" id="escena-petalos"></canvas>
   <div class="escena-velo" id="escena-velo"></div>
@@ -37,7 +38,6 @@
 <!-- ============================================================ MÁQUINA ARCADE -->
 <div id="maquina" class="maquina" role="dialog" aria-modal="true" aria-label="Portafolio en modo arcade">
   <div class="sala" aria-hidden="true"></div>
-  <button class="maquina-salir" id="maquina-salir" type="button">Portafolio clásico <span aria-hidden="true">→</span></button>
   <div class="gabinete" id="gabinete">
     <div class="marquesina"><img src="assets/img/conari-wordmark.png" alt="Studios Conari"><span>ARCADE</span></div>
     <div class="bisel">
@@ -415,17 +415,18 @@
 <div class="toasts" id="toasts" aria-live="polite"></div>
 <button type="button" class="dragon-volador" id="dragon" aria-label="Volver al inicio de la página" title="Volver arriba"><span class="dragon-sprite"></span></button>
 
-<script src="js/escena.js?v=20260926c"></script>
+<script src="js/escena.js?v=20260927a"></script>
 <script src="js/dragon.js?v=20260927a"></script>
 <script src="js/nucleo.js?v=20260926c"></script>
 <script src="js/laboratorio.js?v=20260926b"></script>
 <script src="js/gremio.js?v=20260926f"></script>
 <script src="js/ritmo.js?v=20260926c"></script>
-<script src="js/mundo.js?v=20260926d"></script>
-<script src="js/batalla.js?v=20260926f"></script>
-<script src="js/informe.js?v=20260926f"></script>
+<script src="js/mundo.js?v=20260927pj"></script>
+<script src="js/batalla.js?v=20260927pj"></script>
+<script src="js/informe.js?v=20260927inf"></script>
 <script src="js/memoria.js?v=20260926"></script>
 <script src="js/arena.js?v=20260926b"></script>
-<script src="js/arcade.js?v=20260926h"></script>
+<script src="js/sala.js?v=20260927pj"></script>
+<script src="js/arcade.js?v=20260927box2"></script>
 </body>
 </html>
