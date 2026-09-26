@@ -770,6 +770,28 @@ kbd {
 .inf-final { flex-basis: 100%; margin-top: 6px; padding: 14px 16px; text-align: center; border-radius: 14px; border: 1px solid var(--oro); background: rgba(224, 183, 86, .07); }
 .inf-final p { margin: 0; color: var(--suave); }
 .inf-final .fila-botones { justify-content: center; margin-top: 12px; }
+/* dentro de la pantalla del arcade el informe se compacta para que ningún paso necesite scroll */
+.capa-panel.panel-informe { padding: 20px 28px; }
+.capa-panel .inf-cab { margin-bottom: 8px; }
+.capa-panel .inf-pasos { margin-bottom: 10px; padding-bottom: 8px; }
+.capa-panel .inf-explica { margin-bottom: 10px; padding: 8px 12px; }
+.capa-panel .inf-conteo { margin-bottom: 8px; }
+.capa-panel .inf-tabla-caja { max-height: 168px; }
+.capa-panel .inf-nota { margin: 4px 0 0; }
+.capa-panel .inf-resumen { margin-top: 8px; }
+.capa-panel .inf-resumen figure { padding: 8px 12px; }
+.capa-panel .inf-pie { margin-top: 10px; }
+.capa-panel .inf-hallazgos { grid-template-columns: 1fr 1fr; gap: 8px; }
+.capa-panel .inf-hallazgos li { padding: 8px 12px; font-size: .92em; }
+.capa-panel .inf-acciones section { padding: 10px 14px; }
+.capa-panel .inf-acciones li { margin-bottom: 3px; font-size: .9em; }
+.capa-panel .inf-acciones ol { margin: 0; padding-left: 1.3em; }
+.capa-panel .inf-puente { margin-top: 8px; font-size: .9em; }
+.capa-panel .inf-final { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 6px 16px; padding: 10px 14px; text-align: left; }
+.capa-panel .inf-final .inf-nota { grid-column: 1 / -1; margin: 0; font-size: .78em; }
+.capa-panel .inf-final p { font-size: .9em; }
+.capa-panel .inf-final .fila-botones { margin: 0; flex-wrap: nowrap; }
+.capa-panel .inf-final .btn { white-space: nowrap; }
 
 /* invitación al modo arcade (portafolio clásico) */
 .invitacion { display: grid; grid-template-columns: 1.2fr 1fr; gap: 30px; align-items: center; padding: 30px; }
@@ -830,4 +852,59 @@ kbd {
   .px-mago { animation: none; }
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
   .revelar { opacity: 1; transform: none; }
+}
+
+
+/* --------------------------------------------------------------- paneles del arcade que llenan la pantalla
+   El lienzo del panel siempre tiene la proporción de la pantalla (16:9). Cada panel se organiza en
+   columna con el alto completo y su zona principal se estira: sin huecos y sin scroll. */
+.capa-panel:not(.panel-estudio):not(.panel-ficha) { display: flex; flex-direction: column; overflow: hidden; }
+.capa-panel > .pn, .capa-panel > .inf { flex: 1; min-height: 0; max-width: none; width: 100%; display: flex; flex-direction: column; }
+/* informe */
+.capa-panel .inf-cuerpo { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.capa-panel .inf-cuerpo > * { flex: none; }
+.capa-panel .inf-tabla-caja { flex: 1 1 0; min-height: 90px; max-height: none; }
+.capa-panel .inf-kpis { flex: 1 1 0; grid-auto-rows: 1fr; }
+.capa-panel .inf-kpi { display: flex; flex-direction: column; justify-content: center; }
+.capa-panel .inf-kpi b { font-size: 1.7em; }
+.capa-panel .inf-cuatro { flex: 1 1 0; min-height: 0; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+.capa-panel .inf-cuatro figure { display: grid; grid-template-columns: 1fr 1.6fr; grid-template-rows: auto 1fr; column-gap: 14px; }
+.capa-panel .inf-cuatro figcaption { grid-column: 1; min-height: 0; font-size: 1em; }
+.capa-panel .inf-cuatro figure > :not(figcaption):not(.inf-lee):not(.inf-leyenda):not(.inf-lista-dona) { grid-column: 2; grid-row: 1 / span 3; align-self: stretch; }
+.capa-panel .inf-cuatro .inf-lee, .capa-panel .inf-cuatro .inf-leyenda, .capa-panel .inf-cuatro .inf-lista-dona { grid-column: 1; margin: 6px 0 0; font-size: .82em; }
+.capa-panel .inf-cuatro figure { min-height: 0; }
+.capa-panel .inf-cuatro .inf-svg { flex: 1 1 0; min-height: 0; max-height: none; width: 100%; height: 100%; }
+.capa-panel .inf-cuatro .inf-dona { max-width: none; }
+.capa-panel .inf-hallazgos { flex: 1 1 0; grid-auto-rows: 1fr; }
+.capa-panel .inf-hallazgos li { align-items: center; font-size: 1em; }
+.capa-panel .inf-acciones { flex: 1 1 0; min-height: 0; }
+.capa-panel .inf-acciones li { font-size: 1em; margin-bottom: 6px; }
+.capa-panel .inf-resumen { flex: none; }
+/* memorize: las cartas crecen con el alto disponible */
+.capa-panel .pn-memoria .mem { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.capa-panel .pn-memoria .mem-grilla { flex: 1 1 0; min-height: 0; width: 100%; max-width: 1180px; grid-template-rows: repeat(4, 1fr); }
+.capa-panel .pn-memoria .mem-carta { aspect-ratio: auto; }
+.capa-panel .pn-memoria .mem-frente svg { width: 46px; }
+.capa-panel .pn-memoria .mem-frente b { font-size: 1em; }
+.capa-panel .pn-memoria .mem-frente small { font-size: .74em; }
+/* especialidad: rama del Gremio y elección */
+.capa-panel .pn-rama .rama-grid { flex: 1 1 0; min-height: 0; align-items: stretch; }
+.capa-panel .pn-rama .hab-lista { grid-auto-rows: 1fr; height: 100%; }
+.capa-panel .pn-rama .hab-fila { font-size: 1.05em; }
+.capa-panel .pn-rama .esp-caja { display: flex; flex-direction: column; justify-content: center; font-size: 1.05em; }
+.capa-panel .pn-esp .esp-grilla { flex: 1 1 0; min-height: 0; grid-auto-rows: 1fr; }
+.capa-panel .pn-esp .esp-carta { justify-content: center; font-size: 1.1em; }
+/* nueva habilidad, fin del juego y pausa: centrados y a buen tamaño */
+.capa-panel .pn-subida { justify-content: center; align-self: center; max-width: 1060px; font-size: 1.5em; }
+.capa-panel .pn-final { justify-content: space-evenly; font-size: 1.1em; }
+.capa-panel .pn-final .contacto { padding: 30px 12px; }
+.capa-panel .pn-pausa { justify-content: center; align-self: center; max-width: 620px; padding-top: 0; font-size: 1.2em; }
+
+.capa-panel .pn-subida .btn, .capa-panel .pn-pausa .btn { font-size: 1em; padding: .75em 1.6em; }
+
+/* 7 especialidades: 4 arriba y 3 centradas abajo (grilla de 8 columnas, cada tarjeta ocupa 2) */
+@media (min-width: 561px) {
+  .esp-grilla { grid-template-columns: repeat(8, 1fr); }
+  .esp-carta { grid-column: span 2; }
+  .esp-carta:nth-child(5) { grid-column: 2 / span 2; }
 }
