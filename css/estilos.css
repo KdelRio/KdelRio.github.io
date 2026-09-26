@@ -909,3 +909,6 @@ kbd {
   .esp-carta { grid-column: span 2; }
   .esp-carta:nth-child(5) { grid-column: 2 / span 2; }
 }
+
+.confirma-texto { max-width: 34em; margin: 10px auto 6px; color: var(--suave); }
+.confirma-botones { grid-template-columns: 1fr 1fr; }

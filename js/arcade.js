@@ -382,9 +382,19 @@
       if (e.target.closest('[data-continuar]')) continuar();
       if (e.target.closest('[data-aldea]')) volverAldea();
       if (e.target.closest('[data-infinito]')) iniciarBatalla(true);
-      if (e.target.closest('[data-nueva]') && confirm('¿Reiniciar la partida desde la misión 1?')) nuevaPartida();
+      if (e.target.closest('[data-nueva]')) confirmarReinicio();
+      if (e.target.closest('[data-si]')) nuevaPartida();
+      if (e.target.closest('[data-no]')) abrirPausa();
       if (e.target.closest('[data-clasico]')) cerrarMaquina();
     };
+  }
+  // confirmación dentro del juego (en vez del cuadro del navegador)
+  function confirmarReinicio() {
+    capa.querySelector('.pn-pausa').innerHTML = `<p class="fin-titulo">¿REINICIAR?</p>
+      <p class="pn-texto confirma-texto">Volverás a la misión 1 y perderás el avance del modo arcade: especialidad, habilidades y misiones. Tu experiencia y tus logros se mantienen.</p>
+      <div class="pausa-botones confirma-botones"><button type="button" class="btn btn-oro" data-si>Sí, reiniciar</button><button type="button" class="btn btn-linea" data-no>No, volver</button></div>`;
+    capa.querySelector('[data-no]').focus({ preventScroll: true });
+    KR.beep([[330, .06], [262, .08]]);
   }
   function continuar() {
     capa.hidden = true; capa.innerHTML = ''; panelTipo = null;
@@ -393,7 +403,7 @@
     else mostrar(pausaDe || 'aldea');
   }
   function escape() {
-    if (panelTipo === 'pausa') return continuar();
+    if (panelTipo === 'pausa') return capa.querySelector('[data-no]') ? abrirPausa() : continuar();
     if (panelTipo === 'informe') return;
     if (panelTipo) return volverAldea();
     if (['aldea', 'batalla', 'ritmo'].includes(actual)) abrirPausa();
