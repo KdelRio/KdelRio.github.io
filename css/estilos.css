@@ -859,6 +859,7 @@ kbd {
    El lienzo del panel siempre tiene la proporción de la pantalla (16:9). Cada panel se organiza en
    columna con el alto completo y su zona principal se estira: sin huecos y sin scroll. */
 .capa-panel:not(.panel-estudio):not(.panel-ficha) { display: flex; flex-direction: column; overflow: hidden; }
+.capa-panel[hidden]:not(#_) { display: none; }   /* oculto gana siempre, aunque el panel use flex */
 .capa-panel > .pn, .capa-panel > .inf { flex: 1; min-height: 0; max-width: none; width: 100%; display: flex; flex-direction: column; }
 /* informe */
 .capa-panel .inf-cuerpo { flex: 1; min-height: 0; display: flex; flex-direction: column; }
