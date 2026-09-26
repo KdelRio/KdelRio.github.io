@@ -161,6 +161,15 @@ kbd {
 .hero-texto { color: var(--suave); font-size: 1.08rem; max-width: 640px; }
 .hero-botones { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 26px; }
 
+/* mascota (js/mascota.js): dos hojas de 3 × 3, una celda visible a la vez */
+.mascota { position: relative; display: block; flex-shrink: 0; width: 120px; height: 120px; padding: 0; border: 0; background: transparent; cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent; }
+.mascota-cuerpo { position: relative; display: block; width: 100%; height: 100%; transform-origin: 50% 78%; }
+.mascota-capa { position: absolute; inset: 0; background-size: 300% 300%; background-repeat: no-repeat; }
+/* flotando fija abajo a la derecha: al tocarla vuelve al inicio (encima del contenido, bajo modales y arcade) */
+.mascota-fija { position: fixed; right: 14px; bottom: 10px; z-index: 60; width: 104px; height: 104px; filter: drop-shadow(0 10px 18px rgba(2, 8, 20, .55)); }
+@media (max-width: 560px) { .mascota-fija { width: 80px; height: 80px; right: 6px; bottom: 6px; } }
+.mascota:focus-visible { outline-offset: -4px; border-radius: 50%; }
+
 /* --------------------------------------------------------------- estudio */
 .estudio-grid { display: grid; grid-template-columns: 1fr 1.1fr; gap: 24px; }
 .estudio-marca { padding: 30px; text-align: center; }
@@ -338,7 +347,7 @@ kbd {
 .lista-logros b { display: block; }
 .lista-logros small { color: var(--tenue); }
 .lista-logros .xp { font: .52rem var(--pixel); color: var(--oro); }
-.toasts { position: fixed; right: 18px; bottom: 18px; z-index: 95; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+.toasts { position: fixed; right: 18px; bottom: 124px; /* sobre la mascota fija */ z-index: 95; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
 .toast {
   display: flex; align-items: center; gap: 12px; min-width: 260px; max-width: 340px; padding: 12px 16px; border-radius: 12px;
   background: var(--panel-fuerte); border: 1px solid var(--linea-oro); box-shadow: var(--sombra);
