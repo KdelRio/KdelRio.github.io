@@ -172,7 +172,7 @@
   }, { rootMargin: '-45% 0px -50% 0px' });
   $$('.zona').forEach(s => io.observe(s));
   const ioRev = new IntersectionObserver(entradas => entradas.forEach(en => { if (en.isIntersecting) { en.target.classList.add('visible'); ioRev.unobserve(en.target); } }), { threshold: .12 });
-  $$('.panel, .hero-stats li, .disciplinas li, .titulo, .subtitulo').forEach(el => { el.classList.add('revelar'); ioRev.observe(el); });
+  $$('.panel, .disciplinas li, .titulo, .subtitulo').forEach(el => { el.classList.add('revelar'); ioRev.observe(el); });
 
   // ---------------------------------------------------------- enlaces con logro
   document.addEventListener('click', e => {

@@ -124,13 +124,9 @@ kbd {
 .cursor { animation: parpadeo 1s steps(2, start) infinite; margin-left: 2px; }
 .hero-texto { color: var(--suave); font-size: 1.08rem; max-width: 640px; }
 .hero-botones { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 26px; }
-.hero-stats { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.hero-stats li { padding: 22px 18px; border-radius: var(--radio); background: var(--panel); border: 1px solid var(--linea-oro); }
-.hero-stats b { display: block; font: 700 2.4rem/1 var(--titulo); color: var(--oro-2); }
-.hero-stats span { color: var(--suave); font-size: .92rem; }
 
 /* --------------------------------------------------------------- mundo */
-.mundo-marco { position: relative; border-radius: var(--radio); overflow: hidden; border: 1px solid var(--linea-oro); box-shadow: var(--sombra); background: #0d2a1a; }
+.mundo-marco { position: relative; border-radius: var(--radio); overflow: hidden; border: 1px solid var(--linea-oro); box-shadow: var(--sombra); background: #071428; }
 #mundo-canvas { display: block; width: 100%; height: auto; image-rendering: pixelated; cursor: pointer; touch-action: none; }
 .mundo-aviso {
   position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%);
