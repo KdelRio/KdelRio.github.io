@@ -170,16 +170,34 @@ kbd {
 .hero-texto { color: var(--suave); font-size: 1.08rem; max-width: 640px; }
 .hero-botones { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 26px; }
 
-/* mascota (js/mascota.js): dos hojas de 3 × 3, una celda visible a la vez */
-.mascota { position: relative; display: block; flex-shrink: 0; width: 120px; height: 120px; padding: 0; border: 0; background: transparent; cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent; }
-.mascota-cuerpo { position: relative; display: block; width: 100%; height: 100%; transform-origin: 50% 78%; }
-.mascota-capa { position: absolute; inset: 0; background-size: 300% 300%; background-repeat: no-repeat; }
-/* flotando fija abajo a la derecha: al tocarla vuelve al inicio (encima del contenido, bajo modales y arcade) */
-.mascota-fija { position: fixed; right: 14px; bottom: 10px; z-index: 60; width: 96px; height: 96px; filter: drop-shadow(0 8px 14px rgba(2, 8, 20, .6)); }
-/* versión pixel: celdas de 48 px mostradas al doble, sin suavizado */
-.mascota-pixel .mascota-capa { image-rendering: pixelated; }
-@media (max-width: 560px) { .mascota-fija { width: 72px; height: 72px; right: 6px; bottom: 6px; } }
-.mascota:focus-visible { outline-offset: -4px; border-radius: 50%; }
+/* dragón volador (js/dragon.js): vuela en el borde derecho siguiendo la altura del mouse y aterriza en el nido del pie */
+.dragon-volador {
+  --t: 100px; position: fixed; left: 0; top: 0; z-index: 60; width: var(--t); height: var(--t); padding: 0; border: 0;
+  background: transparent; cursor: pointer; will-change: transform; filter: drop-shadow(0 8px 12px rgba(2, 8, 20, .55));
+  -webkit-tap-highlight-color: transparent;
+}
+.dragon-sprite {
+  display: block; width: 100%; height: 100%; image-rendering: pixelated; background-repeat: no-repeat;
+  background-image: url("../assets/img/mascota/dragon-vuela.png"); background-size: calc(var(--t) * 9) var(--t);
+}
+.dragon-sprite.reaccion { background-image: url("../assets/img/mascota/dragon-caras.png"); background-size: calc(var(--t) * 9) var(--t); }
+.dragon-volador:focus-visible { outline: 2px solid var(--oro-2); outline-offset: 2px; border-radius: 12px; }
+@media (max-width: 560px) { .dragon-volador { --t: 75px; } }
+
+/* las crías del equipo esperan al dragón, centradas al pie de la página (tamaño nativo, sin suavizado) */
+.pie { position: relative; }
+.pie:has(.nido-escena) { padding-bottom: 122px; }
+.nido-escena { position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%); display: flex; align-items: flex-end; gap: 8px; pointer-events: none; }
+.bebe { display: block; max-width: none; image-rendering: pixelated; }
+.nido-posada { width: 100px; height: 100px; flex: none; margin: 0 6px; }
+/* cuando el dragón se posa las crías saltan contentas; la dormida sigue durmiendo */
+.nido-escena.llego .salta { animation: bebe-salta .45s ease-out infinite alternate; }
+.nido-escena.llego .salta:nth-child(3) { animation-delay: .17s; } .nido-escena.llego .salta:nth-child(5) { animation-delay: .09s; }
+.nido-escena.llego .salta:nth-child(6) { animation-delay: .26s; } .nido-escena.llego .salta:nth-child(7) { animation-delay: .34s; }
+.duerme { animation: bebe-respira 2.6s ease-in-out infinite; transform-origin: 50% 100%; }
+@keyframes bebe-salta { from { transform: translateY(0); } to { transform: translateY(-5px); } }
+@keyframes bebe-respira { 50% { transform: scaleY(.94); } }
+@media (max-width: 560px) { .nido-posada { width: 75px; height: 75px; margin: 0 2px; } .nido-escena { gap: 3px; } }
 
 /* --------------------------------------------------------------- estudio */
 .estudio-grid { display: grid; grid-template-columns: 1fr 1.1fr; gap: 24px; }
@@ -352,7 +370,7 @@ kbd {
 .lista-logros b { display: block; }
 .lista-logros small { color: var(--tenue); }
 .lista-logros .xp { font: .52rem var(--pixel); color: var(--oro); }
-.toasts { position: fixed; right: 18px; bottom: 124px; /* sobre la mascota fija */ z-index: 95; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+.toasts { position: fixed; right: 150px; top: calc(var(--hud) + 12px); /* arriba, a la izquierda del dragón volador */ z-index: 95; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
 .toast {
   display: flex; align-items: center; gap: 12px; min-width: 260px; max-width: 340px; padding: 12px 16px; border-radius: 12px;
   background: var(--panel-fuerte); border: 1px solid var(--linea-oro); box-shadow: var(--sombra);

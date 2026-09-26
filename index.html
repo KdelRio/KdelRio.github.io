@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Geist:wght@400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/estilos.css?v=20260926n">
+  <link rel="stylesheet" href="css/estilos.css?v=20260927b">
 </head>
 <body>
 <a class="saltar" href="#contenido">Saltar al contenido</a>
@@ -389,8 +389,17 @@
 </main>
 
 <footer class="pie">
+  <!-- nido del dragón (js/dragon.js): al llegar al final de la página el dragón aterriza aquí -->
+  <div class="nido-escena" aria-hidden="true">
+    <img class="bebe duerme" src="assets/img/mascota/cria-bebe-2.png" alt="">
+    <img class="bebe salta" src="assets/img/mascota/cria-bebe-0.png" alt="">
+    <img class="bebe salta" src="assets/img/mascota/cria-bebe-3.png" alt="">
+    <span class="nido-posada" id="nido-posada"></span>
+    <img class="bebe salta" src="assets/img/mascota/cria-bebe-1.png" alt="">
+    <img class="bebe salta" src="assets/img/mascota/cria-bebe-5.png" alt="">
+    <img class="bebe salta" src="assets/img/mascota/cria-bebe-4.png" alt="">
+  </div>
   <p>© 2026 Kevin del Río, Studios Conari SpA. Concepción, Chile.</p>
-  <p class="pie-chico">El mapache es de <a href="https://github.com/nilbuild/page-mascot" target="_blank" rel="noopener">page-mascot</a>, de Kamran Ahmed (licencia MIT).</p>
   <p class="pie-chico">Los datos de Magic Foods son ficticios. Pista: los clásicos nunca mueren (↑ ↑ ↓ ↓ ← → ← → B A).</p>
 </footer>
 
@@ -404,10 +413,10 @@
   </div>
 </div>
 <div class="toasts" id="toasts" aria-live="polite"></div>
-<button class="mascota mascota-fija mascota-pixel" data-mascota data-accion="arriba" data-nombre="mapache" data-direcciones="assets/img/mascota/raccoon-pixel-directions.png" data-reacciones="assets/img/mascota/raccoon-pixel-reactions.png"></button>
+<button type="button" class="dragon-volador" id="dragon" aria-label="Volver al inicio de la página" title="Volver arriba"><span class="dragon-sprite"></span></button>
 
 <script src="js/escena.js?v=20260926c"></script>
-<script src="js/mascota.js?v=20260926b"></script>
+<script src="js/dragon.js?v=20260927a"></script>
 <script src="js/nucleo.js?v=20260926c"></script>
 <script src="js/laboratorio.js?v=20260926b"></script>
 <script src="js/gremio.js?v=20260926f"></script>
