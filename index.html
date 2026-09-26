@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Geist:wght@400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/estilos.css?v=20260927conf3">
+  <link rel="stylesheet" href="css/estilos.css?v=20260927movil">
 </head>
 <body>
 <a class="saltar" href="#contenido">Saltar al contenido</a>
@@ -33,6 +33,14 @@
   <canvas class="escena-petalos" id="escena-petalos"></canvas>
   <div class="escena-velo" id="escena-velo"></div>
   <div class="escena-tinte"></div>
+</div>
+
+<!-- ============================================================ PANTALLA DE CARGA (js/carga.js) -->
+<div class="carga" id="carga" role="status" aria-live="polite" hidden>
+  <div class="carga-dragon" aria-hidden="true"></div>
+  <p class="carga-texto">CARGANDO EL REINO</p>
+  <div class="carga-barra"><div class="carga-relleno"></div></div>
+  <div class="carga-crias" aria-hidden="true"><img src="assets/img/mascota/cria-bebe-0.png" alt=""><img src="assets/img/mascota/cria-bebe-3.png" alt=""><img src="assets/img/mascota/cria-bebe-1.png" alt=""></div>
 </div>
 
 <!-- ============================================================ MÁQUINA ARCADE -->
@@ -419,7 +427,8 @@
 <div class="toasts" id="toasts" aria-live="polite"></div>
 <button type="button" class="dragon-volador" id="dragon" aria-label="Volver al inicio de la página" title="Volver arriba"><span class="dragon-sprite"></span></button>
 
-<script src="js/escena.js?v=20260927a"></script>
+<script src="js/carga.js?v=20260927"></script>
+<script src="js/escena.js?v=20260927movil"></script>
 <script src="js/dragon.js?v=20260927a"></script>
 <script src="js/nucleo.js?v=20260927conf2"></script>
 <script src="js/laboratorio.js?v=20260926b"></script>
@@ -431,6 +440,6 @@
 <script src="js/memoria.js?v=20260926"></script>
 <script src="js/arena.js?v=20260926b"></script>
 <script src="js/sala.js?v=20260927pj"></script>
-<script src="js/arcade.js?v=20260927conf2"></script>
+<script src="js/arcade.js?v=20260927movil"></script>
 </body>
 </html>

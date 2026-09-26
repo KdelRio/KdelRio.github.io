@@ -522,12 +522,30 @@
   }
   function acercar() {
     fase = 'acercando';
-    if (tactil) { if (destino === 'clasico') return cerrarMaquina(); fase = 'juego'; iniciarJuego(); return; }
+    if (tactil) { if (destino === 'clasico') return abrirClasico(); fase = 'juego'; iniciarJuego(); return; }
     maquina.classList.add('enfocada'); enfocar(true);
     setTimeout(() => {
-      if (destino === 'clasico') { pantalla.classList.add('encendido'); setTimeout(() => { pantalla.classList.remove('encendido'); cerrarMaquina(); }, 450); return; }
+      if (destino === 'clasico') return abrirClasico();
       fase = 'juego'; iniciarJuego();
     }, 1650);
+  }
+  // el portafolio clásico aparece dentro del recuadro de la pantalla, con las bandas negras del juego,
+  // y ese recuadro se agranda hasta el borde real del navegador
+  async function abrirClasico() {
+    const r = pantalla.getBoundingClientRect();
+    if (window.KRCarga) await KRCarga.esperar();                    // dragones mientras todo se descarga y decodifica
+    cerrarMaquina(); scrollTo(0, 0);
+    if (window.KRCarga) KRCarga.ocultar();
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const marco = document.createElement('div'); marco.className = 'marco-transicion';
+    Object.assign(marco.style, { left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px' });
+    document.body.appendChild(marco);
+    void marco.offsetWidth;                                        // fija la posición inicial antes de animar
+    setTimeout(() => {
+      marco.classList.add('abre');
+      Object.assign(marco.style, { left: '0px', top: '0px', width: innerWidth + 'px', height: innerHeight + 'px' });
+    }, 450);                                                       // un instante con el borde negro, como en el juego
+    setTimeout(() => marco.remove(), 450 + 1100);
   }
   function iniciarJuego() {
     KR.desbloquear('start');
@@ -594,7 +612,12 @@
 
   // ---------------------------------------------------------- arranque: la página comienza en la máquina
   const q = new URLSearchParams(location.search);
-  if (q.has('clasico') || (location.hash && location.hash.length > 1)) { maquina.hidden = true; fase = 'cerrada'; }
-  else abrirMaquina();
+  if (q.has('clasico') || (location.hash && location.hash.length > 1)) {
+    maquina.hidden = true; fase = 'cerrada';
+    if (window.KRCarga) KRCarga.esperar().then(KRCarga.ocultar);    // entrada directa al clásico: también con carga
+  } else {
+    abrirMaquina();
+    if (window.KRCarga) KRCarga.precargar();                         // mientras miras el arcade, el clásico se prepara
+  }
   window.KRArcade = { abrir: abrirMaquina, cerrar: cerrarMaquina };
 })();

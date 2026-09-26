@@ -918,3 +918,38 @@ kbd {
 .confirma-reinicio b { color: var(--texto); }
 .confirma-reinicio .fila-botones { margin-top: 10px; }
 #reiniciar-progreso[hidden] { display: none; }
+
+/* transición al portafolio clásico: un recuadro con bandas negras (sombra gigante) que se agranda hasta el borde */
+.marco-transicion { position: fixed; z-index: 250; pointer-events: none; box-shadow: 0 0 0 200vmax #02040a; }
+.marco-transicion::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .16) 0 1px, transparent 1px 3px); transition: opacity .8s ease; }
+.marco-transicion.abre { transition: left 1s cubic-bezier(.65, .02, .2, 1), top 1s cubic-bezier(.65, .02, .2, 1), width 1s cubic-bezier(.65, .02, .2, 1), height 1s cubic-bezier(.65, .02, .2, 1); }
+.marco-transicion.abre::after { opacity: 0; }
+
+/* --------------------------------------------------------------- pantalla de carga (js/carga.js) */
+.carga { position: fixed; inset: 0; z-index: 400; display: grid; place-content: center; justify-items: center; gap: 18px; background: #070a1f; transition: opacity .4s ease; }
+.carga[hidden] { display: none; }
+.carga.sale { opacity: 0; }
+.carga-dragon {
+  width: 100px; height: 100px; image-rendering: pixelated; transform: scale(1.6);
+  background: url("../assets/img/mascota/dragon-vuela.png") 0 0 / 900px 100px no-repeat;
+  animation: carga-aleteo .72s steps(8) infinite, carga-flota 1.8s ease-in-out infinite alternate;
+}
+@keyframes carga-aleteo { to { background-position-x: -800px; } }
+@keyframes carga-flota { from { translate: 0 -6px; } to { translate: 0 6px; } }
+.carga-texto { margin: 34px 0 0; font: .8rem/1.4 var(--pixel); color: var(--oro-2); letter-spacing: .08em; }
+.carga-barra { width: min(280px, 70vw); height: 12px; padding: 2px; background: #111a33; box-shadow: inset 0 0 0 2px #9a7a2c; }
+.carga-relleno { height: 100%; background: #ffd400; transform: scaleX(0); transform-origin: 0 50%; transition: transform .25s steps(6); }
+.carga-crias { display: flex; align-items: flex-end; gap: 10px; }
+.carga-crias img { image-rendering: pixelated; animation: bebe-salta .45s ease-out infinite alternate; }
+.carga-crias img:nth-child(2) { animation-delay: .15s; } .carga-crias img:nth-child(3) { animation-delay: .3s; }
+@media (prefers-reduced-motion: reduce) { .carga-dragon, .carga-crias img { animation: none; } }
+
+/* --------------------------------------------------------------- modo liviano en celulares
+   La GPU de un teléfono no alcanza para desenfocar en vivo el fondo animado ni para mantener
+   capas gigantes: paneles sólidos, sin mezcla de color y capas sin reserva permanente. */
+@media (pointer: coarse), (max-width: 820px) {
+  .panel { backdrop-filter: none; background: rgba(8, 22, 44, .92); box-shadow: 0 10px 24px rgba(0, 0, 0, .35); }
+  .hud { backdrop-filter: none; background: rgba(5, 14, 29, .97); }
+  .escena-tinte { display: none; }
+  .plano { will-change: auto; }
+}

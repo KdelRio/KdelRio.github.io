@@ -29,7 +29,8 @@
     contacto: { f: null, z: 1, claro: 1, tinte: [150, 175, 255], t: .1 }, // de vuelta al reino completo
   };
 
-  const dpr = Math.min(devicePixelRatio || 1, 2);
+  const movil = matchMedia('(pointer: coarse)').matches || innerWidth < 820;
+  const dpr = movil ? 1 : Math.min(devicePixelRatio || 1, 2);   // en celular los lienzos van a densidad 1 (son pixel art)
   const azar = (a, b) => a + Math.random() * (b - a);
   const suave = x => x * x * (3 - 2 * x);
   let p = 0, mx = 0, my = 0, objX = 0, objY = 0, sucio = true;
@@ -98,7 +99,7 @@
     listaE = Array.from({ length: Math.round(Wc * Hc / (9000 * dpr * dpr)) }, () => ({
       x: azar(0, Wc), y: azar(0, Hc) * azar(.2, 1), r: azar(.5, 1.5) * dpr, f: azar(0, 6.3), v: azar(.6, 1.8)
     }));
-    listaP = Array.from({ length: vw < 700 ? 10 : 22 }, () => nuevoPetalo(true));
+    listaP = Array.from({ length: movil ? 7 : 22 }, () => nuevoPetalo(true));
     leerScroll();
     Object.assign(cam, obj); sucio = true;
   }
@@ -117,7 +118,7 @@
   function cuadro(ahora) {
     requestAnimationFrame(cuadro);
     if (document.hidden || document.body.classList.contains('bloqueado')) return;
-    if (ahora - previo < 30) return;                 // ~33 fps bastan para el ambiente
+    if (ahora - previo < (movil ? 45 : 30)) return;          // celular: ~22 fps para el ambiente                 // ~33 fps bastan para el ambiente
     previo = ahora; t += .033;
 
     // cámara: se acerca a su objetivo con inercia
