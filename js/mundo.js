@@ -1,16 +1,16 @@
 /* ==========================================================================
-   Aldea del reino: plataformero 2D de scroll lateral en pixel art.
-   Seis edificios (uno por sección), aldeanos que explican cada zona,
-   plataformas, doble salto y gemas de datos coleccionables.
+   Aldea del reino (modo arcade): plataformero 2D de scroll lateral en pixel art.
+   Cinco edificios, uno por misión; barreras mágicas que se abren al superar
+   cada etapa, aldeanos que explican la misión, doble salto y gemas de datos.
+   La lógica de las misiones vive en arcade.js, que escucha KRAldea.al.
    El mundo se dibuja a 320x180 y se escala x3; la interfaz va a resolución completa.
    ========================================================================== */
 (function () {
   'use strict';
-  const cv = document.getElementById('mundo-canvas'); if (!cv) return;
+  const cv = document.getElementById('aldea-canvas'); if (!cv) return;
   const ctx = cv.getContext('2d');
   const W = cv.width, H = cv.height, S = 3, WW = W / S, WH = H / S;
-  const G = 158, MUNDO = 1900, DY = G - 236;                                   // línea del suelo y largo de la aldea
-  const aviso = document.getElementById('mundo-aviso');
+  const G = 158, MUNDO = 1560, DY = G - 236;                                   // línea del suelo y largo de la aldea
   const lienzo = (w, h) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
   const mundo = lienzo(WW, WH), m = mundo.getContext('2d');
   const frente = lienzo(WW, WH), f = frente.getContext('2d');
@@ -65,8 +65,6 @@
       luces: [[34, 182, 34, 'rgba(140,255,180,.45)']] },
     { id: 'cv', nombre: 'Biblioteca · CV', img: 'logo-libro', mx: 1420, base: 236, puerta: { x: 240 }, caja: { x: 194, y: 150, w: 92, h: 92 },
       ventanas: [[213, 206, 6, 12], [261, 206, 6, 12], [239, 160, 2, 3]], antorchas: [[229, 222, '#ffb347'], [251, 222, '#ffb347']], techos: [[198, 194, 84], [230, 165, 20]] },
-    { id: 'contacto', nombre: 'Buzón de Contacto', img: 'logo-sol-luna', mx: 1730, base: 236, puerta: { x: 392 }, caja: { x: 346, y: 164, w: 90, h: 78 },
-      ventanas: [[364, 212, 8, 7], [402, 212, 6, 7]], antorchas: [[384, 222, '#ffb347']], techos: [[366, 218, 12], [415, 189, 14]] },
   ];
 
   const DIBUJO = {
@@ -155,22 +153,6 @@
       R(g, 233, 212, 1, 20, '#e0b756'); R(g, 246, 212, 1, 20, '#e0b756');
       [228, 248].forEach(x => { R(g, x, 202, 4, 12, '#1d3366'); R(g, x, 202, 4, 1, '#e0b756'); R(g, x + 1, 206, 2, 2, '#f3d27f'); R(g, x, 214, 1, 1, '#1d3366'); R(g, x + 3, 214, 1, 1, '#1d3366'); });
     },
-    contacto(g) {
-      sombra(g, 388, 237, 42, 4);
-      R(g, 356, 208, 56, 28, '#e3d5b8'); for (let y = 211; y < 230; y += 4) R(g, 356, y, 56, 1, '#cbbd9f');
-      ladrillos(g, 356, 230, 56, 6, '#7a7f8a', '#646975', 7, 3);
-      R(g, 356, 208, 2, 28, '#6b4a2a'); R(g, 410, 208, 2, 28, '#6b4a2a');
-      tri(g, 350, 418, 209, 384, 182, '#6b4fa8', true); tri(g, 384, 418, 209, 384, 182, '#56408a', true); R(g, 350, 208, 68, 2, '#453270');
-      R(g, 384, 172, 1, 10, '#cad6e5');
-      R(g, 388, 219, 12, 17, '#5a3b22'); R(g, 387, 218, 14, 1, '#3a2412'); R(g, 393, 219, 1, 17, '#3a2412'); R(g, 397, 227, 1, 2, '#e0b756');
-      R(g, 388, 211, 12, 6, '#f4f7fd'); R(g, 388, 211, 12, 1, '#b8bfcc'); R(g, 389, 212, 2, 1, '#8a8f9a'); R(g, 391, 213, 2, 1, '#8a8f9a'); R(g, 393, 214, 2, 1, '#8a8f9a'); R(g, 395, 213, 2, 1, '#8a8f9a'); R(g, 397, 212, 2, 1, '#8a8f9a');
-      [[363, 211, 10, 9], [401, 211, 8, 9]].forEach(r => R(g, ...r, '#3a2412'));
-      [[362, 220, 12], [400, 220, 10]].forEach(([x, y, w]) => { R(g, x, y, w, 2, '#6b4a2a'); for (let i = 0; i < w; i += 2) R(g, x + i, y - 1, 1, 1, ['#f472b6', '#f3d27f', '#a78bfa'][(i / 2) % 3]); });
-      R(g, 371, 226, 2, 10, '#5a3b22'); R(g, 366, 219, 12, 7, '#c24848'); R(g, 367, 218, 10, 1, '#c24848'); R(g, 366, 225, 12, 1, '#8e2f2f'); R(g, 368, 221, 6, 1, '#5a1f1f');
-      R(g, 378, 216, 1, 6, '#e0b756'); R(g, 379, 216, 3, 2, '#e0b756');
-      R(g, 421, 204, 2, 32, '#5a3b22'); R(g, 415, 194, 14, 11, '#9a7a4f'); tri(g, 413, 431, 195, 422, 187, '#6b4fa8'); R(g, 415, 204, 14, 1, '#6b4a2a');
-      R(g, 418, 197, 3, 3, '#2a2016'); R(g, 424, 197, 3, 3, '#2a2016'); R(g, 421, 201, 3, 2, '#2a2016');
-    },
   };
   EDIFICIOS.forEach(e => {
     e.off = { x: e.mx - e.puerta.x, y: G - e.base };                       // de coordenadas de diseño a coordenadas del mundo
@@ -187,53 +169,54 @@
     [548, 198, 32], [690, 192, 30],
     [930, 198, 36], [985, 170, 30],
     [1196, 206, 32], [1256, 180, 32], [1312, 154, 30],
-    [1506, 202, 34], [1574, 178, 34], [1634, 204, 28],
+    [40, 206, 34], [78, 174, 28],
   ].map(([x, y, w]) => ({ x, y: y + DY, w }));
   EDIFICIOS.forEach(e => e.techos.forEach(([x, y, w]) => PLATAFORMAS.push({ x: x + e.off.x, y: y + e.off.y, w, oculta: true })));
   const FUENTE = { x: 625 };
   PLATAFORMAS.push({ x: FUENTE.x - 16, y: G - 8, w: 32, oculta: true });
   const CAJAS = [{ x: 870, y: G - 14, w: 14, h: 14 }, { x: 884, y: G - 14, w: 14, h: 14 }, { x: 877, y: G - 28, w: 14, h: 14 }];
   const GEMAS = [];
-  PLATAFORMAS.forEach(p => { if (p.w >= 12) GEMAS.push({ x: p.x + p.w / 2, y: p.y - 11 }); });
-  [[230, 214], [520, 212], [884, 196], [1160, 212], [1470, 212], [1800, 214], [1840, 196]].forEach(([x, y]) => GEMAS.push({ x, y: y + DY }));
+  PLATAFORMAS.forEach(p => { if (p.w >= 12 && p.x > 236) GEMAS.push({ x: p.x + p.w / 2, y: p.y - 11 }); });
+  [[520, 212], [884, 196], [1160, 212], [1470, 212], [1500, 196]].forEach(([x, y]) => GEMAS.push({ x, y: y + DY }));
   GEMAS.forEach((g, i) => { g.fase = i * .7; g.tomada = false; });
+
+  // ---------------------------------------------------------- misiones: barreras y fragmentos del emblema
+  const BARRERAS = [238, 522, 852, 1166].map((x, i) => ({ x, i, abierta: false, disolver: 0 }));
+  const FRAGMENTOS = [[57, G - 42], [92, G - 74], [170, G - 50]].map(([x, y]) => ({ x, y, tomado: false }));
+  let aviso = null;
 
   // ---------------------------------------------------------- aldeanos
   const NPCS = [
-    { id: 'lumi', tipo: 'lumi', x: 92, nombre: 'Lumi, la guía', lineas: [
-      '¡Hola, viajero! Soy Lumi. Bienvenido al reino de Kevin del Río.',
-      'Muévete con A/D o las flechas y salta con Espacio. ¡En el aire puedes saltar una segunda vez!',
-      'Habla con los aldeanos: cada uno te cuenta qué hay en su edificio. Y junta las gemas de datos para ganar XP.'] },
+    { id: 'lumi', tipo: 'lumi', x: 30, nombre: 'Lumi, la guía', lineas: [
+      '¡Bienvenido, viajero! Soy Lumi, la guía del reino de Kevin del Río.',
+      'Para recorrer su historia debes superar cinco misiones, una por edificio. Las barreras mágicas se abren al completar cada una.',
+      'Muévete con A/D o las flechas y salta con Espacio: en el aire puedes saltar otra vez. Habla con todos y junta las gemas. ¡Suerte!'] },
     { id: 'guardia', tipo: 'guardia', x: 136, nombre: 'Sir Brando, guardia real', lineas: [
-      '¡Alto ahí! Este es el Castillo Conari, hogar de Studios Conari SpA.',
-      'Un estudio independiente de videojuegos que Kevin cofundó y donde es Lead Programmer.',
-      'Adentro conocerás la visión del estudio y cómo nacen sus mundos. Párate en el portón y pulsa E.'] },
+      '¡Alto! El Castillo Conari, hogar de Studios Conari SpA, está sellado.',
+      'El emblema del estudio se partió en 3 fragmentos: uno flota junto a la entrada, otro más arriba y el último sobre la muralla.',
+      'Tráelos y el portón se abrirá para que conozcas el estudio. Luego pulsa E frente a la puerta.'] },
     { id: 'maga', tipo: 'maga', x: 424, nombre: 'Aurora, maga del dato', lineas: [
-      'En lo alto de esta torre estudio los datos de Magic Foods.',
-      'Adentro hay un laboratorio en vivo: filtra por año, zona y canal y mira cómo cambian los KPIs.',
-      'Resuelve mi desafío de preguntas y compara Power BI con Tableau lado a lado. ¿Te atreves?'] },
+      'La Torre del Dato entrena analistas con una prueba de combate.',
+      'Cada golpe que des o recibas y cada enemigo que enfrentes quedará registrado como un dato.',
+      'Sobrevive a las tres oleadas y te enseñaré a convertir esos datos en decisiones. Entra con E.'] },
     { id: 'gamer', tipo: 'gamer', x: 744, nombre: 'Tomi, campeón del arcade', lineas: [
-      '¡Eh! ¿Vienes a jugar? Este es el Arcade del Dragón.',
-      'Aquí están los juegos de Kevin: Dungeon Ascent, VILU, Proyecto Origen y Proyecto Resonancia.',
-      'Y hay dos minijuegos para jugar ahí mismo: Mini Mazmorra y Ritmo Resonancia. ¡A ver si vences al Rey Slime!'] },
+      '¡Eh! El Arcade del Dragón guarda los juegos que creó el estudio.',
+      'Primero encuentra los pares de cada juego en el Memorize.',
+      'Si lo logras, te espera Ritmo Resonancia. ¡Sube el volumen y entra con E!'] },
     { id: 'sylva', tipo: 'elfa', x: 1172, nombre: 'Sylva, maestra del gremio', lineas: [
-      'Bienvenido al Gremio de Habilidades.',
-      'Dentro crece un árbol con más de 30 competencias: BI, datos, desarrollo en Godot, gestión y más.',
-      'Toca cada nodo para desbloquearlo y descubrir su nivel. Cada uno te da XP.'] },
+      'Tus batallas te dieron puntos de habilidad. Aquí se invierten.',
+      'Presiona H para abrir el mapa del árbol y sube cada rama con tus puntos.',
+      'Cuando todas las ramas florezcan, se abrirá el camino a la Biblioteca.'] },
     { id: 'buho', tipo: 'buho', x: 1356, nombre: 'Profesor Búho', lineas: [
-      'Shhh… Esta es la Biblioteca. Aquí se guarda la historia de Kevin.',
-      'Encontrarás su ficha de personaje, su trayectoria profesional y sus logros.',
-      'Y si quieres llevarte un pergamino, puedes descargar su CV en PDF.'] },
-    { id: 'rita', tipo: 'cartera', x: 1686, nombre: 'Rita, la cartera', lineas: [
-      '¡Hola! Este es el Buzón de Contacto.',
-      'Desde aquí puedes escribirle a Kevin por correo o LinkedIn, y visitar su GitHub y Studios Conari.',
-      'Deja tu mensaje, ¡yo me encargo de que llegue!'] },
+      'Llegaste al final del camino, viajero. Shhh, esta es la Biblioteca.',
+      'Presiona P para abrir la hoja de personaje de Kevin: trayectoria, formación y logros.',
+      'Ahí mismo termina esta aventura... y quizás empiece una conversación.'] },
   ];
   NPCS.forEach(n => { n.hablado = false; n.dir = 1; });
 
   // ---------------------------------------------------------- decorado
-  const FAROLES = [40, 250, 372, 530, 700, 905, 1045, 1190, 1300, 1490, 1620, 1810];
-  const BANCAS = [300, 580, 1240, 1560];
+  const FAROLES = [18, 250, 372, 530, 700, 905, 1045, 1190, 1300, 1490];
+  const BANCAS = [300, 580, 1240];
   const ARBOLES_FONDO = [];
   for (let x = 8; x < MUNDO; x += 17 + rnd() * 16) {
     if (EDIFICIOS.some(e => x + 11 > e.caja.x + e.off.x && x - 11 < e.caja.x + e.caja.w + e.off.x)) continue;
@@ -326,6 +309,7 @@
       teclas[k] = true; P.meta = null;
     }
     if (['e', 'enter'].includes(e.key.toLowerCase())) { e.preventDefault(); accion(); }
+    if (['h', 'p'].includes(e.key.toLowerCase()) && !e.repeat) { e.preventDefault(); API.al.tecla(e.key.toLowerCase(), cerca && cerca.id); }
   });
   cv.addEventListener('keyup', e => {
     const k = MAPA[e.key.toLowerCase()]; if (!k) return;
@@ -350,10 +334,9 @@
     if (dialogo && !dialogo.cerrado) avanzarDialogo();
   }
   function entrar(e) {
-    window.KR && KR.visitarZona(e.id);
     window.KR && KR.beep([[660, .08], [880, .12]]);
     destello = { x: e.puerta.wx, t: 30 };
-    document.getElementById(e.id).scrollIntoView({ behavior: 'smooth' });
+    API.al.entrar(e.id);
   }
   function avanzarDialogo() {
     const d = dialogo, txt = d.npc.lineas[d.linea];
@@ -401,6 +384,11 @@
     P.x += P.vx;
     const cx = tocaCaja(P.x, P.y);
     if (cx) { P.x = P.vx > 0 ? cx.x - 4 : cx.x + cx.w + 4; P.vx = 0; P.bloqueado = true; }
+    BARRERAS.forEach(b => {
+      if (b.abierta || P.x + 4 <= b.x) return;
+      P.x = b.x - 4; P.vx = 0; P.meta = null;
+      if (!aviso || aviso.t < 60) aviso = { txt: 'Barrera sellada: completa la misión de esta zona para abrirla', t: 150 };
+    });
     P.x = Math.max(8, Math.min(MUNDO - 8, P.x));
 
     // vertical
@@ -428,17 +416,21 @@
       if (GEMAS.every(x => x.tomada)) window.KR && KR.sumarXP(40, '¡Juntaste todas las gemas de datos!');
     });
 
+    // fragmentos del emblema
+    FRAGMENTOS.forEach(fr => {
+      if (fr.tomado || Math.abs(P.x - fr.x) > 8 || Math.abs(P.y - 9 - fr.y) > 12) return;
+      fr.tomado = true; textos.push({ x: fr.x, y: fr.y, t: 50, txt: 'FRAGMENTO' });
+      for (let k = 0; k < 12; k++) chispas.push({ x: fr.x, y: fr.y, vx: Math.cos(k / 12 * 6.28) * 1.4, vy: Math.sin(k / 12 * 6.28) * 1.4, t: 26, c: '#f3d27f' });
+      window.KR && KR.beep([[784, .06], [988, .06], [1175, .12]]);
+      API.al.fragmento(FRAGMENTOS.map(x => x.tomado));
+    });
+    BARRERAS.forEach(b => { if (b.disolver > 0) b.disolver--; });
+    if (aviso && aviso.t > 0) aviso.t--;
+
     // puertas y aldeanos
     const antes = cerca;
     cerca = P.suelo && P.y === G ? EDIFICIOS.find(e => Math.abs(P.x - e.puerta.wx) < 10) || null : null;
-    if (cerca !== antes) {
-      if (cerca) {
-        aviso.hidden = false; aviso.innerHTML = '';
-        const s = document.createElement('span'); s.textContent = `${cerca.nombre} · pulsa E`;
-        const b = document.createElement('button'); b.textContent = 'Entrar'; const obj2 = cerca; b.addEventListener('click', () => entrar(obj2));
-        aviso.append(s, b); window.KR && KR.beep([[520, .04]]);
-      } else aviso.hidden = true;
-    }
+    if (cerca !== antes && cerca) window.KR && KR.beep([[520, .04]]);
     const npc = NPCS.find(n => Math.abs(P.x - n.x) < 17 && P.y > G - 40);
     if (npc) {
       npc.dir = P.x < npc.x ? -1 : 1;
@@ -506,17 +498,6 @@
       R(g, x - 3, y - 4, 7, 4, '#2a2a35'); R(g, x + 2, y - 7, 4, 4, '#2a2a35'); R(g, x + 2, y - 8, 1, 1, '#2a2a35'); R(g, x + 5, y - 8, 1, 1, '#2a2a35');
       R(g, x - 4, y - 5 + cola, 1, 3, '#2a2a35'); R(g, x - 5, y - 6 + cola, 1, 2, '#2a2a35');
       if ((t % 200) > 8) { R(g, x + 3, y - 6, 1, 1, '#f3d27f'); R(g, x + 5, y - 6, 1, 1, '#f3d27f'); B(x + 3, y - 6, 3, 1); }
-    },
-    contacto(g) {
-      const y = 168;
-      if ((t / 300 | 0) % 2 === 0) { circ(g, 384, y, 3, '#f3d27f'); [[-5, 0], [5, 0], [0, -5], [0, 5]].forEach(([a, b]) => R(g, 384 + a, y + b, 1, 1, '#f3d27f')); }
-      else { circ(g, 384, y, 3, '#cad6e5'); circ(g, 386, y - 1, 2, '#0b1733'); }
-      for (let i = 0; i < 3; i++) {
-        const a = t / 40 + i * 2.1, bx = Math.round(422 + Math.cos(a) * (14 + i * 3)), by = Math.round(180 + Math.sin(a) * 5 - i * 3), up = ((t >> 3) + i) % 2;
-        R(g, bx - 2, by - up, 1, 1, '#f4f7fd'); R(g, bx - 1, by, 3, 1, '#f4f7fd'); R(g, bx + 2, by - up, 1, 1, '#f4f7fd');
-      }
-      const c = t % 320;
-      if (c < 90) { const k = c / 90, ex = 372 + Math.sin(k * 7) * 4, ey = 216 - k * 40; g.globalAlpha = 1 - k; R(g, ex, ey, 5, 3, '#f4f7fd'); R(g, ex + 2, ey + 1, 1, 1, '#c24848'); g.globalAlpha = 1; }
     },
   };
 
@@ -642,6 +623,23 @@
     [1, 3, 5, 7, 5, 3, 1].forEach((k, i) => { const ww = Math.max(1, Math.round(k * w / 7)); R(g, x - ww / 2, y - 3 + i, ww, 1, i < 3 ? '#fff5c4' : i < 5 ? '#f3d27f' : '#c9a24a'); });
     brillos.push([x - 3, y - 3, 7, 7]);
   }
+  function barrera(g, b) {
+    if (b.abierta && b.disolver <= 0) return;
+    const x = Math.round(b.x - cam); if (x < -10 || x > WW + 10) return;
+    g.globalAlpha = b.abierta ? b.disolver / 60 : 1;
+    R(g, x - 3, 0, 6, G, 'rgba(126,200,255,.16)'); R(g, x - 1, 0, 2, G, 'rgba(190,232,255,.35)');
+    for (let k = 0; k < 14; k++) { const yy = (k * 13 + t * 1.3) % G; R(g, x - 2, G - yy, 4, 2, '#bfe8ff'); brillos.push([x - 2, G - yy, 4, 2]); }
+    for (let k = 0; k < 4; k++) { const yy = G - 16 - k * 24, on = (t / 20 + k) % 3 < 2; R(g, x - 2, yy, 4, 4, on ? '#f3d27f' : '#c9a24a'); if (on) brillos.push([x - 2, yy, 4, 4]); }
+    R(g, x - 6, G - 5, 12, 5, '#6b6f7a'); R(g, x - 6, G - 5, 12, 1, '#8a8f9a'); R(g, x - 1, G - 4, 2, 2, '#7ec8ff');
+    if (b.abierta) for (let k = 0; k < 8; k++) R(g, x - 6 + ((k * 37 + t * 3) % 12), G - ((k * 29 + (60 - b.disolver) * 3) % G), 1, 1, '#e6f7ff');
+    g.globalAlpha = 1;
+  }
+  function fragmento(g, fr) {
+    if (fr.tomado) return;
+    const x = Math.round(fr.x - cam), y = Math.round(fr.y + Math.sin(t / 12 + fr.x) * 2), fase = (t >> 3) % 4;
+    [[0, 2], [1, 4], [2, 6], [3, 6], [4, 4], [5, 2]].forEach(([r, w]) => R(g, x - w / 2 + (fase === 1 && r > 2 ? 1 : 0), y - 3 + r, w, 1, r < 2 ? '#fff5c4' : r < 4 ? '#f3d27f' : '#c9a24a'));
+    R(g, x, y - 1, 1, 2, '#1d3366'); brillos.push([x - 3, y - 3, 6, 6]);
+  }
   function cartel(g) {
     const x = Math.round(MUNDO - 44 - cam), y = G;
     R(g, x, y - 18, 2, 18, '#5a3b22'); R(g, x - 12, y - 24, 26, 10, '#8a6a42'); R(g, x - 12, y - 24, 26, 1, '#a8845a'); R(g, x - 12, y - 15, 26, 1, '#5a3b22');
@@ -663,6 +661,8 @@
       if (e.id === 'arcade' && t % 260 < 44) luces.push([410 + ox, 26 + oy, 30, 'rgba(255,150,60,.9)', 1]);
     });
     luces.push([FUENTE.x - cam, G - 26, 22, 'rgba(243,210,127,.45)', 0]);
+    BARRERAS.forEach(b => { if (!b.abierta || b.disolver > 0) luces.push([b.x - cam, G - 50, 38, 'rgba(126,200,255,.55)', 1]); });
+    FRAGMENTOS.forEach(fr => { if (!fr.tomado) luces.push([fr.x - cam, fr.y, 18, 'rgba(243,210,127,.7)', 1]); });
     NPCS.forEach(n => { if (n.tipo === 'lumi') luces.push([n.x - cam, G - 16, 30, 'rgba(255,225,140,.7)', 1]); if (n.tipo === 'maga') luces.push([n.x - cam + 6 * n.dir, G - 27, 16, 'rgba(126,200,255,.7)', 0]); });
     luces.push([P.x - cam, P.y - 10, 34, 'rgba(255,225,170,.5)', 0]);
     luces.forEach(([x, y, r0, c, parpadea]) => { if (x < -60 || x > WW + 60) return; halo(l, x, y, r0 * (parpadea ? 1 + Math.sin(t * .21 + x) * .04 + (Math.random() - .5) * .04 : 1), c); });
@@ -696,6 +696,8 @@
     PLATAFORMAS.forEach(p => { if (!p.oculta && p.x - c < WW && p.x + p.w - c > 0) plataforma(f, p); });
     fuente(f); CAJAS.forEach(k => caja(f, k)); cartel(f);
     BANCAS.forEach(x => banca(f, x)); FAROLES.forEach(x => farol(f, x));
+    BARRERAS.forEach(b => barrera(f, b));
+    FRAGMENTOS.forEach(fr => fragmento(f, fr));
     f.drawImage(calle, c, 0, WW, WH - G + 4, 0, G - 4, WW, WH - G + 4);
     GEMAS.forEach(g => gema(f, g));
     NPCS.forEach(n => { if (n.x - c > -20 && n.x - c < WW + 20) dibujarNPC(f, n, n.x - c, G, n.dir).forEach(b => brillos.push(b)); });
@@ -715,6 +717,7 @@
     FAROLES.forEach(x => halo(m, x - c + 1, G - 30, 10, 'rgba(255,200,120,.35)'));
     EDIFICIOS.forEach(e => e.antorchas.forEach(([x, y]) => halo(m, x + e.off.x - c + 1, y + e.off.y, 6, 'rgba(255,190,110,.35)')));
     GEMAS.forEach(g => { if (!g.tomada) halo(m, g.x - c, g.y, 7, 'rgba(243,210,127,.3)'); });
+    FRAGMENTOS.forEach(fr => { if (!fr.tomado) halo(m, fr.x - c, fr.y, 10, 'rgba(243,210,127,.4)'); });
     NPCS.forEach(n => { if (n.tipo === 'lumi') halo(m, n.x - c, G - 16, 10, 'rgba(255,230,150,.5)'); });
     m.globalCompositeOperation = 'source-over';
   }
@@ -723,7 +726,7 @@
   const redondo = (x, y, w, h, r) => { ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x, y, w, h, r) : ctx.rect(x, y, w, h); };
   function cinta(e) {
     const cx = (e.puerta.wx - cam) * S; if (cx < -150 || cx > W + 150) return;
-    const visitada = window.KR && KR.estado().zonas.includes(e.id), cy = (G + 11) * S;
+    const visitada = API.al.hecho(e.id), cy = (G + 11) * S;
     ctx.font = '600 14px Cinzel, Georgia, serif';
     const w = ctx.measureText(e.nombre).width + 50, h = 26, x = cx - w / 2, y = cy - h / 2;
     ctx.fillStyle = 'rgba(5,14,29,.86)'; ctx.strokeStyle = cerca === e ? '#f3d27f' : 'rgba(224,183,86,.55)'; ctx.lineWidth = cerca === e ? 2 : 1;
@@ -779,14 +782,25 @@
       ctx.fillStyle = '#f3d27f'; ctx.font = '10px "Press Start 2P", monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('E', x + 1, y + 1);
     }
     if (destello && destello.t-- > 0) { const k = destello.t / 30; ctx.strokeStyle = `rgba(243,210,127,${k})`; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc((destello.x - cam) * S, (G - 10) * S, (1 - k) * 60 + 10, 0, 7); ctx.stroke(); }
-    if (!dialogo || dialogo.cerrado) {                                   // contador de gemas, avance y controles
-      const n = GEMAS.filter(g => g.tomada).length;
-      ctx.textBaseline = 'middle'; ctx.textAlign = 'right'; ctx.font = '10px "Press Start 2P", monospace';
-      ctx.fillStyle = 'rgba(5,14,29,.8)'; redondo(W - 128, 14, 114, 28, 14); ctx.fill();
+    if (!dialogo || dialogo.cerrado) {                                   // misión, gemas, puntos y controles
+      const info = API.al.hud(), n = GEMAS.filter(g => g.tomada).length;
+      ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
+      ctx.font = '600 14px Inter, sans-serif';
+      const mw = Math.min(W - 250, ctx.measureText(info.mision).width + 36);
+      ctx.fillStyle = 'rgba(5,14,29,.84)'; ctx.strokeStyle = 'rgba(224,183,86,.6)'; ctx.lineWidth = 1; redondo(14, 12, mw, 50, 10); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#f3d27f'; ctx.font = '8px "Press Start 2P", monospace'; ctx.fillText(info.titulo, 28, 28);
+      ctx.fillStyle = '#f4f7fd'; ctx.font = '600 14px Inter, sans-serif'; ctx.fillText(info.mision, 28, 47, mw - 28);
+      ctx.textAlign = 'right'; ctx.font = '10px "Press Start 2P", monospace';
+      ctx.fillStyle = 'rgba(5,14,29,.84)'; redondo(W - 150, 12, 136, 50, 10); ctx.fill();
       ctx.fillStyle = '#f3d27f'; ctx.fillText(`◆ ${n}/${GEMAS.length}`, W - 26, 29);
-      ctx.fillStyle = 'rgba(5,14,29,.7)'; redondo(14, 14, 200, 8, 4); ctx.fill();
-      ctx.fillStyle = 'rgba(224,183,86,.8)'; redondo(14, 14, 200 * Math.max(.04, P.x / MUNDO), 8, 4); ctx.fill();
-      if (document.activeElement === cv) { ctx.textAlign = 'left'; ctx.font = '12px Inter, sans-serif'; ctx.fillStyle = 'rgba(244,247,253,.75)'; ctx.fillText('A/D mover · Espacio saltar (x2) · S bajar · E hablar/entrar', 14, 36); }
+      ctx.fillStyle = '#9dffc0'; ctx.fillText(`PH ${info.ph}`, W - 26, 49);
+      if (document.activeElement === cv) { ctx.textAlign = 'left'; ctx.font = '12px Inter, sans-serif'; ctx.fillStyle = 'rgba(244,247,253,.7)'; ctx.fillText('A/D mover · Espacio saltar (x2) · S bajar · E hablar/entrar · Esc pausa', 16, 78); }
+    }
+    if (aviso && aviso.t > 0) {
+      ctx.globalAlpha = Math.min(1, aviso.t / 30); ctx.font = '600 15px Inter, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      const w = ctx.measureText(aviso.txt).width + 40;
+      ctx.fillStyle = 'rgba(5,14,29,.92)'; ctx.strokeStyle = '#7ec8ff'; ctx.lineWidth = 2; redondo(W / 2 - w / 2, 150, w, 38, 19); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = '#e6f7ff'; ctx.fillText(aviso.txt, W / 2, 170); ctx.globalAlpha = 1;
     }
     if (document.activeElement !== cv && !P.movio) {
       ctx.textBaseline = 'middle'; ctx.font = '10px "Press Start 2P", monospace'; ctx.textAlign = 'center';
@@ -806,7 +820,19 @@
 
   let activo = false, raf = 0;
   function bucle() { t++; actualizar(); dibujar(); raf = activo ? requestAnimationFrame(bucle) : 0; }
-  new IntersectionObserver(en => { activo = en[0].isIntersecting; if (activo && !raf) raf = requestAnimationFrame(bucle); }, { threshold: .05 }).observe(cv);
+  const API = window.KRAldea = {
+    activar() { activo = true; if (!raf) raf = requestAnimationFrame(bucle); cv.focus({ preventScroll: true }); },
+    pausar() { activo = false; Object.keys(teclas).forEach(k => teclas[k] = false); P.meta = null; },
+    fijar(p) {
+      BARRERAS.forEach(b => { b.abierta = p.etapa > b.i; b.disolver = 0; });
+      FRAGMENTOS.forEach((fr, i) => { fr.tomado = !!(p.fragmentos && p.fragmentos[i]); });
+      if (typeof p.x === 'number') { P.x = p.x; P.y = G; cam = Math.max(0, Math.min(MUNDO - WW, P.x - WW * .45)); }
+      dialogo = null;
+    },
+    abrirBarrera(i) { const b = BARRERAS[i]; if (b && !b.abierta) { b.abierta = true; b.disolver = 60; window.KR && KR.beep([[523, .08], [659, .08], [784, .08], [1047, .2]]); } },
+    avisar(txt, dur) { aviso = { txt, t: dur || 180 }; },
+    get x() { return P.x; },
+    al: { entrar() {}, tecla() {}, fragmento() {}, hecho: () => false, hud: () => ({ titulo: '', mision: '', ph: 0 }) },
+  };
   document.fonts && document.fonts.ready.then(() => dibujar());
-  dibujar();
 })();

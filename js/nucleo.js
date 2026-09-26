@@ -8,7 +8,7 @@
 
   const LOGROS = [
     { id: 'start', ico: '🎮', nombre: 'Press Start', desc: 'Comienza la aventura.', xp: 50 },
-    { id: 'pasos', ico: '👣', nombre: 'Primeros pasos', desc: 'Mueve al personaje por el mapa del reino.', xp: 50 },
+    { id: 'pasos', ico: '👣', nombre: 'Primeros pasos', desc: 'Mueve al personaje por la aldea del modo arcade.', xp: 50 },
     { id: 'explorador', ico: '🗺️', nombre: 'Explorador del reino', desc: 'Visita las seis zonas del portafolio.', xp: 150 },
     { id: 'filtro', ico: '🔍', nombre: 'Filtro en mano', desc: 'Usa un filtro del laboratorio de análisis.', xp: 75 },
     { id: 'analista', ico: '📊', nombre: 'Analista certificado', desc: 'Responde correctamente las tres preguntas del desafío.', xp: 200 },
@@ -53,7 +53,6 @@
     $('#hud-xp-texto').textContent = `${estado.xp} XP · ${TITULOS[Math.min(nv - 1, TITULOS.length - 1)]}`;
     $('#hud-logros').textContent = estado.logros.length;
     $('#hud-logros-total').textContent = LOGROS.length;
-    $$('.mundo-leyenda a').forEach(a => a.classList.toggle('visitada', estado.zonas.includes(a.getAttribute('href').slice(1))));
   }
 
   function toast(ico, titulo, sub) {
@@ -120,34 +119,7 @@
     estado = { xp: 0, logros: [], zonas: [], extra: {} }; guardar(); pintarHUD(); pintarLogros();
   });
 
-  // ---------------------------------------------------------- pantalla de inicio
-  const boot = $('#boot');
-  const estrellas = $('.boot-estrellas');
-  for (let i = 0; i < 90; i++) {
-    const s = document.createElement('i');
-    s.style.left = Math.random() * 100 + '%'; s.style.top = Math.random() * 100 + '%';
-    s.style.animationDelay = (Math.random() * 3) + 's';
-    estrellas.appendChild(s);
-  }
-  let modo = 'clasico';
-  function empezar(m) {
-    modo = m;
-    boot.classList.add('oculto'); document.body.classList.remove('bloqueado');
-    try { sessionStorage.setItem('kr-boot', m); } catch (e) { /* sin sesión */ }
-    if (m === 'aventura') {
-      desbloquear('start');
-      setTimeout(() => { $('#mundo').scrollIntoView({ behavior: 'smooth' }); $('#mundo-canvas').focus({ preventScroll: true }); }, 350);
-    }
-  }
-  let yaInicio = null;
-  try { yaInicio = sessionStorage.getItem('kr-boot'); } catch (e) { /* sin sesión */ }
-  if (yaInicio) { boot.classList.add('oculto'); modo = yaInicio; }
-  else { document.body.classList.add('bloqueado'); setTimeout(() => $('[data-modo=aventura]').focus(), 50); }
-  $$('[data-modo]').forEach(b => b.addEventListener('click', () => empezar(b.dataset.modo)));
-  document.addEventListener('keydown', e => {
-    if (!boot.classList.contains('oculto') && e.key === 'Enter' && !e.target.matches('button')) empezar('aventura');
-    if (e.key === 'Escape' && !modal.hidden) cerrarLogros();
-  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !modal.hidden) cerrarLogros(); });
 
   // ---------------------------------------------------------- rol rotativo tipo máquina de escribir
   const ROLES = ['Business Intelligence · Power BI · Tableau', 'Lead Programmer · Godot Engine', 'Análisis de datos y toma de decisiones', 'Socio fundador · Studios Conari SpA', 'Modelos de datos · ETL · DAX · SQL'];
@@ -199,5 +171,5 @@
   });
 
   pintarHUD();
-  window.KR = { sumarXP, desbloquear, visitarZona, toast, beep, get modo() { return modo; }, estado: () => estado, guardar };
+  window.KR = { sumarXP, desbloquear, visitarZona, toast, beep, estado: () => estado, guardar };
 })();

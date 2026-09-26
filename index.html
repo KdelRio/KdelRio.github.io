@@ -16,19 +16,44 @@
 </head>
 <body>
 
-<!-- ============================================================ PANTALLA DE INICIO -->
-<div id="boot" class="boot" role="dialog" aria-modal="true" aria-labelledby="boot-titulo">
-  <div class="boot-estrellas" aria-hidden="true"></div>
-  <div class="boot-caja">
-    <img src="assets/img/conari-wordmark.png" alt="Studios Conari" class="boot-logo">
-    <h1 id="boot-titulo" class="boot-titulo">Kevin del Río</h1>
-    <p class="boot-sub">Datos que se convierten en decisiones · Código que se convierte en experiencias</p>
-    <p class="boot-press" aria-hidden="true">PRESS START</p>
-    <div class="boot-opciones">
-      <button class="btn btn-oro" data-modo="aventura">▶ Modo aventura</button>
-      <button class="btn btn-linea" data-modo="clasico">Ver portafolio clásico</button>
+<!-- ============================================================ MÁQUINA ARCADE -->
+<div id="maquina" class="maquina" role="dialog" aria-modal="true" aria-label="Portafolio en modo arcade">
+  <div class="sala" aria-hidden="true"></div>
+  <button class="maquina-salir" id="maquina-salir" type="button">Portafolio clásico <span aria-hidden="true">→</span></button>
+  <div class="gabinete" id="gabinete">
+    <div class="marquesina"><img src="assets/img/conari-wordmark.png" alt="Studios Conari"><span>ARCADE</span></div>
+    <div class="bisel">
+      <div class="pantalla" id="pantalla">
+        <canvas id="portada-canvas" class="capa-juego" width="960" height="540" tabindex="0" aria-label="Pantalla de inicio: presiona F para meter una ficha y Enter para iniciar"></canvas>
+        <canvas id="aldea-canvas" class="capa-juego" width="960" height="540" tabindex="0" aria-label="Aldea de plataformas del reino" hidden></canvas>
+        <canvas id="batalla-canvas" class="capa-juego" width="960" height="540" tabindex="0" aria-label="Arena del Dato" hidden></canvas>
+        <canvas id="ritmo-arcade-canvas" class="capa-juego" width="960" height="540" tabindex="0" aria-label="Ritmo Resonancia" hidden></canvas>
+        <div class="capa-panel" id="capa-panel" hidden></div>
+        <div class="crt" aria-hidden="true"></div>
+      </div>
     </div>
-    <p class="boot-ayuda">En modo aventura exploras un mapa, juegas y ganas experiencia. El modo clásico muestra todo el contenido de corrido.</p>
+    <div class="consola">
+      <div class="palanca" aria-label="Palanca">
+        <button type="button" data-tecla="ArrowUp" aria-label="Arriba">▲</button>
+        <button type="button" data-tecla="ArrowLeft" aria-label="Izquierda">◀</button>
+        <span class="palanca-bola" aria-hidden="true"></span>
+        <button type="button" data-tecla="ArrowRight" aria-label="Derecha">▶</button>
+        <button type="button" data-tecla="ArrowDown" aria-label="Abajo">▼</button>
+      </div>
+      <div class="consola-centro">
+        <button type="button" class="bt-chico" data-tecla="h">H<small>Árbol</small></button>
+        <button type="button" class="bt-chico" data-tecla="p">P<small>Ficha</small></button>
+        <button type="button" class="bt-chico" data-tecla="Escape">ESC<small>Pausa</small></button>
+      </div>
+      <div class="botonera">
+        <button type="button" class="bt bt-a" data-tecla=" "><b>A</b><small>Saltar · Atacar</small></button>
+        <button type="button" class="bt bt-b" data-tecla="e"><b>B</b><small>Acción</small></button>
+      </div>
+    </div>
+    <div class="puerta-fichas">
+      <button type="button" class="ranura" data-tecla="f"><i aria-hidden="true"></i><span>INSERT COIN · F</span></button>
+      <button type="button" class="ranura ranura-start" data-tecla="Enter"><i aria-hidden="true"></i><span>START · ENTER</span></button>
+    </div>
   </div>
 </div>
 
@@ -64,31 +89,31 @@
       <p class="hero-rol"><span id="rol-rotativo">Business Intelligence · Power BI · Tableau</span><span class="cursor">▌</span></p>
       <p class="hero-texto">Socio fundador, administrador y <strong>Lead Programmer de Studios Conari SpA</strong>. Especialista en <strong>análisis de datos y Business Intelligence</strong>, con más de tres años liderando áreas de Tecnologías de la Información. Diseño modelos de datos, procesos ETL y tableros de gestión, y construyo videojuegos en Godot Engine.</p>
       <div class="hero-botones">
-        <a href="#mundo" class="btn btn-oro">Explorar el reino</a>
+        <button type="button" class="btn btn-oro" data-abrir-arcade>▶ Jugar modo arcade</button>
         <a href="assets/CV_Kevin_del_Rio.pdf" class="btn btn-linea" download data-logro="cv">Descargar CV</a>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ============================================================ MAPA DEL MUNDO -->
+<!-- ============================================================ MODO ARCADE -->
 <section id="mundo" class="seccion">
   <div class="contenedor">
-    <p class="kicker">Modo aventura</p>
-    <h2 class="titulo">La aldea del reino</h2>
-    <p class="bajada">Recorre la aldea con <kbd>A</kbd><kbd>D</kbd> o las flechas y salta con <kbd>Espacio</kbd> (doble salto). Habla con los aldeanos para saber qué te espera en cada zona, junta las gemas de datos y pulsa <kbd>E</kbd> frente a una puerta para entrar. También puedes tocar un edificio para ir directo.</p>
-    <div class="mundo-marco">
-      <canvas id="mundo-canvas" width="960" height="540" tabindex="0" aria-label="Aldea de plataformas con seis edificios que llevan a cada sección del portafolio"></canvas>
-      <div class="mundo-aviso" id="mundo-aviso" hidden></div>
+    <div class="panel invitacion">
+      <div>
+        <p class="kicker">Modo arcade</p>
+        <h2 class="titulo">La aventura del reino</h2>
+        <p class="bajada">Recorre este portafolio como un videojuego: cinco misiones, una arena de combate que genera datos para analizarlos, un memorize con los juegos del estudio, ritmo, un árbol de habilidades y la hoja de personaje.</p>
+        <button type="button" class="btn btn-oro" data-abrir-arcade>▶ Jugar modo arcade</button>
+      </div>
+      <ol class="invitacion-misiones">
+        <li><img src="assets/img/logo-castillo-montana-bosque.png" alt=""><span><b>Castillo Conari</b>Recupera el emblema del estudio</span></li>
+        <li><img src="assets/img/logo-investigacion.png" alt=""><span><b>Torre del Dato</b>Combate, datos y análisis</span></li>
+        <li><img src="assets/img/logo-dragon.png" alt=""><span><b>Arcade del Dragón</b>Memorize y Ritmo Resonancia</span></li>
+        <li><img src="assets/img/logo-arbol.png" alt=""><span><b>Gremio</b>Sube el árbol de habilidades</span></li>
+        <li><img src="assets/img/logo-libro.png" alt=""><span><b>Biblioteca</b>Hoja de personaje</span></li>
+      </ol>
     </div>
-    <ul class="mundo-leyenda">
-      <li><a href="#estudio"><img src="assets/img/logo-castillo-montana-bosque.png" alt="">Castillo Conari</a></li>
-      <li><a href="#datos"><img src="assets/img/logo-investigacion.png" alt="">Torre del Dato</a></li>
-      <li><a href="#arcade"><img src="assets/img/logo-dragon.png" alt="">Arcade del Dragón</a></li>
-      <li><a href="#gremio"><img src="assets/img/logo-arbol.png" alt="">Gremio</a></li>
-      <li><a href="#cv"><img src="assets/img/logo-libro.png" alt="">Biblioteca</a></li>
-      <li><a href="#contacto"><img src="assets/img/logo-sol-luna.png" alt="">Buzón</a></li>
-    </ul>
   </div>
 </section>
 
@@ -347,10 +372,13 @@
 <div class="toasts" id="toasts" aria-live="polite"></div>
 
 <script src="js/nucleo.js"></script>
-<script src="js/mundo.js"></script>
 <script src="js/laboratorio.js"></script>
 <script src="js/gremio.js"></script>
 <script src="js/mazmorra.js"></script>
 <script src="js/ritmo.js"></script>
+<script src="js/mundo.js"></script>
+<script src="js/batalla.js"></script>
+<script src="js/informe.js"></script>
+<script src="js/arcade.js"></script>
 </body>
 </html>

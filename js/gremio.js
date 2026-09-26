@@ -51,6 +51,7 @@
     ] },
   ];
   const ATRIBUTOS = [['Análisis de datos', 95], ['Business Intelligence', 95], ['Programación', 85], ['Liderazgo', 85], ['Gestión', 85], ['Creatividad', 80]];
+  window.KR_HABILIDADES = { RAMAS, ATRIBUTOS };
 
   const arbol = document.getElementById('arbol'), detalle = document.getElementById('habilidad-detalle'), prog = document.getElementById('gremio-progreso');
   const total = RAMAS.reduce((a, r) => a + r.nodos.length, 0);
