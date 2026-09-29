@@ -163,7 +163,7 @@
     const lema = document.querySelector('#estudio .estudio-lema').textContent, desc = document.querySelector('#estudio .estudio-marca > p:not(.estudio-lema)').textContent;
     diapositivas('estudio', [
       `<div class="dia-centro"><p class="pn-kicker">Misión 1 · Castillo Conari</p>
-        <img class="dia-logo" src="assets/img/conari-wordmark.png" alt="Studios Conari">
+        <img class="dia-logo" src="assets/img/intro/w-completo.png" alt="Studios Conari">
         <p class="dia-lema">${lema}</p><p class="pn-logro">✓ Emblema restaurado · +1 punto de habilidad</p></div>`,
       `<div class="dia-centro dia-angosto"><h2 class="dia-h">El estudio</h2><p class="dia-p">${desc}</p>
         <div class="fila-botones centro"><a class="btn btn-oro" href="https://studiosconari.github.io/" target="_blank" rel="noopener">Sitio oficial</a>
@@ -396,7 +396,7 @@
 
   // ---------------------------------------------------------- pantalla INSERT COIN
   const pc = CV.portada.getContext('2d'), PW = CV.portada.width, PH = CV.portada.height;
-  const logo = new Image(); logo.src = 'assets/img/conari-wordmark.png';
+  const logo = new Image(); logo.src = 'assets/img/intro/w-portada.png';   // pixel art nativo: un píxel del arte = un píxel del lienzo
   const ESTRELLAS = Array.from({ length: 140 }, () => ({ x: Math.random() * PW, y: Math.random() * PH, v: .2 + Math.random() * 1.3, b: Math.random() }));
   let tp = 0, creditos = 0, arranque = 0, rechazo = 0, rafP = 0, destino = 'interactivo', opcion = 0;
   const OPCIONES = [['1', 'PORTAFOLIO INTERACTIVO', 'interactivo'], ['2', 'PORTAFOLIO CLÁSICO', 'clasico']];
@@ -413,7 +413,7 @@
     txt('1UP', 110, 36, 14, '#f87171'); txt('00000', 110, 60, 14, '#f4f7fd');
     txt('HI-SCORE', PW / 2, 36, 14, '#f87171'); txt('KEVIN DEL RIO', PW / 2, 60, 14, '#f4f7fd');
     txt('2UP', PW - 110, 36, 14, '#f87171'); txt('00000', PW - 110, 60, 14, '#f4f7fd');
-    if (logo.complete && logo.naturalWidth) { const w = 300, h = w * logo.naturalHeight / logo.naturalWidth; pc.globalAlpha = .95; pc.drawImage(logo, PW / 2 - w / 2, 100, w, h); pc.globalAlpha = 1; }
+    if (logo.complete && logo.naturalWidth) { pc.imageSmoothingEnabled = false; pc.drawImage(logo, Math.round(PW / 2 - logo.naturalWidth / 2), 96); }
     const sacude = rechazo > 0 ? Math.sin(rechazo * 1.7) * 8 : 0; if (rechazo > 0) rechazo--;
     if (arranque > 0) {
       arranque--;

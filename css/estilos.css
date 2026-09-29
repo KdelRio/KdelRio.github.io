@@ -406,8 +406,7 @@ kbd {
   background: repeating-linear-gradient(180deg, #1c2e58 0 4px, #19284f 4px 8px);
   box-shadow: inset 0 0 0 4px #2a1d04, inset 0 0 0 8px var(--oro), inset 0 0 0 12px #9a7a2c, inset 12px 12px 0 #2b4580, inset -12px -12px 0 #0c1631;
 }
-.marquesina img { height: 62%; width: auto; }
-.marquesina span { font: clamp(.75rem, 1.5vw, 1.25rem)/1 var(--pixel); color: #ffd1ea; letter-spacing: .12em; text-shadow: 3px 3px 0 #7a1d4a, 0 0 8px #ff5fb0; animation: neon 5s steps(1, end) infinite; }
+.marquesina span { font: clamp(.9rem, 2.2vw, 1.6rem)/1 var(--pixel); color: #ffd1ea; letter-spacing: .12em; text-shadow: 3px 3px 0 #7a1d4a, 0 0 8px #ff5fb0; animation: neon 5s steps(1, end) infinite; }
 @keyframes neon { 0%, 18%, 22%, 100% { opacity: 1; } 20% { opacity: .35; } }
 .bisel {
   width: 100%; padding: 22px 32px; background: #121829;
@@ -797,7 +796,6 @@ kbd {
   .gabinete { --pw: calc(100vw - 56px); width: calc(var(--pw) + 48px); }
   .bisel { padding: 14px 18px; border-width: 0 8px; }
   .marquesina { width: 100%; }
-  .marquesina span { display: none; }
   .consola { width: 100%; padding: 18px 28px 26px; gap: 8px; }
   .palanca { grid-template-columns: repeat(3, 32px); grid-template-rows: repeat(3, 28px); }
   .palanca-bola { width: 24px; height: 24px; }
@@ -941,43 +939,46 @@ kbd {
   font: .7rem/1 var(--pixel); color: rgba(255, 255, 255, .8); background: rgba(255, 255, 255, .08); border: 2px solid rgba(255, 255, 255, .3);
 }
 
-/* --------------------------------------------------------------- intro de Studios Conari (js/intro.js) */
+/* --------------------------------------------------------------- intro de Studios Conari (js/intro.js)
+   Todo vive en una grilla de píxeles real: el logo, los emblemas y el dragón comparten el mismo tamaño de
+   píxel (P = 2.4 unidades del escenario) y js/intro.js escala el escenario para que P sea un número entero
+   de píxeles de pantalla. Sin desenfoques ni degradados suaves; los cambios avanzan a saltos (steps). */
 .intro { display: none; }
-.con-intro .intro { display: block; position: fixed; inset: 0; z-index: 600; overflow: hidden; cursor: pointer; background: radial-gradient(ellipse at 50% 45%, #0d1636 0%, #050817 70%); }
+.con-intro .intro {
+  display: block; position: fixed; inset: 0; z-index: 600; overflow: hidden; cursor: pointer;
+  background: radial-gradient(ellipse at 50% 45%, #101b40 0 20%, #0c1533 20% 38%, #09102a 38% 58%, #060b1f 58% 78%, #040716 78%);
+}
 .con-intro body { overflow: hidden; }
-.intro-estrellas { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; }
+.intro-estrellas { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; image-rendering: pixelated; }
 .intro-escenario { position: absolute; left: 0; top: 0; width: 1000px; height: 600px; transform-origin: 0 0; }
+.intro-escenario img { image-rendering: pixelated; }
 .intro-constelacion { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-.intro-constelacion line { stroke: rgba(243, 210, 127, .45); stroke-width: 1.2; stroke-dasharray: 1; stroke-dashoffset: 1; }
-.intro-emblema { position: absolute; width: 140px; height: 140px; margin: -70px 0 0 -70px; opacity: 0; filter: drop-shadow(0 0 8px rgba(255, 212, 90, .45)); }
-.intro-emblema svg, .intro-emblema img { position: absolute; inset: 0; width: 100%; height: 100%; }
+.intro-constelacion line { stroke: #b87406; stroke-width: 2.4; shape-rendering: crispEdges; stroke-dasharray: 1; stroke-dashoffset: 1; }
+.intro-emblema { position: absolute; width: 153.6px; height: 153.6px; margin: -76.8px 0 0 -76.8px; opacity: 0; }
+.intro-emblema svg, .intro-emblema img { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .intro-emblema img { opacity: 0; }
-.it-emblema path, .intro-trazo path { fill: none; stroke: #ffd98a; stroke-width: 1.6; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 1; }
-.intro-trazo path { stroke-width: 1.2; }
-.intro-logo { position: absolute; left: 236.5px; top: 146.15px; width: 620px; height: 362px; transform: scale(.85); transform-origin: 0 0; }
+.it-emblema path, .intro-trazo path { fill: none; stroke: #fcdf6b; stroke-width: 4; stroke-linejoin: miter; stroke-dasharray: 1; stroke-dashoffset: 1; shape-rendering: crispEdges; }
+.intro-trazo path { stroke-width: 3; }
+.intro-logo { position: absolute; left: 252px; top: 156px; width: 620px; height: 362px; transform: scale(.8); transform-origin: 0 0; }
 .intro-logo .iw, .intro-trazo, .intro-brillo { position: absolute; inset: 0; width: 100%; height: 100%; }
-.intro-trazo { filter: drop-shadow(0 0 4px rgba(255, 212, 90, .8)); overflow: visible; }
+.intro-trazo { overflow: visible; }
 .iw { opacity: 0; }
 .iw-conari { opacity: 1; }
-.iw-lineas { transform-origin: 50% 29%; }
-.iw-base { transform-origin: 50% 90%; }
 .intro-brillo {
-  -webkit-mask: url("../assets/img/conari-wordmark.png") 0 0 / 100% 100% no-repeat; mask: url("../assets/img/conari-wordmark.png") 0 0 / 100% 100% no-repeat;
-  background: linear-gradient(105deg, transparent 40%, rgba(255, 255, 240, .95) 50%, transparent 60%) -250% 0 / 60% 100% no-repeat; mix-blend-mode: screen;
+  -webkit-mask: url("../assets/img/intro/w-completo.png") 0 0 / 100% 100% no-repeat; mask: url("../assets/img/intro/w-completo.png") 0 0 / 100% 100% no-repeat;
+  background: linear-gradient(105deg, transparent 44%, rgba(255, 255, 240, .85) 44% 56%, transparent 56%) -250% 0 / 40% 100% no-repeat;
 }
 .intro-destello {
-  position: absolute; width: 90px; height: 90px; margin: -45px 0 0 -45px; opacity: 0; pointer-events: none;
-  background: radial-gradient(circle, #fff 0 6%, rgba(255, 230, 150, .9) 12%, rgba(255, 212, 90, .25) 35%, transparent 65%),
-              linear-gradient(90deg, transparent 47%, rgba(255, 245, 200, .9) 50%, transparent 53%),
-              linear-gradient(0deg, transparent 47%, rgba(255, 245, 200, .9) 50%, transparent 53%);
+  position: absolute; width: 21.6px; height: 21.6px; margin: -10.8px 0 0 -10.8px; opacity: 0; pointer-events: none; image-rendering: pixelated;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 9 9' shape-rendering='crispEdges'%3E%3Cpath fill='%23fabd18' d='M4 0h1v9H4zM0 4h9v1H0zM2 2h1v1H2zM6 2h1v1H6zM2 6h1v1H2zM6 6h1v1H6z'/%3E%3Cpath fill='%23fcdf6b' d='M4 1h1v7H4zM1 4h7v1H1z'/%3E%3Cpath fill='%23fff' d='M3 3h3v3H3z'/%3E%3C/svg%3E") 0 0 / 100% 100%;
 }
-.intro-presenta { position: absolute; left: 0; right: 0; top: 488px; margin: 0; text-align: center; opacity: 0; font: 13px/1 var(--pixel); letter-spacing: .5em; color: #f3d27f; }
-.intro-presenta span { display: block; margin-top: 14px; font: 600 22px/1 var(--titulo); letter-spacing: .08em; color: #e8ecff; }
+.intro-presenta { position: absolute; left: 0; right: 0; top: 490px; margin: 0; text-align: center; opacity: 0; font: 14.4px/1 var(--pixel); letter-spacing: .5em; color: #fabd18; }
+.intro-presenta span { display: block; margin-top: 16px; font: 12px/1 var(--pixel); letter-spacing: .12em; color: #e9eeff; }
 .intro-dragon { position: absolute; left: 0; top: 0; width: 100px; height: 100px; margin: -50px 0 0 -50px; }
 .intro-dragon-spr {
-  width: 100px; height: 100px; image-rendering: pixelated; scale: 2.1;
+  width: 100px; height: 100px; image-rendering: pixelated; scale: 2.4;
   background: url("../assets/img/mascota/dragon-vuela.png") 0 0 / 900px 100px no-repeat;
-  animation: carga-aleteo .6s steps(8) infinite; filter: drop-shadow(0 0 10px rgba(255, 212, 90, .35));
+  animation: carga-aleteo .6s steps(8) infinite;
 }
 .intro-saltar { position: absolute; bottom: 18px; left: 0; right: 0; margin: 0; text-align: center; font: 9px/1 var(--pixel); color: rgba(232, 236, 255, .4); letter-spacing: .1em; }
 
@@ -1020,3 +1021,5 @@ kbd {
   font: .7rem/1 var(--pixel); color: #ffd400; text-shadow: 0 2px 0 #000, 0 0 12px rgba(255, 212, 0, .5); animation: pista-late 1.2s steps(2) infinite;
 }
 @keyframes pista-late { 50% { color: #fff1a8; } }
+
+.dia-logo { image-rendering: pixelated; }
