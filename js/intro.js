@@ -141,6 +141,9 @@
         conari.style.clipPath = `inset(0 0 0 ${f}%)`;
       }
     }, 4.4)
+    // y sigue volando, subiendo, hasta salir por el borde izquierdo real de la ventana (en pantallas anchas está lejos del escenario)
+    .to(dragon, { x: () => -ox / k - 260, y: conariY - 150, duration: .75, ease: 'none' }, 5.55)
+    .set(dragon, { opacity: 0 }, 6.3)
     .to('.it-conari', { opacity: 0, duration: .5 }, 5.4)
     .fromTo('.iw-base', { opacity: 0, scale: .3 }, { opacity: 1, scale: 1, duration: .5, ease: 'back.out(3)' }, 5.35)
     .fromTo('.intro-brillo', { backgroundPosition: '-250% 0' }, { backgroundPosition: '300% 0', duration: 1.3, ease: 'power1.inOut' }, 5.5)
