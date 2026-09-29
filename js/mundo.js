@@ -201,8 +201,8 @@
       'Sobrevive a las tres oleadas y te enseñaré a convertir esos datos en decisiones. Entra con E.'] },
     { id: 'gamer', tipo: 'gamer', x: 744, nombre: 'Tomi, campeón del arcade', lineas: [
       '¡Eh! El Arcade del Dragón guarda los juegos que creó el estudio.',
-      'Primero encuentra los pares de habilidades en el Memorize.',
-      'Si lo logras, te espera Ritmo Resonancia. ¡Sube el volumen y entra con E!'] },
+      'Adentro te espera Ritmo Resonancia: pulsa cada nota cuando llegue a la línea dorada.',
+      'Completa una canción y la misión es tuya. ¡Sube el volumen y entra con E!'] },
     { id: 'sylva', tipo: 'elfa', x: 1172, nombre: 'Sylva, maestra del gremio', lineas: [
       'Aquí se forjan las especialidades del reino. Cada misión te enseñó algo de la tuya.',
       'Entra al Gremio y aprende las habilidades que te faltan de tu rama. También puedes verla con H.',

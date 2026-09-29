@@ -36,6 +36,7 @@
   let p = 0, mx = 0, my = 0, objX = 0, objY = 0, sucio = true;
   let vw = innerWidth, vh = innerHeight, W = 0, H = 0, vertical = false, llaves = [];
   const cam = { x: 0, y: 0, z: 1, tr: 0, tg: 0, tb: 0, t: 0, claro: 0 }, obj = { ...cam };
+  let forzada = null, vel = .085;                    // toma fija de la obertura (js/obertura.js) y rapidez de la cámara
 
   // ---------------------------------------------------------- geometría y llaves de cámara
   function encuadre(toma) {
@@ -44,7 +45,7 @@
       return { x, y: -.03 * vh, z: 1 };
     }
     // el hito se encuadra en el hueco a la derecha del título de la zona, que es lo que se ve al llegar
-    const z = toma.z, Wz = W * z, Hz = H * z, tx = vertical ? .5 : .76, ty = vertical ? .2 : .27;
+    const z = toma.z, Wz = W * z, Hz = H * z, tx = toma.c ? .5 : vertical ? .5 : .76, ty = toma.c ? .5 : vertical ? .2 : .27;   // c: plano centrado (obertura)
     const x = Math.min(0, Math.max(vw - Wz, vw * tx - toma.f[0] * Wz));
     const y = Math.min(0, Math.max(vh - Hz * .97, vh * ty - toma.f[1] * Hz));
     return { x, y, z };
@@ -63,6 +64,7 @@
     });
   }
   function apuntar() {
+    if (forzada) { Object.assign(obj, encuadre(forzada), { t: 0, claro: 0, tr: 0, tg: 0, tb: 0 }); return; }
     if (!llaves.length) return;
     const y = scrollY;
     let i = llaves.findIndex(k => k.s > y);
@@ -125,7 +127,7 @@
     let mueve = false;
     for (const c of ['x', 'y', 'z', 't', 'claro', 'tr', 'tg', 'tb']) {
       const d = obj[c] - cam[c];
-      if (Math.abs(d) > (c === 'z' || c === 't' || c === 'claro' ? .0005 : .2)) { cam[c] += d * .085; mueve = true; } else cam[c] = obj[c];
+      if (Math.abs(d) > (c === 'z' || c === 't' || c === 'claro' ? .0005 : .2)) { cam[c] += d * vel; mueve = true; } else cam[c] = obj[c];
     }
     mx += (objX - mx) * .06; my += (objY - my) * .06;
     if (mueve || sucio || Math.abs(objX - mx) > .002 || Math.abs(objY - my) > .002) {
@@ -152,10 +154,12 @@
     }
 
     const Wc = petalos.width, Hc = petalos.height, atenua = Math.max(1 - p * .45, cam.claro);
+    if (listaP.includes(null)) listaP = listaP.filter(Boolean);
     cP.clearRect(0, 0, Wc, Hc);
     listaP.forEach((q, i) => {
+      if (!q) return;
       q.x += q.vx + Math.sin(t * 1.3 + q.fase) * .5 * dpr; q.y += q.vy; q.a += q.va;
-      if (q.y > Hc + 20 || q.x < -30) { listaP[i] = nuevoPetalo(false); return; }
+      if (q.y > Hc + 20 || q.x < -30) { listaP[i] = q.extra ? null : nuevoPetalo(false); return; }
       // pétalo pixel art: bloque de 2 x 1 píxeles de 3 px que alterna horizontal y vertical al girar
       const px = 3 * dpr, x0 = Math.round(q.x / px) * px, y0 = Math.round(q.y / px) * px, gira = Math.sin(t * 2 + q.fase) > 0;
       cP.fillStyle = `rgba(${q.color}, ${q.alfa * atenua})`;
@@ -170,4 +174,24 @@
   new ResizeObserver(() => { medirCamara(); leerScroll(); }).observe(document.querySelector('main'));
   medir();
   requestAnimationFrame(cuadro);
+
+  // ---------------------------------------------------------- control externo (obertura del clásico)
+  window.KREscena = {
+    enfocar(f, z, ya, c) {
+      forzada = { f, z, c }; apuntar(); sucio = true;
+      if (ya) {                                        // plano inmediato: se pinta ya, sin esperar el ritmo del ambiente
+        Object.assign(cam, obj);
+        marco.style.transform = `translate3d(${cam.x.toFixed(1)}px, ${cam.y.toFixed(1)}px, 0) scale(${cam.z.toFixed(4)})`;
+      }
+    },
+    soltar() { forzada = null; apuntar(); },
+    velocidad(v) { vel = v || .085; },
+    aPantalla(fx, fy) { return { x: cam.x + fx * W * cam.z, y: cam.y + fy * H * cam.z }; },
+    rafaga(n) {                                        // el árbol suelta un golpe de pétalos
+      for (let i = 0; i < n; i++) {
+        const o = { x: cam.x + azar(.74, .98) * W * cam.z, y: cam.y + azar(.02, .3) * H * cam.z };
+        listaP.push({ ...nuevoPetalo(true), x: o.x * dpr, y: o.y * dpr, vx: azar(-3.2, -1.1) * dpr, vy: azar(-.4, 1.4) * dpr, extra: true });
+      }
+    },
+  };
 })();

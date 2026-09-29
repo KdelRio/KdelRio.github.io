@@ -16,10 +16,12 @@
   <meta property="og:url" content="https://kdelrio.github.io/">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="assets/img/favicon.png">
+  <!-- intro del estudio: una vez por sesión (o con ?intro), se decide antes de pintar para que no parpadee el arcade -->
+  <script>try{var q=/[?&]intro/.test(location.search);if(q||(!sessionStorage.getItem('kr-intro')&&!matchMedia('(prefers-reduced-motion: reduce)').matches))document.documentElement.classList.add('con-intro')}catch(e){}</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Geist:wght@400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/estilos.css?v=20260927tactil2">
+  <link rel="stylesheet" href="css/estilos.css?v=20260929cine">
 </head>
 <body>
 <a class="saltar" href="#contenido">Saltar al contenido</a>
@@ -29,14 +31,36 @@
   <div class="escena-marco">
     <div class="plano plano-lejano"><img src="assets/img/fondo/px-fondo.webp" alt="" class="plano-img" fetchpriority="high"></div>
     <canvas class="plano plano-estrellas" id="escena-estrellas"></canvas>
-    <div class="plano plano-dragon"><img src="assets/img/fondo/px-dragon.webp" alt="" class="px-dragon"></div>
-    <div class="plano plano-mago"><img src="assets/img/fondo/px-mago.webp" alt="" class="px-mago"></div>
+    <div class="plano plano-dragon"><img src="assets/img/fondo/px-dragon.webp" alt="" class="px-dragon"><i class="brillo brillo-ojo"></i></div>
+    <div class="plano plano-mago"><img src="assets/img/fondo/px-mago.webp" alt="" class="px-mago"><i class="brillo brillo-baculo"></i></div>
     <div class="plano plano-bosque"><img src="assets/img/fondo/px-bosque.webp" alt="" class="px-bosque"></div>
-    <div class="plano plano-frente"><img src="assets/img/fondo/px-frente.webp" alt="" class="px-frente"></div>
+    <div class="plano plano-frente"><img src="assets/img/fondo/px-frente.webp" alt="" class="px-frente"><i class="brillo brillo-hombro"></i><i class="brillo brillo-liston"></i><div class="obertura-corazones"></div></div>
   </div>
   <canvas class="escena-petalos" id="escena-petalos"></canvas>
   <div class="escena-velo" id="escena-velo"></div>
   <div class="escena-tinte"></div>
+  <div class="obertura-negro"></div>
+</div>
+
+<!-- ============================================================ INTRO DE STUDIOS CONARI (js/intro.js) -->
+<div class="intro" id="intro" aria-hidden="true">
+  <canvas class="intro-estrellas"></canvas>
+  <div class="intro-escenario">
+    <svg class="intro-constelacion" viewBox="0 0 1000 600"></svg>
+    <div class="intro-logo">
+      <img class="iw iw-lineas" src="assets/img/intro/w-lineas.png" alt="">
+      <img class="iw iw-luna" src="assets/img/intro/w-luna.png" alt="">
+      <img class="iw iw-studios" src="assets/img/intro/w-studios.png" alt="">
+      <img class="iw iw-conari" src="assets/img/intro/w-conari.png" alt="">
+      <img class="iw iw-base" src="assets/img/intro/w-base.png" alt="">
+      <svg class="intro-trazo" viewBox="0 0 620 362"></svg>
+      <div class="intro-brillo"></div>
+    </div>
+    <div class="intro-destello"></div>
+    <p class="intro-presenta">PRESENTA<span>el reino de Kevin del Río</span></p>
+    <div class="intro-dragon"><div class="intro-dragon-spr"></div></div>
+  </div>
+  <p class="intro-saltar">Toca o pulsa una tecla para saltar</p>
 </div>
 
 <!-- ============================================================ PANTALLA DE CARGA (js/carga.js) -->
@@ -117,7 +141,7 @@
     <a href="#cv">CV</a>
     <a href="#contacto">Contacto</a>
   </nav>
-  <button class="hud-logros" id="btn-logros" aria-haspopup="dialog">🏆 <b id="hud-logros">0</b>/<span id="hud-logros-total">12</span></button>
+  <button class="hud-logros" id="btn-logros" aria-haspopup="dialog">🏆 <b id="hud-logros">0</b>/<span id="hud-logros-total">10</span></button>
 </header>
 
 <main id="contenido" tabindex="-1">
@@ -144,13 +168,13 @@
       <div>
         <p class="kicker">Modo arcade</p>
         <h2 class="titulo">La aventura del reino</h2>
-        <p class="bajada">Recorre este portafolio como un videojuego: cinco misiones, una arena de combate que genera datos para analizarlos, un memorize de habilidades, ritmo, un árbol de habilidades y la hoja de personaje.</p>
+        <p class="bajada">Recorre este portafolio como un videojuego: cinco misiones, una arena de combate que genera datos para analizarlos, un juego de ritmo, un árbol de habilidades y la hoja de personaje.</p>
         <button type="button" class="btn btn-oro" data-abrir-arcade>▶ Jugar modo arcade</button>
       </div>
       <ol class="invitacion-misiones">
         <li><img src="assets/img/logo-castillo-montana-bosque.png" alt=""><span><b>Castillo Conari</b>Recupera el emblema del estudio</span></li>
         <li><img src="assets/img/logo-investigacion.png" alt=""><span><b>Torre del Dato</b>Combate, datos y análisis</span></li>
-        <li><img src="assets/img/logo-dragon.png" alt=""><span><b>Arcade del Dragón</b>Memorize y Ritmo Resonancia</span></li>
+        <li><img src="assets/img/logo-dragon.png" alt=""><span><b>Arcade del Dragón</b>Ritmo Resonancia</span></li>
         <li><img src="assets/img/logo-arbol.png" alt=""><span><b>Gremio</b>Sube el árbol de habilidades</span></li>
         <li><img src="assets/img/logo-libro.png" alt=""><span><b>Biblioteca</b>Hoja de personaje</span></li>
       </ol>
@@ -242,12 +266,6 @@
         </div>
         <p class="lab-hallazgo" id="lab-hallazgo" aria-live="polite"></p>
       </div>
-
-      <div class="desafio panel" id="desafio">
-        <h3>Desafío del analista</h3>
-        <p class="bajada-chica">Responde usando el tablero de arriba. Cada acierto suma experiencia.</p>
-        <div id="desafio-preguntas"></div>
-      </div>
     </div>
 
     <h3 class="subtitulo">Un mismo requerimiento, dos plataformas</h3>
@@ -332,17 +350,10 @@
       </article>
     </div>
 
-    <h3 class="subtitulo">Salón de juegos</h3>
-    <p class="bajada">Dos minijuegos hechos para esta página, inspirados en mis proyectos. Se juegan aquí mismo.</p>
-    <div class="salon-tabs" role="tablist">
-      <button class="salon-tab activo" data-juego="memoria" role="tab" aria-selected="true">Memorize</button>
-      <button class="salon-tab" data-juego="ritmo" role="tab" aria-selected="false">Ritmo Resonancia</button>
-    </div>
+    <h3 class="subtitulo">Ritmo Resonancia</h3>
+    <p class="bajada">Un minijuego de ritmo hecho para esta página, inspirado en Proyecto Resonancia. Se juega aquí mismo.</p>
     <div class="salon panel">
-      <div class="salon-juego" id="juego-memoria">
-        <div class="mem" id="memoria-salon"></div>
-      </div>
-      <div class="salon-juego" id="juego-ritmo" hidden>
+      <div class="salon-juego" id="juego-ritmo">
         <canvas id="ritmo-canvas" width="768" height="480" tabindex="0" aria-label="Minijuego de ritmo"></canvas>
         <p class="salon-ayuda">Pulsa <kbd>D</kbd><kbd>F</kbd><kbd>J</kbd><kbd>K</kbd> cuando las notas lleguen a la línea dorada, o toca los carriles. Sube el volumen.</p>
       </div>
@@ -447,19 +458,24 @@
 <div class="toasts" id="toasts" aria-live="polite"></div>
 <button type="button" class="dragon-volador" id="dragon" aria-label="Volver al inicio de la página" title="Volver arriba"><span class="dragon-sprite"></span></button>
 
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/MotionPathPlugin.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/SplitText.min.js"></script>
+<script src="js/intro-trazos.js?v=20260929"></script>
+<script src="js/intro.js?v=20260929"></script>
 <script src="js/carga.js?v=20260927"></script>
-<script src="js/escena.js?v=20260927movil"></script>
+<script src="js/escena.js?v=20260929cine"></script>
+<script src="js/obertura.js?v=20260929cine"></script>
 <script src="js/dragon.js?v=20260927a"></script>
-<script src="js/nucleo.js?v=20260927conf2"></script>
-<script src="js/laboratorio.js?v=20260926b"></script>
+<script src="js/nucleo.js?v=20260929c"></script>
+<script src="js/laboratorio.js?v=20260929b"></script>
 <script src="js/gremio.js?v=20260926f"></script>
-<script src="js/ritmo.js?v=20260926c"></script>
-<script src="js/mundo.js?v=20260927pj"></script>
+<script src="js/ritmo.js?v=20260929b"></script>
+<script src="js/mundo.js?v=20260929c"></script>
 <script src="js/batalla.js?v=20260927pj"></script>
 <script src="js/informe.js?v=20260927inf"></script>
-<script src="js/memoria.js?v=20260926"></script>
 <script src="js/arena.js?v=20260926b"></script>
 <script src="js/sala.js?v=20260927pj"></script>
-<script src="js/arcade.js?v=20260927tactil"></script>
+<script src="js/arcade.js?v=20260929c"></script>
 </body>
 </html>

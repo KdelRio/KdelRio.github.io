@@ -126,11 +126,19 @@
         const x = X0 + c * AC;
         ctx.fillStyle = pulsado[c] ? COLORES[c] + '33' : 'rgba(255,255,255,.035)'; ctx.fillRect(x + 2, 0, AC - 4, H);
         ctx.strokeStyle = 'rgba(255,255,255,.08)'; ctx.strokeRect(x + 2, 0, AC - 4, H);
-        ctx.fillStyle = pulsado[c] ? COLORES[c] : 'rgba(255,255,255,.14)';
-        ctx.beginPath(); ctx.arc(x + AC / 2, LINEA, 24, 0, Math.PI * 2); ctx.fill();
-        ctx.fillStyle = '#071428'; ctx.font = '12px "Press Start 2P", monospace'; ctx.textAlign = 'center'; ctx.fillText(TECLAS[c].toUpperCase(), x + AC / 2, LINEA + 5);
       }
+      // la línea dorada va detrás: los botones son sólidos y la tapan, así la letra queda limpia
       ctx.fillStyle = `rgba(224,183,86,${.6 + pulso * .4})`; ctx.fillRect(X0, LINEA - 2, CARRILES * AC, 4);
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.font = '16px "Press Start 2P", monospace';
+      for (let c = 0; c < CARRILES; c++) {
+        const cx = X0 + c * AC + AC / 2;
+        ctx.beginPath(); ctx.arc(cx, LINEA, 26, 0, Math.PI * 2);
+        ctx.fillStyle = pulsado[c] ? COLORES[c] : '#0d1a36'; ctx.fill();
+        ctx.lineWidth = 3; ctx.strokeStyle = COLORES[c]; ctx.stroke();
+        ctx.fillStyle = pulsado[c] ? '#071428' : COLORES[c];
+        ctx.fillText(TECLAS[c].toUpperCase(), cx + 1, LINEA + 1);
+      }
+      ctx.textBaseline = 'alphabetic'; ctx.lineWidth = 1;
     }
     function dibujar() {
       escenario();

@@ -150,44 +150,6 @@
     if (interaccion) window.KR && KR.desbloquear('filtro');
   }
 
-  // ---------------------------------------------------------- desafío con respuestas calculadas desde los datos
-  function desafio() {
-    const porZona = a => { const t = {}; M.filter(r => r.anio === a).forEach(r => t[r.zona] = (t[r.zona] || 0) + r.v); return t; };
-    const z23 = porZona(2023), z24 = porZona(2024);
-    const cae = D.dims.zonas.find(z => z24[z] < z23[z]);
-    const porCanal = {}; M.forEach(r => porCanal[r.canal] = (porCanal[r.canal] || 0) + r.v);
-    const canalTop = Object.entries(porCanal).sort((a, b) => b[1] - a[1])[0][0];
-    const tp = {}; PR.forEach(r => { const t = tp[r.prod] || (tp[r.prod] = { v: 0, c: 0 }); t.v += r.v; t.c += r.c; });
-    const bajos = Object.entries(tp).filter(([, t]) => t.v > 3e7).map(([k, t]) => ({ k, m: 1 - t.c / t.v })).sort((a, b) => a.m - b.m);
-    const PREG = [
-      { q: '¿Qué macrozona vendió menos en 2024 que en 2023?', ops: D.dims.zonas, ok: cae, pista: 'Filtra por año y compara el gráfico de macrozonas.' },
-      { q: '¿Qué canal concentra la mayor parte de las ventas?', ops: D.dims.canales, ok: canalTop, pista: 'Prueba el filtro de canal y mira las ventas netas.' },
-      { q: '¿Qué producto de alta venta tiene el margen más bajo?', ops: [...new Set([0, Math.floor(bajos.length / 3), Math.floor(bajos.length * 2 / 3), bajos.length - 1].map(i => bajos[i].k))].sort(), ok: bajos[0].k, pista: 'Revisa el hallazgo automático bajo los gráficos.' },
-    ];
-    const cont = $('#desafio-preguntas'); cont.innerHTML = '';
-    const estado = (window.KR && KR.estado().extra) || {};
-    estado.desafio = estado.desafio || {};
-    PREG.forEach((p, i) => {
-      const div = document.createElement('div'); div.className = 'pregunta';
-      const t = document.createElement('p'); t.textContent = `${i + 1}. ${p.q}`;
-      const ops = document.createElement('div'); ops.className = 'opciones';
-      const res = document.createElement('p'); res.className = 'resultado';
-      p.ops.forEach(o => {
-        const b = document.createElement('button'); b.className = 'opcion'; b.textContent = o;
-        b.addEventListener('click', () => {
-          if (o === p.ok) {
-            [...ops.children].forEach(x => x.disabled = true);
-            b.classList.add('correcta'); res.textContent = '¡Correcto! Así se lee un tablero.';
-            if (!estado.desafio[i]) { estado.desafio[i] = true; KR.guardar(); KR.sumarXP(40, 'Respuesta correcta'); }
-            if (Object.keys(estado.desafio).length === PREG.length) KR.desbloquear('analista');
-          } else { b.classList.add('incorrecta'); b.disabled = true; res.textContent = 'No es esa. Pista: ' + p.pista; }
-        });
-        ops.appendChild(b);
-      });
-      div.append(t, ops, res); cont.appendChild(div);
-    });
-  }
-
   // ---------------------------------------------------------- comparador Power BI ↔ Tableau
   const DASH = ['Resumen Comercial', 'Metas y Pedidos', 'Finanzas', 'Cobranza y Proveedores', 'Producción e Inventario', 'Personas', 'Calidad y Activos TI'];
   function comparador() {
@@ -221,7 +183,7 @@
     fz.addEventListener('change', e => { F.zona = e.target.value; actualizar(true); });
     fc.addEventListener('change', e => { F.canal = e.target.value; actualizar(true); });
     $('#f-limpiar').addEventListener('click', () => { F.anio = F.zona = F.canal = ''; $('#f-anio').value = fz.value = fc.value = ''; actualizar(); });
-    actualizar(); desafio();
+    actualizar();
   }
   comparador();
   fetch('assets/data/magicfoods.json').then(r => r.json()).then(j => { D = j; iniciar(); })

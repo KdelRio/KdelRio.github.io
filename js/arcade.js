@@ -38,7 +38,7 @@
   const MISIONES = [
     { titulo: 'MISIÓN 1/5 · CASTILLO CONARI', texto: p => { const n = p.fragmentos.filter(Boolean).length; return n < 3 ? `Recupera los fragmentos del emblema Conari (${n}/3)` : 'Entra al Castillo Conari: pulsa E en el portón'; } },
     { titulo: 'MISIÓN 2/5 · TORRE DEL DATO', texto: () => 'Entra a la torre y supera las 3 oleadas de la Arena del Dato' },
-    { titulo: 'MISIÓN 3/5 · ARCADE DEL DRAGÓN', texto: () => 'Entra al arcade: completa el Memorize y Ritmo Resonancia' },
+    { titulo: 'MISIÓN 3/5 · ARCADE DEL DRAGÓN', texto: () => 'Entra al arcade y completa una canción de Ritmo Resonancia' },
     { titulo: 'MISIÓN 4/5 · GREMIO', texto: p => { const r = ramaDe(p); return r ? `Entra al Gremio o presiona H y domina tu especialidad (${aprendidas(p)}/${r.nodos.length})` : 'Entra al Gremio'; } },
     { titulo: 'MISIÓN 5/5 · BIBLIOTECA', texto: () => 'Presiona P para abrir la hoja de personaje' },
   ];
@@ -146,7 +146,7 @@
       return abrirEstudio();
     }
     if (id === 'datos') return iniciarBatalla(p.etapa >= 5);
-    if (id === 'arcade') return abrirMemoria();
+    if (id === 'arcade') return iniciarRitmo();
     if (id === 'gremio') return abrirArbol();
     if (id === 'cv') return abrirFicha();
   };
@@ -203,30 +203,15 @@
     }, { bonos: bonos(), infinito, record: p.record || 0 });
   }
 
-  // ---------------------------------------------------------- misión 3: memorize + ritmo
-  // el memorize de habilidades vive en js/memoria.js y se comparte con el salón de la página clásica
-  function abrirMemoria() {
-    panel('memoria', `<div class="pn pn-memoria">
-      <div class="pn-cab"><div><p class="pn-kicker">Misión 3 · Arcade del Dragón</p><h2 class="pn-titulo">Memorize de habilidades</h2></div></div>
-      <p class="pn-texto">Encuentra los pares de las disciplinas de Kevin para desbloquear Ritmo Resonancia.</p>
-      <div class="mem" data-memoria></div></div>`);
-    KRMemoria.montar(capa.querySelector('[data-memoria]'), {
-      alCompletar: (mov, info) => {
-        const p = prog(); if (!p.premios.memoria) { p.premios.memoria = true; p.ph += 1; KR.guardar(); }
-        KR.desbloquear('memoria');
-        info.innerHTML = `<p class="mem-par"><b>Memorize completado en ${mov} movimientos.</b> +1 punto de habilidad. Ahora, al ritmo de Proyecto Resonancia.</p>
-          <div class="fila-botones centro"><button type="button" class="btn btn-oro" data-ritmo>Siguiente: Ritmo Resonancia ▶</button></div>`;
-        const bt = info.querySelector('[data-ritmo]'); bt.onclick = iniciarRitmo; bt.focus({ preventScroll: true });
-      }
-    });
-  }
+  // ---------------------------------------------------------- misión 3: Ritmo Resonancia
   function iniciarRitmo() {
     if (!ritmo) ritmo = KRCrearRitmo(CV.ritmo, {
       activo: () => actual === 'ritmo' && !ritmoPausado && !maquina.hidden,
       alTerminar: st => {
-        if (prog().etapa === 2) pendiente = 2;
-        completar(2, 0, 'arcade');
-        flotante.innerHTML = `<p><b>¡Canción completada!</b> Precisión ${Math.round(st.precision * 100)}% · ${st.puntos} puntos</p><div class="fila-botones centro"><button type="button" class="btn btn-oro" data-seguir>Continuar la aventura ▶</button></div>`;
+        const p = prog(), primera = !p.premios[2];
+        if (p.etapa === 2) pendiente = 2;
+        completar(2, p.premios.memoria ? 0 : 1, 'arcade');          // partidas antiguas ya recibieron este punto con el memorize
+        flotante.innerHTML = `<p><b>¡Canción completada!</b> Precisión ${Math.round(st.precision * 100)}% · ${st.puntos} puntos${primera && !p.premios.memoria ? ' · +1 punto de habilidad' : ''}</p><div class="fila-botones centro"><button type="button" class="btn btn-oro" data-seguir>Continuar la aventura ▶</button></div>`;
         flotante.hidden = false;
         flotante.querySelector('[data-seguir]').onclick = () => volverAldea();
       },
@@ -385,7 +370,7 @@
       if (e.target.closest('[data-nueva]')) confirmarReinicio();
       if (e.target.closest('[data-si]')) nuevaPartida();
       if (e.target.closest('[data-no]')) abrirPausa();
-      if (e.target.closest('[data-clasico]')) cerrarMaquina();
+      if (e.target.closest('[data-clasico]')) abrirClasico();
     };
   }
   // confirmación dentro del juego (en vez del cuadro del navegador)
@@ -537,7 +522,9 @@
     const r = pantalla.getBoundingClientRect();
     if (window.KRCarga) await KRCarga.esperar();                    // dragones mientras todo se descarga y decodifica
     cerrarMaquina(); scrollTo(0, 0);
+    const obertura = window.KRObertura && KRObertura.preparar();     // la página espera oculta: primero el valle
     if (window.KRCarga) KRCarga.ocultar();
+    if (obertura) KRObertura.iniciar();
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const marco = document.createElement('div'); marco.className = 'marco-transicion';
     Object.assign(marco.style, { left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px' });
@@ -674,7 +661,9 @@
   const q = new URLSearchParams(location.search);
   if (q.has('clasico') || (location.hash && location.hash.length > 1)) {
     maquina.hidden = true; fase = 'cerrada';
-    if (window.KRCarga) KRCarga.esperar().then(KRCarga.ocultar);    // entrada directa al clásico: también con carga
+    const obertura = window.KRObertura && KRObertura.preparar();     // sin ancla: la página entra con la obertura
+    Promise.all([window.KRCarga ? KRCarga.esperar() : 0, window.KRIntro ? KRIntro.fin : 0])   // carga (y la intro, si toca)
+      .then(() => { if (window.KRCarga) KRCarga.ocultar(); if (obertura) KRObertura.iniciar(); });
   } else {
     abrirMaquina();
     if (window.KRCarga) KRCarga.precargar();                         // mientras miras el arcade, el clásico se prepara
