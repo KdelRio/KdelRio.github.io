@@ -32,7 +32,7 @@
   ['luna', 'conari', 'base'].forEach(k => svgLogo.appendChild(trazos(k, 'it-' + k)));
 
   // 8 emblemas en una elipse alrededor del logo (coordenadas del escenario de 1000 × 600)
-  const P = 2.4;                                                     // tamaño del píxel del arte, en unidades del escenario
+  const P = 1.6;                                                     // tamaño del píxel del logo y los emblemas, en unidades del escenario
   const aGrilla = v => Math.round(v / P) * P;
   const EMBLEMAS = ['estrella', 'castillo-montana-bosque', 'investigacion', 'dragon', 'arbol', 'libro', 'sol-luna', 'proyeccion'];
   const vertical = innerHeight > innerWidth;                         // celular vertical: anillo más angosto y escenario más grande
@@ -59,8 +59,7 @@
   function medir() {
     lienzo.width = innerWidth; lienzo.height = innerHeight;
     const k0 = vertical ? Math.min(innerWidth / 600, innerHeight / 700) : Math.min(innerWidth / 1000, innerHeight / 600) * .94;
-    n = Math.max(1, Math.floor(P * k0 + .15));                          // cada píxel del arte mide n píxeles de pantalla, entero
-    k = n / P;
+    k = k0; n = Math.max(2, Math.round(P * k));                         // n: tamaño en pantalla de las estrellas y el polvo
     ox = Math.round((innerWidth - 1000 * k) / 2); oy = Math.round((innerHeight - 600 * k) / 2);
     escenario.style.transform = `translate(${ox}px, ${oy}px) scale(${k})`;
   }
@@ -142,7 +141,7 @@
     .to(vuelo, {
       x: -220, y: conariY - 40, duration: 1.15, ease: 'none',
       onUpdate() {
-        const f = Math.min(100, Math.max(0, Math.round((aGrilla(vuelo.x) - L.x) / P) * 3 / 620 * 100));   // corta en columnas de píxel
+        const f = Math.min(100, Math.max(0, Math.round((aGrilla(vuelo.x) - L.x) / P) * 2 / 620 * 100));   // corta en columnas de píxel
         conari.style.clipPath = `inset(0 0 0 ${f}%)`;
       }
     }, 4.4)

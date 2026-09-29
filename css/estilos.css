@@ -406,7 +406,7 @@ kbd {
   background: repeating-linear-gradient(180deg, #1c2e58 0 4px, #19284f 4px 8px);
   box-shadow: inset 0 0 0 4px #2a1d04, inset 0 0 0 8px var(--oro), inset 0 0 0 12px #9a7a2c, inset 12px 12px 0 #2b4580, inset -12px -12px 0 #0c1631;
 }
-.marquesina span { font: clamp(.9rem, 2.2vw, 1.6rem)/1 var(--pixel); color: #ffd1ea; letter-spacing: .12em; text-shadow: 3px 3px 0 #7a1d4a, 0 0 8px #ff5fb0; animation: neon 5s steps(1, end) infinite; }
+.marquesina span { font: clamp(.7rem, 3.4vw, 1.6rem)/1 var(--pixel); white-space: nowrap; color: #ffd1ea; letter-spacing: .12em; text-shadow: 3px 3px 0 #7a1d4a, 0 0 8px #ff5fb0; animation: neon 5s steps(1, end) infinite; }
 @keyframes neon { 0%, 18%, 22%, 100% { opacity: 1; } 20% { opacity: .35; } }
 .bisel {
   width: 100%; padding: 22px 32px; background: #121829;
@@ -941,8 +941,7 @@ kbd {
 
 /* --------------------------------------------------------------- intro de Studios Conari (js/intro.js)
    Todo vive en una grilla de píxeles real: el logo, los emblemas y el dragón comparten el mismo tamaño de
-   píxel (P = 2.4 unidades del escenario) y js/intro.js escala el escenario para que P sea un número entero
-   de píxeles de pantalla. Sin desenfoques ni degradados suaves; los cambios avanzan a saltos (steps). */
+   píxel fino (P = 1.6 unidades del escenario; el dragón usa su sprite a 2.4). Sin desenfoques ni degradados suaves; los cambios avanzan a saltos (steps). */
 .intro { display: none; }
 .con-intro .intro {
   display: block; position: fixed; inset: 0; z-index: 600; overflow: hidden; cursor: pointer;
@@ -953,12 +952,12 @@ kbd {
 .intro-escenario { position: absolute; left: 0; top: 0; width: 1000px; height: 600px; transform-origin: 0 0; }
 .intro-escenario img { image-rendering: pixelated; }
 .intro-constelacion { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-.intro-constelacion line { stroke: #b87406; stroke-width: 2.4; shape-rendering: crispEdges; stroke-dasharray: 1; stroke-dashoffset: 1; }
-.intro-emblema { position: absolute; width: 153.6px; height: 153.6px; margin: -76.8px 0 0 -76.8px; opacity: 0; }
+.intro-constelacion line { stroke: #b87406; stroke-width: 1.6; shape-rendering: crispEdges; stroke-dasharray: 1; stroke-dashoffset: 1; }
+.intro-emblema { position: absolute; width: 136.5px; height: 136.5px; margin: -68.25px 0 0 -68.25px; opacity: 0; }
 .intro-emblema svg, .intro-emblema img { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .intro-emblema img { opacity: 0; }
-.it-emblema path, .intro-trazo path { fill: none; stroke: #fcdf6b; stroke-width: 4; stroke-linejoin: miter; stroke-dasharray: 1; stroke-dashoffset: 1; shape-rendering: crispEdges; }
-.intro-trazo path { stroke-width: 3; }
+.it-emblema path, .intro-trazo path { fill: none; stroke: #fcdf6b; stroke-width: 3; stroke-linejoin: miter; stroke-dasharray: 1; stroke-dashoffset: 1; shape-rendering: crispEdges; }
+.intro-trazo path { stroke-width: 2; }
 .intro-logo { position: absolute; left: 252px; top: 156px; width: 620px; height: 362px; transform: scale(.8); transform-origin: 0 0; }
 .intro-logo .iw, .intro-trazo, .intro-brillo { position: absolute; inset: 0; width: 100%; height: 100%; }
 .intro-trazo { overflow: visible; }

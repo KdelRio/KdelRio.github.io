@@ -396,7 +396,7 @@
 
   // ---------------------------------------------------------- pantalla INSERT COIN
   const pc = CV.portada.getContext('2d'), PW = CV.portada.width, PH = CV.portada.height;
-  const logo = new Image(); logo.src = 'assets/img/intro/w-portada.png';   // pixel art nativo: un píxel del arte = un píxel del lienzo
+  const logo = new Image(); logo.src = 'assets/img/intro/w-portada.png?v=fino';   // pixel art nativo: un píxel del arte = un píxel del lienzo
   const ESTRELLAS = Array.from({ length: 140 }, () => ({ x: Math.random() * PW, y: Math.random() * PH, v: .2 + Math.random() * 1.3, b: Math.random() }));
   let tp = 0, creditos = 0, arranque = 0, rechazo = 0, rafP = 0, destino = 'interactivo', opcion = 0;
   const OPCIONES = [['1', 'PORTAFOLIO INTERACTIVO', 'interactivo'], ['2', 'PORTAFOLIO CLÁSICO', 'clasico']];
