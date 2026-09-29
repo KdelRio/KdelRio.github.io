@@ -312,7 +312,7 @@
     diapositivas('ficha', [
       `<div class="dia-perfil"><div class="dia-centro">
           <p class="pn-kicker">Misión 5 · Biblioteca</p>
-          <img class="dia-avatar" src="assets/img/logo-estrella.png" alt="">
+          <img class="dia-avatar" src="assets/img/pixel/ic-estrella.png" alt="">
           <h2 class="dia-h">${txt('.ficha h3')}</h2><p class="dia-clase">${txt('.ficha-clase')}</p>
           <p class="dia-p">${txt('.ficha-origen')}</p><p class="dia-p">${txt('.ficha-idiomas')}</p>
           <a class="btn btn-oro" href="assets/CV_Kevin_del_Rio.pdf" download data-logro="cv">Descargar CV</a></div>
