@@ -1138,7 +1138,7 @@ html { font-synthesis: none; }   /* las fuentes pixel son de un solo peso: nunca
 /* cifras grandes de indicadores con la fuente de títulos */
 .kpi b, .lab-kpis b { font-family: "Jersey 10", monospace; font-weight: 400; font-size: 2.1rem; line-height: 1; letter-spacing: .01em; }
 
-/* retrato de Kevin (assets/img/avatar-px.png, 77 × 77 nativo): marco de píxel y siempre a escala entera */
-.hud-avatar { padding: 0; border: 0; object-fit: cover; box-shadow: 0 0 0 2px var(--px-contorno), 0 0 0 4px var(--px-oro-1); }
-.ficha-avatar { width: 154px; height: 154px; padding: 0; border: 0; background: none; image-rendering: pixelated; box-shadow: 0 0 0 3px var(--px-contorno), 0 0 0 6px var(--px-oro-1), 0 0 0 9px var(--px-contorno); margin-bottom: 18px; }
-.dia-avatar { width: 7em; height: 7em; padding: 0; border: 0; background: none; image-rendering: pixelated; box-shadow: 0 0 0 .2em var(--px-contorno), 0 0 0 .4em var(--px-oro-1); }
+/* retrato de Kevin en un círculo de píxeles con aro dorado (assets/img/avatar-circulo*.png): el aro viene dibujado en la imagen */
+.hud-avatar { width: 34px; height: 34px; padding: 0; border: 0; background: none; box-shadow: none; image-rendering: pixelated; }
+.ficha-avatar { width: 166px; height: 166px; padding: 0; border: 0; background: none; box-shadow: none; image-rendering: pixelated; margin-bottom: 14px; }
+.dia-avatar { width: 7.5em; height: 7.5em; padding: 0; border: 0; background: none; box-shadow: none; image-rendering: pixelated; }
