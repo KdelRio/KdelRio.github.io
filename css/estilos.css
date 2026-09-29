@@ -185,6 +185,8 @@ kbd {
 .nido-escena { position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%); display: flex; align-items: flex-end; gap: 8px; pointer-events: none; }
 .bebe { display: block; max-width: none; image-rendering: pixelated; }
 .nido-posada { width: 100px; height: 100px; flex: none; margin: 0 6px; }
+/* las crías de la derecha se voltean para mirar al dragón grande del centro (scale no choca con la animación del salto) */
+.nido-posada ~ .bebe { scale: -1 1; }
 /* cuando el dragón se posa las crías saltan contentas; la dormida sigue durmiendo */
 .nido-escena.llego .salta { animation: bebe-salta .45s ease-out infinite alternate; }
 .nido-escena.llego .salta:nth-child(3) { animation-delay: .17s; } .nido-escena.llego .salta:nth-child(5) { animation-delay: .09s; }
