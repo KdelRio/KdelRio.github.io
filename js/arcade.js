@@ -601,7 +601,7 @@
     if (p.etapa === 0 && !p.fragmentos.some(Boolean)) KRAldea.avisar('Habla con Lumi, la guía, para comenzar tu aventura', 240);
   }
   function abrirMaquina() {
-    maquina.hidden = false; document.body.classList.add('bloqueado');
+    maquina.hidden = false; document.body.classList.add('bloqueado'); ajustarGabinete();
     fase = 'attract'; arranque = 0;
     maquina.classList.remove('enfocada'); gab.style.transition = 'none'; gab.style.transform = 'none';   // primero, el gabinete completo
     mostrar('portada');
@@ -615,7 +615,17 @@
     girar.hidden = true;
     if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {});
   }
-  addEventListener('resize', () => { if (maquina.classList.contains('enfocada')) enfocar(false); });   // mantiene el acercamiento al cambiar el tamaño
+  // el gabinete completo (marquesina, pantalla y consola) tiene que caber en la ventana, con cualquier zoom del navegador:
+  // su alto crece en línea recta con el ancho de la pantalla (pw), así que se mide con dos anchos y se despeja el que cabe
+  function ajustarGabinete() {
+    if (maquina.hidden || innerWidth <= 560) { gab.style.removeProperty('--pw'); return; }
+    const alto = pw => { gab.style.setProperty('--pw', pw + 'px'); return gab.offsetHeight; };
+    const h1 = alto(400), h2 = alto(800), m = (h2 - h1) / 400, b = h1 - m * 400;
+    const cabe = (innerHeight - 28 - b) / m;
+    gab.style.setProperty('--pw', Math.round(Math.max(320, Math.min(cabe, innerWidth * .86 - 84, 1200))) + 'px');
+  }
+  addEventListener('resize', () => { const enf = maquina.classList.contains('enfocada'); if (!enf) ajustarGabinete(); else enfocar(false); });
+  document.fonts && document.fonts.ready.then(() => { if (!maquina.classList.contains('enfocada')) ajustarGabinete(); });   // las fuentes cambian el alto de la consola
 
   // ---------------------------------------------------------- teclado global y controles del gabinete
   const botonDe = k => $$('[data-tecla]', maquina).find(b => b.dataset.tecla.toLowerCase() === k);
