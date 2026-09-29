@@ -6,7 +6,8 @@
   const $ = s => document.querySelector(s);
   const NS = 'http://www.w3.org/2000/svg';
   const MESES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-  const COL = { a2023: '#8fa3bd', a2024: '#e0b756', zonas: '#7ec8ff', mix: ['#e0b756', '#7ec8ff', '#f472b6', '#6bd49a', '#a78bfa'] };
+  const COL = { a2023: '#8fa3bd', a2024: '#fabd18', zonas: '#7ec8ff', mix: ['#fabd18', '#7ec8ff', '#f472b6', '#6bd49a', '#a78bfa'] };   // paleta pixel art del sitio
+  const CONTORNO = '#030712';
   const fmt = (v, d = 0) => v.toLocaleString('es-CL', { minimumFractionDigits: d, maximumFractionDigits: d });
   const mill = v => '$' + fmt(v / 1e6) + ' mill.';
   let D = null;
@@ -40,7 +41,7 @@
     const X = i => pl + i * (w - pl - pr) / 11, Y = v => pt + (h - pt - pb) * (1 - v / max);
     for (let k = 0; k <= 4; k++) {
       const v = max * k / 4, y = Y(v);
-      el('line', { x1: pl, x2: w - pr, y1: y, y2: y, stroke: 'rgba(255,255,255,.08)' }, s);
+      el('line', { x1: pl, x2: w - pr, y1: y, y2: y, stroke: 'rgba(255,255,255,.12)', 'stroke-dasharray': '4 6', 'shape-rendering': 'crispEdges' }, s);
       el('text', { x: pl - 6, y: y + 4, 'text-anchor': 'end' }, s).textContent = fmt(v / 1e6);
     }
     MESES.forEach((m, i) => el('text', { x: X(i), y: h - 8, 'text-anchor': 'middle' }, s).textContent = m);
@@ -48,13 +49,14 @@
       const tenue = F.anio && +F.anio !== se.a;
       const color = se.a === 2024 ? COL.a2024 : COL.a2023;
       const d = se.v.map((v, i) => `${i ? 'L' : 'M'}${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(' ');
-      el('path', { d, fill: 'none', stroke: color, 'stroke-width': tenue ? 1.5 : 3, opacity: tenue ? .35 : 1, 'stroke-linejoin': 'round' }, s);
+      el('path', { d, fill: 'none', stroke: color, 'stroke-width': tenue ? 2 : 4, opacity: tenue ? .35 : 1, 'stroke-linejoin': 'miter', 'shape-rendering': 'crispEdges' }, s);
       se.v.forEach((v, i) => {
-        const c = el('circle', { cx: X(i), cy: Y(v), r: tenue ? 2.5 : 4, fill: color, opacity: tenue ? .35 : 1 }, s);
+        const t = tenue ? 6 : 10;                                       // puntos cuadrados con contorno, como un píxel grande
+        const c = el('rect', { x: X(i) - t / 2, y: Y(v) - t / 2, width: t, height: t, fill: color, stroke: CONTORNO, 'stroke-width': 2, opacity: tenue ? .35 : 1, 'shape-rendering': 'crispEdges' }, s);
         el('title', {}, c).textContent = `${MESES[i]} ${se.a}: ${mill(v)}`;
       });
       const lx = w - pr - (se.a === 2024 ? 60 : 130);
-      el('rect', { x: lx, y: 2, width: 12, height: 4, fill: color }, s);
+      el('rect', { x: lx, y: 0, width: 10, height: 10, fill: color, stroke: CONTORNO, 'stroke-width': 2, 'shape-rendering': 'crispEdges' }, s);
       el('text', { x: lx + 16, y: 8 }, s).textContent = se.a;
     });
     cont.appendChild(s);
@@ -72,7 +74,8 @@
     datos.forEach((d, i) => {
       const y = i * fila + 4, ancho = (w - 150) * d.v / max, activo = !F.zona || F.zona === d.z;
       el('text', { x: 0, y: y + 17 }, s).textContent = d.z;
-      const r = el('rect', { x: 78, y: y + 4, width: Math.max(2, ancho), height: 18, rx: 4, fill: COL.zonas, opacity: activo ? 1 : .3, class: 'barra' }, s);
+      const r = el('rect', { x: 78, y: y + 4, width: Math.max(2, ancho), height: 18, fill: COL.zonas, stroke: CONTORNO, 'stroke-width': 2, opacity: activo ? 1 : .3, class: 'barra', 'shape-rendering': 'crispEdges' }, s);
+      el('rect', { x: 80, y: y + 6, width: Math.max(0, ancho - 4), height: 3, fill: '#ffffff', opacity: activo ? .35 : .1, 'pointer-events': 'none' }, s);   // brillo superior
       el('title', {}, r).textContent = `${d.z}: ${mill(d.v)} · clic para filtrar`;
       r.addEventListener('click', () => { F.zona = F.zona === d.z ? '' : d.z; $('#f-zona').value = F.zona; actualizar(true); });
       el('text', { x: 84 + ancho, y: y + 17 }, s).textContent = fmt(d.v / 1e6);
@@ -86,16 +89,18 @@
     const tot = {}; M.filter(r => pasa(r)).forEach(r => tot[r.fam] = (tot[r.fam] || 0) + r.v);
     const datos = Object.entries(tot).sort((a, b) => b[1] - a[1]);
     const suma = datos.reduce((a, d) => a + d[1], 0) || 1;
-    const s = svg(200, 170), cx = 100, cy = 85, R = 70, r = 42;
-    let ang = -Math.PI / 2;
-    datos.forEach(([fam, v], i) => {
-      const a2 = ang + v / suma * Math.PI * 2, largo = a2 - ang > Math.PI ? 1 : 0;
-      const p = (rr, a) => `${cx + rr * Math.cos(a)},${cy + rr * Math.sin(a)}`;
-      const path = el('path', { d: `M${p(R, ang)} A${R},${R} 0 ${largo} 1 ${p(R, a2)} L${p(r, a2)} A${r},${r} 0 ${largo} 0 ${p(r, ang)} Z`, fill: COL.mix[i % 5] }, s);
-      el('title', {}, path).textContent = `${fam}: ${fmt(v / suma * 100, 1)}%`;
-      ang = a2;
-    });
-    const t = el('text', { x: cx, y: cy + 5, 'text-anchor': 'middle', style: 'font: 700 15px Geist; fill: #f4f7fd' }, s);
+    const s = svg(200, 170), cx = 100, cy = 85, R = 72, r = 40, C = 8;   // la dona se arma con celdas de 8 como un sprite
+    const cortes = []; let acum = 0;
+    datos.forEach(([fam, v], i) => { acum += v / suma; cortes.push({ fin: acum, fam, v, color: COL.mix[i % 5] }); });
+    const grupos = cortes.map(k => { const g = el('g', {}, s); el('title', {}, g).textContent = `${k.fam}: ${fmt(k.v / suma * 100, 1)}%`; return g; });
+    for (let y = cy - R; y < cy + R; y += C) for (let x = cx - R; x < cx + R; x += C) {
+      const dx = x + C / 2 - cx, dy = y + C / 2 - cy, d = Math.hypot(dx, dy);
+      if (d > R || d < r) continue;
+      const f = ((Math.atan2(dy, dx) + Math.PI / 2 + Math.PI * 2) % (Math.PI * 2)) / (Math.PI * 2);
+      const i = Math.max(0, cortes.findIndex(k => f <= k.fin));
+      el('rect', { x, y, width: C, height: C, fill: cortes[i].color, stroke: CONTORNO, 'stroke-width': 1, 'shape-rendering': 'crispEdges' }, grupos[i]);
+    }
+    const t = el('text', { x: cx, y: cy + 6, 'text-anchor': 'middle', style: 'font: 20px "Jersey 10", monospace; fill: #f4f7fd' }, s);
     t.textContent = fmt(suma / 1e6) + ' M';
     cont.appendChild(s);
     const ley = document.createElement('div'); ley.className = 'leyenda-mix';

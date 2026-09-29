@@ -7,16 +7,16 @@
   const $$ = (s, c = document) => [...c.querySelectorAll(s)];
 
   const LOGROS = [
-    { id: 'start', ico: '🎮', nombre: 'Press Start', desc: 'Comienza la aventura.', xp: 50 },
-    { id: 'pasos', ico: '👣', nombre: 'Primeros pasos', desc: 'Mueve al personaje por la aldea del modo arcade.', xp: 50 },
-    { id: 'explorador', ico: '🗺️', nombre: 'Explorador del reino', desc: 'Visita las seis zonas del portafolio.', xp: 150 },
-    { id: 'filtro', ico: '🔍', nombre: 'Filtro en mano', desc: 'Usa un filtro del laboratorio de análisis.', xp: 75 },
-    { id: 'bilingue', ico: '⚖️', nombre: 'Bilingüe en BI', desc: 'Compara un dashboard entre Power BI y Tableau.', xp: 100 },
-    { id: 'ritmo', ico: '🎵', nombre: 'Maestro del ritmo', desc: 'Termina Ritmo Resonancia con 70% de precisión o más.', xp: 250 },
-    { id: 'gremio', ico: '🌳', nombre: 'Maestro del gremio', desc: 'Completa el árbol de habilidades o domina tu especialidad en el modo arcade.', xp: 200 },
-    { id: 'cv', ico: '📜', nombre: 'Pergamino obtenido', desc: 'Descarga el CV.', xp: 100 },
-    { id: 'contacto', ico: '🕊️', nombre: 'Mensajero', desc: 'Abre uno de los canales de contacto.', xp: 75 },
-    { id: 'konami', ico: '🐉', nombre: 'Código ancestral', desc: 'Descubre el código secreto.', xp: 150 },
+    { id: 'start', ico: '<img class="px-ico" src="assets/img/pixel/i-destello.png" alt="">', nombre: 'Press Start', desc: 'Comienza la aventura.', xp: 50 },
+    { id: 'pasos', ico: '<img class="px-ico" src="assets/img/pixel/i-pasos.png" alt="">', nombre: 'Primeros pasos', desc: 'Mueve al personaje por la aldea del modo arcade.', xp: 50 },
+    { id: 'explorador', ico: '<img class="px-ico" src="assets/img/pixel/i-mapa.png" alt="">', nombre: 'Explorador del reino', desc: 'Visita las seis zonas del portafolio.', xp: 150 },
+    { id: 'filtro', ico: '<img class="px-ico" src="assets/img/pixel/i-lupa.png" alt="">', nombre: 'Filtro en mano', desc: 'Usa un filtro del laboratorio de análisis.', xp: 75 },
+    { id: 'bilingue', ico: '<img class="px-ico" src="assets/img/pixel/i-balanza.png" alt="">', nombre: 'Bilingüe en BI', desc: 'Compara un dashboard entre Power BI y Tableau.', xp: 100 },
+    { id: 'ritmo', ico: '<img class="px-ico" src="assets/img/pixel/i-nota.png" alt="">', nombre: 'Maestro del ritmo', desc: 'Termina Ritmo Resonancia con 70% de precisión o más.', xp: 250 },
+    { id: 'gremio', ico: '<img class="px-ico" src="assets/img/pixel/i-arbol.png" alt="">', nombre: 'Maestro del gremio', desc: 'Completa el árbol de habilidades o domina tu especialidad en el modo arcade.', xp: 200 },
+    { id: 'cv', ico: '<img class="px-ico" src="assets/img/pixel/i-pergamino.png" alt="">', nombre: 'Pergamino obtenido', desc: 'Descarga el CV.', xp: 100 },
+    { id: 'contacto', ico: '<img class="px-ico" src="assets/img/pixel/i-sobre.png" alt="">', nombre: 'Mensajero', desc: 'Abre uno de los canales de contacto.', xp: 75 },
+    { id: 'konami', ico: '<img class="px-ico" src="assets/img/pixel/i-videojuegos.png" alt="">', nombre: 'Código ancestral', desc: 'Descubre el código secreto.', xp: 150 },
   ];
   const ZONAS = ['estudio', 'datos', 'arcade', 'gremio', 'cv', 'contacto'];
   const XP_ZONA = 25, XP_NIVEL = 250;
@@ -67,10 +67,10 @@
     estado.xp += n; guardar(); pintarHUD();
     const despues = nivelDe(estado.xp);
     if (despues > antes) {
-      toast('⭐', `¡Subiste a nivel ${despues}!`, TITULOS[Math.min(despues - 1, TITULOS.length - 1)].toUpperCase());
+      toast('<img class="px-ico" src="assets/img/pixel/i-estrella.png" alt="">', `¡Subiste a nivel ${despues}!`, TITULOS[Math.min(despues - 1, TITULOS.length - 1)].toUpperCase());
       beep([[523, .12], [659, .12], [784, .12], [1047, .25]]);
     } else if (motivo) {
-      toast('✨', motivo, `+${n} XP`);
+      toast('<img class="px-ico" src="assets/img/pixel/i-destello.png" alt="">', motivo, `+${n} XP`);
     }
   }
 
@@ -119,7 +119,7 @@
   $('#reinicio-no').addEventListener('click', () => pedirConfirmacion(false));
   $('#reinicio-si').addEventListener('click', () => {
     estado = { xp: 0, logros: [], zonas: [], extra: {} }; guardar(); pintarHUD(); pintarLogros();
-    pedirConfirmacion(false); toast('↺', 'Progreso reiniciado', 'COMIENZAS DE NUEVO');
+    pedirConfirmacion(false); toast('<img class="px-ico" src="assets/img/pixel/i-reinicio.png" alt="">', 'Progreso reiniciado', 'COMIENZAS DE NUEVO');
   });
 
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && !modal.hidden) cerrarLogros(); });

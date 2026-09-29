@@ -23,7 +23,7 @@
   }
   function resumenBonos() {
     const b = bonos(), e = ESPECIALIDADES[b.esp];
-    return `${e ? `<p class="esp-linea">✦ <b>${e.hab}</b>, nivel ${b.nivel} de 3</p>` : ''}<ul class="stats-juego"><li>⚔️ Ataque <b>${b.ataque.toFixed(2).replace('.', ',')}</b></li><li>❤️ Vida <b>${b.vidaMax}</b></li><li>⚡ Energía <b>${b.energiaMax}</b></li><li>💨 Cadencia <b>${b.cd}</b></li><li>🛡️ Bloqueo <b>${Math.round(b.bloqueo * 100)}%</b></li><li>✚ Curación <b>${Math.round(b.cura * 100)}%${b.regenVida ? ' + regen.' : ''}</b></li></ul>`;
+    return `${e ? `<p class="esp-linea">✦ <b>${e.hab}</b>, nivel ${b.nivel} de 3</p>` : ''}<ul class="stats-juego"><li><img class="px-ico" src="assets/img/pixel/i-ataque.png" alt=""> Ataque <b>${b.ataque.toFixed(2).replace('.', ',')}</b></li><li><img class="px-ico" src="assets/img/pixel/i-vida.png" alt=""> Vida <b>${b.vidaMax}</b></li><li><img class="px-ico" src="assets/img/pixel/i-energia.png" alt=""> Energía <b>${b.energiaMax}</b></li><li><img class="px-ico" src="assets/img/pixel/i-rapidez.png" alt=""> Cadencia <b>${b.cd}</b></li><li><img class="px-ico" src="assets/img/pixel/i-bloqueo.png" alt=""> Bloqueo <b>${Math.round(b.bloqueo * 100)}%</b></li><li><img class="px-ico" src="assets/img/pixel/i-curacion.png" alt=""> Curación <b>${Math.round(b.cura * 100)}%${b.regenVida ? ' + regen.' : ''}</b></li></ul>`;
   }
 
   // ---------------------------------------------------------- progreso de la partida (persistente)

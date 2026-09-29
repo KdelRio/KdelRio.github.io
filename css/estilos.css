@@ -301,7 +301,7 @@ kbd {
   color: var(--tenue); background: rgba(255, 255, 255, .03); border: 1px dashed rgba(255, 255, 255, .18);
   font: 600 .84rem/1.3 "Geist", sans-serif; transition: all .25s;
 }
-.nodo::before { content: "🔒 "; }
+.nodo::before { content: ""; display: inline-block; width: 16px; height: 16px; margin-right: 6px; vertical-align: -2px; image-rendering: pixelated; background: url("../assets/img/pixel/i-candado.png") 0 0 / 100% 100%; }
 .nodo.abierto { color: var(--texto); background: rgba(224, 183, 86, .12); border: 1px solid var(--linea-oro); box-shadow: 0 0 14px rgba(224, 183, 86, .18); }
 .nodo.abierto::before { content: "✦ "; color: var(--oro); }
 .nodo.seleccionado { outline: 2px solid var(--oro-2); }
@@ -1121,3 +1121,19 @@ img[src*="/pixel/"], img[src*="/intro/"] { image-rendering: pixelated; }
 
 html { font-synthesis: none; }   /* las fuentes pixel son de un solo peso: nunca negritas falsas */
 .estudio-marca p, .rol p { text-shadow: 0 2px 0 rgba(3, 7, 18, .7); }
+
+/* íconos pixel art de 16 × 16 (assets/img/pixel/i-*.png): siempre a escala entera */
+.px-ico { display: inline-block; width: 32px; height: 32px; image-rendering: pixelated; vertical-align: middle; }
+.hud-logros .px-ico, .kicker .px-ico, .pn-kicker .px-ico, .bono .px-ico, .arena-rotulo .px-ico, .habilidad-detalle h4 .px-ico { width: 16px; height: 16px; vertical-align: -3px; }
+.titulo-chico .px-ico { width: 32px; height: 32px; vertical-align: -6px; }
+.rama h3 span .px-ico, .esp-ico .px-ico, .lista-logros .ico .px-ico { width: 32px; height: 32px; }
+.toast .ico .px-ico { width: 32px; height: 32px; }
+.stats-juego .px-ico { width: 16px; height: 16px; vertical-align: -3px; }
+
+/* gráficos del laboratorio en clave pixel: textos en Jersey 10 y leyendas como píxeles */
+.grafico svg text { font-family: "Jersey 10", monospace; font-size: 15px; fill: var(--suave); }
+.leyenda-mix i { box-shadow: 0 0 0 2px var(--px-contorno); }
+.grafico figcaption { font: .58rem/1.5 var(--pixel); color: var(--px-oro-2); letter-spacing: .04em; }
+
+/* cifras grandes de indicadores con la fuente de títulos */
+.kpi b, .lab-kpis b { font-family: "Jersey 10", monospace; font-weight: 400; font-size: 2.1rem; line-height: 1; letter-spacing: .01em; }
