@@ -5,8 +5,8 @@
    ========================================================================== */
 (function () {
   'use strict';
-  const COLOR = { slime: '#6bd49a', murcielago: '#a78bfa', arquero: '#e6e0d0', golem: '#8a8f9a' };
-  const NOMBRE = { slime: 'Slime', murcielago: 'Murciélago', arquero: 'Arquero', golem: 'Gólem' };
+  const COLOR = { slime: '#6bd49a', murcielago: '#a78bfa', arquero: '#e6e0d0', golem: '#8a8f9a', hongo: '#e0664f', lobo: '#9aa3b5', arana: '#7ec8ff', zombi: '#7fae6b', fantasma: '#dbe9ff', diablillo: '#fb923c' };
+  const NOMBRE = { slime: 'Slime', murcielago: 'Murciélago', arquero: 'Arquero', golem: 'Gólem', hongo: 'Hongo', lobo: 'Lobo', arana: 'Araña', zombi: 'Zombi', fantasma: 'Fantasma', diablillo: 'Diablillo' };
   const TIPOS = Object.keys(COLOR);
   // de dónde sale el daño que causas: tus armas y la habilidad de cada especialidad (índice de rama en gremio.js)
   const FUENTE = {
@@ -157,6 +157,12 @@
       golem: 'Cuando el gólem tiembla con ojos rojos va a embestir: apártate de su línea y atácalo mientras se recupera.',
       murcielago: 'Los murciélagos son erráticos: en vez de perseguirlos, espera quieto y golpéalos cuando se acerquen.',
       slime: 'Los slimes son lentos pero llegan en grupo: muévete en círculo para que no te rodeen.',
+      hongo: 'El hongo se agacha antes de saltar: apártate a un lado y golpéalo cuando aterriza.',
+      lobo: 'Cuando el lobo se agazapa con ojos rojos se lanzará en línea recta: esquiva de costado y contraataca.',
+      arana: 'Las arañas avanzan a tirones: espera su pausa para golpearlas en vez de perseguirlas.',
+      zombi: 'Los zombis son lentos, pero aceleran de cerca: golpéalos y retrocede antes de que te alcancen.',
+      fantasma: 'Los fantasmas se vuelven intangibles a ratos: no gastes ataques cuando se ven transparentes.',
+      diablillo: 'Las bolas de fuego del diablillo son lentas: muévete en diagonal y acércate entre disparo y disparo.',
     };
     if (M.dano && fuente.dano) j.push(consejo[fuente.k]);
     if (M.precision < 60) j.push(`Reduce los ataques al aire: ${M.ataques - M.aciertos} de tus ataques no golpearon a nadie. Ataca cuando el enemigo esté a un paso.`);

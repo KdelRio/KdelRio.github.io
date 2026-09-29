@@ -159,7 +159,7 @@
   // ---------------------------------------------------------- misión 1: Studios Conari
   function abrirEstudio() {
     const roles = [...document.querySelectorAll('#estudio .rol')].map(r => ({ ico: r.querySelector('img').getAttribute('src'), t: r.querySelector('h4').textContent, d: r.querySelector('p').textContent }));
-    const disc = [...document.querySelectorAll('#estudio .disciplinas li')].map(li => ({ ico: li.querySelector('img').getAttribute('src'), t: li.querySelector('b').textContent }));
+    const disc = [['estrella', 'Arte'], ['libro', 'Narrativa'], ['proyeccion', 'Tecnología'], ['investigacion', 'Investigación'], ['dragon', 'Identidad']].map(([i, t]) => ({ ico: `assets/img/pixel/ic-${i}.png`, t }));   // disciplinas del estudio: solo en la misión del castillo
     const lema = document.querySelector('#estudio .estudio-lema').textContent, desc = document.querySelector('#estudio .estudio-marca > p:not(.estudio-lema)').textContent;
     diapositivas('estudio', [
       `<div class="dia-centro"><p class="pn-kicker">Misión 1 · Castillo Conari</p>
