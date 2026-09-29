@@ -121,13 +121,7 @@
   });
   pintarProgreso();
 
-  // atributos de la hoja de personaje, animados al entrar en pantalla
+  // fortalezas de la hoja de personaje: solo el nombre, en letra pixel dorada
   const ul = document.getElementById('atributos');
-  ATRIBUTOS.forEach(([n, v]) => {
-    const li = document.createElement('li'); li.textContent = n;
-    const b = document.createElement('div'); b.className = 'barra-attr'; const i = document.createElement('i'); i.dataset.v = v; b.appendChild(i); li.appendChild(b); ul.appendChild(li);
-  });
-  new IntersectionObserver((en, obs) => {
-    if (en[0].isIntersecting) { ul.querySelectorAll('i').forEach(i => i.style.width = i.dataset.v + '%'); obs.disconnect(); }
-  }, { threshold: .3 }).observe(ul);
+  ATRIBUTOS.forEach(([n]) => { const li = document.createElement('li'); li.textContent = n; ul.appendChild(li); });
 })();

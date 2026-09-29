@@ -316,7 +316,7 @@
           <h2 class="dia-h">${txt('.ficha h3')}</h2><p class="dia-clase">${txt('.ficha-clase')}</p>
           <p class="dia-p">${txt('.ficha-origen')}</p><p class="dia-p">${txt('.ficha-idiomas')}</p>
           <a class="btn btn-oro" href="assets/CV_Kevin_del_Rio.pdf" download data-logro="cv">Descargar CV</a></div>
-        <ul class="dia-attrs">${attrs.map(([n, v]) => `<li><span>${n}</span><b>${v}</b><i><em style="width:${v}%"></em></i></li>`).join('')}</ul></div>`,
+        <ul class="dia-attrs">${attrs.map(([n]) => `<li>${n}</li>`).join('')}</ul></div>`,
       `<h2 class="dia-h">Misiones completadas</h2>${experiencia(exp.slice(0, 2))}`,
       `<h2 class="dia-h">Misiones anteriores</h2>${experiencia(exp.slice(2))}`,
       `<h2 class="dia-h">Logros y formación</h2>

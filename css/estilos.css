@@ -1142,3 +1142,10 @@ html { font-synthesis: none; }   /* las fuentes pixel son de un solo peso: nunca
 .hud-avatar { width: 34px; height: 34px; padding: 0; border: 0; background: none; box-shadow: none; image-rendering: pixelated; }
 .ficha-avatar { width: 166px; height: 166px; padding: 0; border: 0; background: none; box-shadow: none; image-rendering: pixelated; margin-bottom: 14px; }
 .dia-avatar { width: 7.5em; height: 7.5em; padding: 0; border: 0; background: none; box-shadow: none; image-rendering: pixelated; }
+
+/* fortalezas de la hoja de personaje: nombres en letra pixel dorada con una estrella de píxel, sin barras */
+.atributos { margin: 18px 0; display: grid; gap: 12px; text-align: left; }
+.atributos li, .dia-attrs li { display: flex; align-items: center; gap: 10px; margin: 0; font: .62rem/1.5 var(--pixel); color: var(--px-oro-2); letter-spacing: .04em; text-shadow: 2px 2px 0 var(--px-contorno); }
+.atributos li::before, .dia-attrs li::before { content: ""; flex: none; width: 16px; height: 16px; image-rendering: pixelated; background: url("../assets/img/pixel/i-destello.png") 0 0 / 100% 100%; }
+.dia-attrs { gap: 1.1em; }
+.dia-attrs li { font-size: .75em; }
