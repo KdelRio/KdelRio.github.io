@@ -67,12 +67,13 @@ main:focus { outline: none; }
 @keyframes mago-flota { 0%, 100% { transform: translateY(-2px); } 50% { transform: translateY(2px); } }
 
 /* al bajar, cada plano se desplaza según su profundidad (los cercanos más) */
-.plano-lejano { transform: translate3d(calc(var(--mx) * -5px), calc(var(--p) * -20px + var(--my) * -3px), 0) scale(calc(1 + var(--p) * .02)); }
-.plano-estrellas { transform: translate3d(calc(var(--mx) * -5px), calc(var(--p) * -20px), 0); }
-.plano-dragon { transform: translate3d(calc(var(--p) * -60px + var(--mx) * -8px), calc(var(--p) * -55px + var(--my) * -4px), 0); }
-.plano-mago { transform: translate3d(calc(var(--p) * 30px + var(--mx) * -12px), calc(var(--p) * -40px + var(--my) * -5px), 0); }
-.plano-bosque { transform: translate3d(calc(var(--mx) * -18px), calc(var(--p) * -35px + var(--my) * -6px), 0); }
-.plano-frente { transform-origin: 100% 100%; transform: translate3d(calc(var(--mx) * -24px), calc(var(--p) * -40px + var(--my) * -6px), 0) scale(calc(1 + var(--p) * .06)); }
+/* las capas solo se mueven con el puntero (profundidad leve); el scroll no las desplaza ni las escala */
+.plano-lejano { transform: translate3d(calc(var(--mx) * -5px), calc(var(--my) * -3px), 0); }
+.plano-estrellas { transform: translate3d(calc(var(--mx) * -5px), 0, 0); }
+.plano-dragon { transform: translate3d(calc(var(--mx) * -8px), calc(var(--my) * -4px), 0); }
+.plano-mago { transform: translate3d(calc(var(--mx) * -12px), calc(var(--my) * -5px), 0); }
+.plano-bosque { transform: translate3d(calc(var(--mx) * -18px), calc(var(--my) * -6px), 0); }
+.plano-frente { transform: translate3d(calc(var(--mx) * -24px), calc(var(--my) * -6px), 0); }
 
 /* con JS la cámara (js/escena.js) fija ancho y transform del marco en px */
 .escena.viva .escena-marco { left: 0; top: 0; transform-origin: 0 0; will-change: transform; }

@@ -18,15 +18,16 @@
   escena.classList.add('viva');                     // desde aquí el encuadre lo maneja la cámara
 
   // hito de cada zona en fracciones del lienzo 1600 × 900 (null = vista completa)
+  // al bajar, el encuadre se queda en la vista completa (sin zooms ni paneos): solo cambia el tono del lugar
   const TOMAS = {
-    inicio:   { f: null, z: 1 },
-    mundo:    { f: null, z: 1 },
-    estudio:  { f: [.53, .54], z: 1.5,  tinte: [224, 183, 86], t: .2 },   // castillo
-    datos:    { f: [.24, .5],  z: 1.5,  tinte: [126, 200, 255], t: .16 }, // mago sobre su báculo
-    arcade:   { f: [.29, .2],  z: 1.35, tinte: [90, 170, 255], t: .22 },  // dragón
-    gremio:   { f: [.9, .25],  z: 1.4,  tinte: [200, 120, 255], t: .2 },  // árbol
-    cv:       { f: [.73, .52], z: 1.4,  tinte: [243, 190, 120], t: .16 }, // pareja
-    contacto: { f: null, z: 1, claro: 1, tinte: [150, 175, 255], t: .1 }, // de vuelta al reino completo
+    inicio:   { f: null },
+    mundo:    { f: null },
+    estudio:  { f: null, tinte: [224, 183, 86], t: .12 },
+    datos:    { f: null, tinte: [126, 200, 255], t: .1 },
+    arcade:   { f: null, tinte: [90, 170, 255], t: .12 },
+    gremio:   { f: null, tinte: [200, 120, 255], t: .1 },
+    cv:       { f: null, tinte: [243, 190, 120], t: .1 },
+    contacto: { f: null, claro: 1, tinte: [150, 175, 255], t: .08 },
   };
 
   const movil = matchMedia('(pointer: coarse)').matches || innerWidth < 820;
