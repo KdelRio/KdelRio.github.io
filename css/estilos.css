@@ -1231,3 +1231,4 @@ html { font-synthesis: none; }   /* las fuentes pixel son de un solo peso: nunca
 [data-tema="claro"] .maquina :is(.btn-linea, .btn-mini) { color: var(--px-oro-3); box-shadow: inset 0 -4px 0 #050b1c, inset 0 0 0 2px var(--px-contorno), inset 0 0 0 4px var(--px-acero); }
 [data-tema="claro"] .maquina :is(.titulo, .hero-titulo, .subtitulo, .titulo-chico) { text-shadow: 3px 3px 0 var(--px-contorno); }
 [data-tema="claro"] .maquina :is(.kicker, .grafico figcaption, .dia-attrs li) { color: var(--px-oro-2); }
+[data-tema="claro"] main .salon canvas, [data-tema="claro"] main #arena-canvas { background: #fffaf0; }

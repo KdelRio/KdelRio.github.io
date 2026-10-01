@@ -35,6 +35,7 @@
     return true;
   }
   const ctx = cv.getContext('2d'), W = cv.width, H = cv.height, S = 2, WW = W / S, WH = H / S;
+  if (window.KRTema) KRTema.diaEn(ctx);                          // interfaz de día en la página con tema claro (el mundo no cambia)
   const buf = document.createElement('canvas'); buf.width = WW; buf.height = WH;
   const g = buf.getContext('2d');
   const R = (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); };

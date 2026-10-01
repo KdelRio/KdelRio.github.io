@@ -6,6 +6,7 @@
   'use strict';
   function crear(cv, op) {
     const ctx = cv.getContext('2d'), W = cv.width, H = cv.height;
+    if (window.KRTema) KRTema.diaEn(ctx);                         // en la página, con tema claro, el juego se pinta de día
     const CARRILES = 4, AC = 84, X0 = (W - CARRILES * AC) / 2, LINEA = H - 80, VIAJE = 1.55;
     const TECLAS = ['d', 'f', 'j', 'k'], COLORES = ['#e0b756', '#7ec8ff', '#f472b6', '#a78bfa'];
     const NOTAS_LEAD = [523.25, 587.33, 659.25, 783.99];            // do re mi sol (pentatónica)
