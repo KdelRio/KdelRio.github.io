@@ -1209,3 +1209,25 @@ html { font-synthesis: none; }   /* las fuentes pixel son de un solo peso: nunca
 [data-tema="claro"] .nodo.abierto { background: rgba(250, 189, 24, .2); color: var(--texto); }
 [data-tema="claro"] .modal { background: rgba(23, 33, 58, .45); }
 [data-tema="claro"] .lista-logros li.hecho { background: rgba(250, 189, 24, .16); }
+/* las pantallas de juego (máquina arcade, carga, intro, gira tu celular) son siempre nocturnas: recuperan la paleta oscura */
+[data-tema="claro"] :is(.maquina, .carga, #intro, .girar, .controles-tactiles) {
+  --texto: #f4f7fd; --suave: #cad6e5; --tenue: #8fa3bd; --oro: #e0b756; --oro-2: #f3d27f; --hielo: #7ec8ff;
+  --verde: #6bd49a; --rojo: #f87171; --rosa: #f472b6; --violeta: #a78bfa;
+  --linea: rgba(255, 255, 255, .10); --linea-oro: rgba(224, 183, 86, .32); --panel: rgba(8, 22, 44, .72); --panel-fuerte: rgba(6, 17, 34, .9);
+  --px-noche: #0a1630; --px-noche-2: #0e1d3d; --px-acero: #24396b; color-scheme: dark;
+}
+[data-tema="claro"] .maquina :is(.titulo, .subtitulo, .titulo-chico) { text-shadow: 3px 3px 0 var(--px-contorno); }
+[data-tema="claro"] .maquina .panel { background: rgba(10, 22, 48, .94); box-shadow: inset 0 0 0 2px var(--px-contorno), inset 0 0 0 4px var(--px-acero), inset 0 4px 0 4px rgba(126, 200, 255, .06); }
+[data-tema="claro"] .maquina .esp-carta { background: rgba(8, 22, 44, .9); border-color: var(--linea-oro); }
+[data-tema="claro"] .maquina .esp-hab { color: #9dffc0; }
+/* informe de la arena en la página clásica */
+[data-tema="claro"] main :is(.inf-kpi, .inf-graficos figure, .inf-resumen figure, .inf-hallazgos li, .inf-acciones section) { background: #fffaf0; border-color: var(--px-acero); }
+[data-tema="claro"] main .inf-tabla th { background: #f3e3bd; color: #6b4300; }
+[data-tema="claro"] main .inf-svg text { fill: var(--suave); }
+[data-tema="claro"] .arena-rotulo b { color: #1f8a4c; }
+[data-tema="claro"] .salon canvas, [data-tema="claro"] #arena-canvas { box-shadow: 0 0 0 2px var(--px-contorno), 0 0 0 4px var(--px-acero); }
+/* verdes de logro/especialidad: el verde menta se pierde sobre pergamino; fuera de los juegos va en verde bosque */
+[data-tema="claro"] main :is(.pn-logro, .arbol-marcador .ph, .esp-hab, .bono, .subida-nivel b, .esp-caja .esp-hab, .esp-caja .ok, .rama-dominada p, .esp-linea b, .es-esp span, .es-esp b) { color: #1f7a43 !important; }
+[data-tema="claro"] .maquina :is(.btn-linea, .btn-mini) { color: var(--px-oro-3); box-shadow: inset 0 -4px 0 #050b1c, inset 0 0 0 2px var(--px-contorno), inset 0 0 0 4px var(--px-acero); }
+[data-tema="claro"] .maquina :is(.titulo, .hero-titulo, .subtitulo, .titulo-chico) { text-shadow: 3px 3px 0 var(--px-contorno); }
+[data-tema="claro"] .maquina :is(.kicker, .grafico figcaption, .dia-attrs li) { color: var(--px-oro-2); }
