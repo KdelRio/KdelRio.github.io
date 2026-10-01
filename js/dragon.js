@@ -35,7 +35,8 @@
     requestAnimationFrame(cuadro);
     if (document.hidden || document.body.classList.contains('bloqueado')) return;
     t++;
-    const T = tam(), final = scrollY + innerHeight >= document.documentElement.scrollHeight - 40;   // margen: la página puede crecer al cargar imágenes
+    const T = tam(), raizC = document.documentElement.classList;
+    const final = raizC.contains("escenas") ? raizC.contains("escena-final") : scrollY + innerHeight >= document.documentElement.scrollHeight - 40;   // en modo escenas, al llegar a la última
     let tx, ty;
     if (final && posada) {                      // al final de la página: al nido
       const r = posada.getBoundingClientRect(); tx = r.left + (r.width - T) / 2; ty = r.bottom - T;

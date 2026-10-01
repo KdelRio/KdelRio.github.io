@@ -47,7 +47,7 @@
     informe.hidden = false;
     KRInforme.construir(informe, T, {
       clasico: true, infinito: false, puntos: 0,
-      alMagic: () => document.getElementById('magic-foods').scrollIntoView({ behavior: 'smooth', block: 'start' }),
+      alMagic: () => window.KREscenas ? KREscenas.irA('magic') : document.getElementById('magic-foods').scrollIntoView({ behavior: 'smooth', block: 'start' }),
       alReintentar: () => { iniciar(); caja.scrollIntoView({ behavior: 'smooth', block: 'start' }); },
       alContinuar: cambiar,
     });

@@ -1241,3 +1241,89 @@ html { font-synthesis: none; }   /* las fuentes pixel son de un solo peso: nunca
 @media (max-width: 900px) { .rol-icono { width: 60px; height: 60px; transform: none; } }
 /* en tema claro el nombre marfil del logotipo necesita un contorno oscuro de píxel para leerse */
 [data-tema="claro"] .estudio-logo { filter: drop-shadow(1px 0 0 #17213a) drop-shadow(-1px 0 0 #17213a) drop-shadow(0 1px 0 #17213a) drop-shadow(0 -1px 0 #17213a); }
+
+/* ==========================================================================
+   MODO ESCENAS (js/escenas.js, prueba local): la página no se desplaza; una escena a la vez
+   ========================================================================== */
+.escenas, .escenas body { overflow: hidden; height: 100%; }
+.escenas main > section { display: none; }
+.escenas .escenas-capa { position: fixed; left: 0; right: 0; top: var(--hud); bottom: 0; z-index: 2; }
+.escenas .ev { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; padding: 20px 96px; overflow: hidden; }
+.escenas .ev.activa { display: flex; }   /* display, no visibility: un hijo con visibility visible se vería a través de otra escena */
+.escenas .ev.desborda { overflow-y: auto; align-items: flex-start; }
+.escenas .ev-caja { width: min(1180px, 100%); }
+.escenas .revelar { opacity: 1 !important; transform: none; transition: none !important; }   /* sin !important en transform: GSAP lo anima en línea */
+.escenas .ev .subtitulo { margin-top: 0; }
+/* inicio */
+.escenas .ev-inicio .hero { min-height: 0; padding: 0; }
+/* camino lineal de misiones */
+.escenas .ev-mundo .invitacion { margin: 0; }
+/* Magic Foods: hoja que se voltea */
+.escenas .lab-marco { position: relative; perspective: 1600px; }
+.escenas .lab-marco .lab { transform-style: preserve-3d; }
+.escenas .lab-cara[hidden] { display: none; }
+.escenas .lab-graficos-dorso { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.lab-voltear {
+  position: absolute; left: -76px; top: 50%; translate: 0 -50%; z-index: 3; display: grid; justify-items: center; gap: 4px; padding: 10px 8px 8px; cursor: pointer;
+  background: var(--px-noche); border: 0; clip-path: var(--px-esquina); box-shadow: inset 0 0 0 2px var(--px-contorno), inset 0 0 0 4px var(--px-acero), inset 0 -4px 0 #050b1c;
+  font: .45rem/1 var(--pixel); color: var(--px-oro-2); letter-spacing: .04em; text-transform: uppercase;
+}
+.lab-voltear img { width: 40px; height: 40px; image-rendering: pixelated; transition: transform .4s steps(4); }
+.lab-voltear:hover img { transform: rotate(90deg); }
+.lab-voltear.dorso img { transform: scaleX(-1); }
+.escenas .ev-fila { margin-top: 22px; }
+/* presentación y juegos: un elemento a la vez */
+.escenas .deck-escena { display: block; position: relative; height: min(64vh, 660px); overflow: visible; }
+.escenas .deck-escena figure { position: absolute; inset: 0; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; opacity: 0; }
+.escenas .deck-escena figure:not(.activa) { cursor: pointer; }
+.escenas .deck-escena figure:not(.activa) figcaption { visibility: hidden; }
+.escenas .deck-escena figure:not(.activa) img { cursor: pointer; filter: brightness(.7); }
+.escenas .ev-deck .ev-caja { overflow: visible; }
+.escenas .deck-escena img { height: calc(100% - 34px); width: auto; max-width: 100%; object-fit: contain; box-shadow: 0 0 0 3px var(--px-contorno), 0 0 0 6px var(--px-acero); cursor: zoom-in; }
+.escenas .deck-escena figcaption { font: .6rem/1.4 var(--pixel); color: var(--px-oro-2); }
+.deck-puntos { display: flex; justify-content: center; gap: 10px; margin-top: 14px; }
+.deck-puntos i { width: 12px; height: 12px; cursor: pointer; background: var(--px-acero); box-shadow: 0 0 0 2px var(--px-contorno); }
+.deck-puntos i.activo { background: var(--px-oro-2); }
+.escenas .ev-deck .fila-botones { opacity: 0; pointer-events: none; margin-top: 16px; }
+.escenas .ev-deck .fila-botones.visible { opacity: 1; pointer-events: auto; }
+.escenas .ev-juegos .ev-caja { width: min(1500px, 100%); }   /* más ancho: dos juegos lado a lado con aire */
+.escenas .juegos-pista { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: stretch; }
+.escenas .juegos-pista .juego { display: none; grid-row: 1; width: 100%; transition: none; }
+.escenas .juegos-pista .juego:nth-child(odd) { grid-column: 1; } .escenas .juegos-pista .juego:nth-child(even) { grid-column: 2; }
+.escenas .juegos-pista .juego.activa { display: flex; }
+.escenas .juegos-pista .juego-banner { width: 100%; height: auto; aspect-ratio: auto; max-height: none; object-fit: contain; }   /* el banner completo */
+.escenas .juegos-pista .juego-cuerpo { padding: 16px 22px 18px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.escenas .juegos-pista .juego-cuerpo > .btn { margin-top: auto; align-self: flex-start; }
+.escenas .juegos-pista .juego-datos { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 18px; }
+.escenas .ev-juegos .ev-caja > .bajada { margin-bottom: 14px; }
+/* hoja de personaje y contacto */
+.escenas .ev-cv .cv-grid { display: grid; grid-template-columns: 340px 1fr; gap: 32px; align-items: start; }
+.escenas .ev-contacto .ev-caja { text-align: center; }
+.escenas .ev-contacto .pie { position: relative; margin-top: 30px; background: none; border: 0; }
+/* cortina de zona: el color de fondo del tema, con borde de píxeles escalonados */
+.cortina-escena {
+  position: fixed; left: 0; right: 0; top: var(--hud); bottom: 0; z-index: 45; visibility: hidden; display: grid; place-items: center;
+  background: var(--bg); box-shadow: 0 -12px 0 var(--bg), 0 12px 0 var(--bg);
+}
+.cortina-escena::before, .cortina-escena::after { content: ""; position: absolute; left: 0; right: 0; height: 12px; background: repeating-linear-gradient(90deg, var(--bg) 0 24px, transparent 24px 48px); }
+.cortina-escena::before { top: -24px; } .cortina-escena::after { bottom: -24px; }
+.cortina-escena p { margin: 0; padding: 0 24px; text-align: center; font: 400 clamp(2.6rem, 6vw, 5rem)/1.05 var(--titulo); color: var(--px-oro-2); text-shadow: 4px 4px 0 var(--px-contorno); }
+[data-tema="claro"] .cortina-escena p { color: #b46f00; text-shadow: 4px 4px 0 rgba(250, 189, 24, .45); }
+/* índice lateral y pista de la rueda */
+.escenas-indice { position: fixed; left: 22px; top: 50%; translate: 0 -50%; z-index: 40; display: grid; gap: 10px; }
+.escenas-indice button { width: 12px; height: 12px; padding: 0; cursor: pointer; border: 0; background: var(--px-acero); box-shadow: 0 0 0 2px var(--px-contorno); transition: transform .15s steps(2); }
+.escenas-indice button:hover { transform: scale(1.3); }
+.escenas-indice button.activo { background: var(--px-oro-2); transform: scale(1.35); }
+.escenas-pista { position: fixed; left: 50%; bottom: 18px; translate: -50% 0; z-index: 40; width: 22px; height: 34px; border-radius: 0; box-shadow: 0 0 0 2px var(--px-contorno), inset 0 0 0 2px var(--px-acero); pointer-events: none; transition: opacity .4s; }
+.escenas-pista span { position: absolute; left: 50%; top: 6px; width: 4px; height: 8px; margin-left: -2px; background: var(--px-oro-2); animation: pista-rueda 1.4s steps(4) infinite; }
+.escenas-pista.oculta { opacity: 0; }
+@keyframes pista-rueda { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(14px); opacity: 0; } }
+.obertura .escenas-indice, .obertura .escenas-pista { visibility: hidden; }
+
+.escenas-velo { position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0; transition: opacity .8s ease; background: radial-gradient(ellipse 90% 85% at 50% 50%, rgba(3, 11, 26, .78), rgba(3, 11, 26, .5)); }
+.escenas-velo.visible { opacity: 1; }
+[data-tema="claro"] .escenas-velo { background: radial-gradient(ellipse 90% 85% at 50% 50%, rgba(244, 248, 255, .86), rgba(244, 248, 255, .55)); }
+.escenas .ev .btn { transition: none; }   /* GSAP anima los botones al entrar; la transición CSS de transform lo estorba */
+.escenas .lab-marco .lab { backface-visibility: hidden; will-change: transform; }
+.escenas .ev.animando, .escenas .ev.animando * { transition: none !important; }
+.trans-juego { position: fixed; left: 0; z-index: 46; width: 100vw; height: calc(100vh - var(--hud)); image-rendering: pixelated; pointer-events: none; visibility: hidden; }
