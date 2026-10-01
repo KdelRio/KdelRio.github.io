@@ -324,10 +324,10 @@
         <p class="dia-sub">Certificaciones de especialidad Duoc UC</p>
         <ul class="dia-chips">${certs.map(c => `<li>${c}</li>`).join('')}</ul>`,
       `<div class="dia-centro"><p class="fin-titulo grande">FIN DEL JUEGO</p><p class="dia-p">Completaste las cinco misiones del reino de Kevin del Río.</p>
-        <button type="button" class="btn btn-oro" data-conversar>¿Conversamos? ▶</button></div>`,
+        <button type="button" class="btn btn-oro" data-conversar>Ver el portafolio completo ▶</button></div>`,
     ]);
     completar(4, 0, 'cv');
-    capa.querySelector('[data-conversar]').onclick = abrirFinal;
+    capa.querySelector('[data-conversar]').onclick = abrirClasico;   // al terminar, directo al portafolio completo
   }
   function abrirFinal() {
     const p = prog();
@@ -342,7 +342,7 @@
       <p class="pn-creditos">Gracias por jugar · Kevin del Río · Studios Conari SpA · 2026</p></div>`);
     capa.querySelector('.pn-contenido').append(limpiarClon($('#contacto .contactos').cloneNode(true)));
     KR.visitarZona('contacto');
-    capa.querySelector('[data-clasico]').onclick = cerrarMaquina;
+    capa.querySelector('[data-clasico]').onclick = abrirClasico;
     capa.querySelector('[data-aldea]').onclick = () => volverAldea();
     capa.querySelector('[data-nueva]').onclick = nuevaPartida;
     capa.querySelector('[data-infinito]').onclick = () => iniciarBatalla(true);
