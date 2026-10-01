@@ -49,7 +49,7 @@
     d.style.left = p.x + 'px'; d.style.top = p.y + 'px';
     const s = document.createElementNS(NS, 'svg'); s.setAttribute('viewBox', '0 0 256 256');
     s.appendChild(trazos('ic-' + p.n, 'it-emblema'));
-    const img = new Image(); img.src = `assets/img/intro/px-${p.n}.png`; img.alt = '';
+    const img = new Image(); img.src = `assets/img/intro/px-${p.n}.png?v=logos`; img.alt = '';
     d.append(s, img); escenario.appendChild(d);
     return d;
   });
@@ -99,8 +99,8 @@
   // ---------------------------------------------------------- guion
   // el logotipo (620 × 362, píxel de 3) va a escala .8: su píxel mide P, igual que el del dragón
   const L = { x: 252, y: 156, s: .8 };
-  const estrellaLuna = { x: L.x + 311 * L.s, y: L.y + 75 * L.s };
-  const conariY = L.y + 258 * L.s;
+  const estrellaLuna = { x: L.x + 314 * L.s, y: L.y + 88 * L.s };
+  const conariY = L.y + 270 * L.s;
   const conari = $('.iw-conari');
   gsap.set(conari, { clipPath: 'inset(0 0 0 100%)' });
 
@@ -141,7 +141,7 @@
     .to(vuelo, {
       x: -220, y: conariY - 40, duration: 1.15, ease: 'none',
       onUpdate() {
-        const f = Math.min(100, Math.max(0, Math.round((aGrilla(vuelo.x) - L.x) / P) * 2 / 620 * 100));   // corta en columnas de píxel
+        const f = Math.min(100, Math.max(0, Math.round((aGrilla(vuelo.x) - L.x) / P) * P / L.s / 620 * 100));   // corta en columnas de píxel
         conari.style.clipPath = `inset(0 0 0 ${f}%)`;
       }
     }, 4.4)

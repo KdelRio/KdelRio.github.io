@@ -159,11 +159,11 @@
   // ---------------------------------------------------------- misión 1: Studios Conari
   function abrirEstudio() {
     const roles = [...document.querySelectorAll('#estudio .rol')].map(r => ({ ico: r.querySelector('img').getAttribute('src'), t: r.querySelector('h4').textContent, d: r.querySelector('p').textContent }));
-    const disc = [['estrella', 'Arte'], ['libro', 'Narrativa'], ['proyeccion', 'Tecnología'], ['investigacion', 'Investigación'], ['dragon', 'Identidad']].map(([i, t]) => ({ ico: `assets/img/pixel/ic-${i}.png`, t }));   // disciplinas del estudio: solo en la misión del castillo
+    const disc = [['estrella', 'Arte'], ['libro', 'Narrativa'], ['proyeccion', 'Tecnología'], ['investigacion', 'Investigación'], ['identidad', 'Identidad']].map(([i, t]) => ({ ico: `assets/img/pixel/ic-${i}.png?v=logos`, t }));   // disciplinas del estudio: solo en la misión del castillo
     const lema = document.querySelector('#estudio .estudio-lema').textContent, desc = document.querySelector('#estudio .estudio-marca > p:not(.estudio-lema)').textContent;
     diapositivas('estudio', [
       `<div class="dia-centro"><p class="pn-kicker">Misión 1 · Castillo Conari</p>
-        <img class="dia-logo" src="assets/img/intro/w-completo.png" alt="Studios Conari">
+        <img class="dia-logo" src="assets/img/intro/w-completo.png?v=logos" alt="Studios Conari">
         <p class="dia-lema">${lema}</p><p class="pn-logro">✓ Emblema restaurado · +1 punto de habilidad</p></div>`,
       `<div class="dia-centro dia-angosto"><h2 class="dia-h">El estudio</h2><p class="dia-p">${desc}</p>
         <div class="fila-botones centro"><a class="btn btn-oro" href="https://studiosconari.github.io/" target="_blank" rel="noopener">Sitio oficial</a>
@@ -396,7 +396,7 @@
 
   // ---------------------------------------------------------- pantalla INSERT COIN
   const pc = CV.portada.getContext('2d'), PW = CV.portada.width, PH = CV.portada.height;
-  const logo = new Image(); logo.src = 'assets/img/intro/w-portada.png?v=fino';   // pixel art nativo: un píxel del arte = un píxel del lienzo
+  const logo = new Image(); logo.src = 'assets/img/intro/w-portada.png?v=logos';   // pixel art nativo: un píxel del arte = un píxel del lienzo
   const ESTRELLAS = Array.from({ length: 140 }, () => ({ x: Math.random() * PW, y: Math.random() * PH, v: .2 + Math.random() * 1.3, b: Math.random() }));
   let tp = 0, creditos = 0, arranque = 0, rechazo = 0, rafP = 0, destino = 'interactivo', opcion = 0;
   const OPCIONES = [['1', 'PORTAFOLIO INTERACTIVO', 'interactivo'], ['2', 'PORTAFOLIO CLÁSICO', 'clasico']];

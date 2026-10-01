@@ -965,7 +965,7 @@ kbd {
 .iw { opacity: 0; }
 .iw-conari { opacity: 1; }
 .intro-brillo {
-  -webkit-mask: url("../assets/img/intro/w-completo.png") 0 0 / 100% 100% no-repeat; mask: url("../assets/img/intro/w-completo.png") 0 0 / 100% 100% no-repeat;
+  -webkit-mask: url("../assets/img/intro/w-completo.png?v=logos") 0 0 / 100% 100% no-repeat; mask: url("../assets/img/intro/w-completo.png?v=logos") 0 0 / 100% 100% no-repeat;
   background: linear-gradient(105deg, transparent 44%, rgba(255, 255, 240, .85) 44% 56%, transparent 56%) -250% 0 / 40% 100% no-repeat;
 }
 .intro-destello {
@@ -1233,3 +1233,11 @@ html { font-synthesis: none; }   /* las fuentes pixel son de un solo peso: nunca
 [data-tema="claro"] .maquina :is(.titulo, .hero-titulo, .subtitulo, .titulo-chico) { text-shadow: 3px 3px 0 var(--px-contorno); }
 [data-tema="claro"] .maquina :is(.kicker, .grafico figcaption, .dia-attrs li) { color: var(--px-oro-2); }
 [data-tema="claro"] main .salon canvas, [data-tema="claro"] main #arena-canvas { background: #fffaf0; }
+
+/* emblemas pixel art de Studios Conari (assets/img/pixel/ic-*.png, 192 px): tamaño fijo y sin filtros */
+.rol-icono { width: 76px; height: 76px; max-width: none; object-fit: contain; transform: none; filter: none; }
+.contacto-ico[src] { width: 34px; height: 34px; object-fit: contain; }
+.invitacion-misiones img, .dia-rol img, .dia-disc img { object-fit: contain; filter: none; }
+@media (max-width: 900px) { .rol-icono { width: 60px; height: 60px; transform: none; } }
+/* en tema claro el nombre marfil del logotipo necesita un contorno oscuro de píxel para leerse */
+[data-tema="claro"] .estudio-logo { filter: drop-shadow(1px 0 0 #17213a) drop-shadow(-1px 0 0 #17213a) drop-shadow(0 1px 0 #17213a) drop-shadow(0 -1px 0 #17213a); }
