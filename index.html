@@ -16,12 +16,14 @@
   <meta property="og:url" content="https://kdelrio.github.io/">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="assets/img/favicon.png">
+  <!-- tema claro/oscuro: el guardado o, si no hay, el del sistema; se decide antes de pintar -->
+  <script>try{var t=localStorage.getItem('kr-tema');document.documentElement.dataset.tema=t||(matchMedia('(prefers-color-scheme: light)').matches?'claro':'oscuro')}catch(e){document.documentElement.dataset.tema='oscuro'}</script>
   <!-- intro del estudio: una vez por sesión (o con ?intro), se decide antes de pintar para que no parpadee el arcade -->
   <script>try{var q=/[?&]intro/.test(location.search);if(q||(!sessionStorage.getItem('kr-intro')&&!matchMedia('(prefers-reduced-motion: reduce)').matches))document.documentElement.classList.add('con-intro')}catch(e){}</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Jersey+10&family=Geist:wght@400;500;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/estilos.css?v=20260929attr">
+  <link rel="stylesheet" href="css/estilos.css?v=20261001tema3">
 </head>
 <body>
 <a class="saltar" href="#contenido">Saltar al contenido</a>
@@ -29,12 +31,12 @@
 <!-- ============================================================ ESCENA DE FONDO (capas con profundidad) -->
 <div class="escena" id="escena" aria-hidden="true">
   <div class="escena-marco">
-    <div class="plano plano-lejano"><img src="assets/img/fondo/px-fondo.webp" alt="" class="plano-img" fetchpriority="high"></div>
+    <div class="plano plano-lejano"><img src="assets/img/fondo/px-fondo.webp" alt="" class="plano-img" fetchpriority="high"><img data-dia="assets/img/fondo/px-fondo-dia.webp" alt="" class="plano-img capa-dia"></div>
     <canvas class="plano plano-estrellas" id="escena-estrellas"></canvas>
-    <div class="plano plano-dragon"><img src="assets/img/fondo/px-dragon.webp" alt="" class="px-dragon"><i class="brillo brillo-ojo"></i></div>
-    <div class="plano plano-mago"><img src="assets/img/fondo/px-mago.webp" alt="" class="px-mago"><i class="brillo brillo-baculo"></i></div>
-    <div class="plano plano-bosque"><img src="assets/img/fondo/px-bosque.webp" alt="" class="px-bosque"></div>
-    <div class="plano plano-frente"><img src="assets/img/fondo/px-frente.webp" alt="" class="px-frente"><i class="brillo brillo-hombro"></i><i class="brillo brillo-liston"></i><div class="obertura-corazones"></div></div>
+    <div class="plano plano-dragon"><img src="assets/img/fondo/px-dragon.webp" alt="" class="px-dragon"><img data-dia="assets/img/fondo/px-dragon-dia.webp" alt="" class="px-dragon capa-dia"><i class="brillo brillo-ojo"></i></div>
+    <div class="plano plano-mago"><img src="assets/img/fondo/px-mago.webp" alt="" class="px-mago"><img data-dia="assets/img/fondo/px-mago-dia.webp" alt="" class="px-mago capa-dia"><i class="brillo brillo-baculo"></i></div>
+    <div class="plano plano-bosque"><img src="assets/img/fondo/px-bosque.webp" alt="" class="px-bosque"><img data-dia="assets/img/fondo/px-bosque-dia.webp" alt="" class="px-bosque capa-dia"></div>
+    <div class="plano plano-frente"><img src="assets/img/fondo/px-frente.webp" alt="" class="px-frente"><img data-dia="assets/img/fondo/px-frente-dia.webp" alt="" class="px-frente capa-dia"><i class="brillo brillo-hombro"></i><i class="brillo brillo-liston"></i><div class="obertura-corazones"></div></div>
   </div>
   <canvas class="escena-petalos" id="escena-petalos"></canvas>
   <div class="escena-velo" id="escena-velo"></div>
@@ -141,6 +143,7 @@
     <a href="#cv">CV</a>
     <a href="#contacto">Contacto</a>
   </nav>
+  <button type="button" class="hud-tema" id="btn-tema" aria-pressed="false" aria-label="Cambiar a tema claro" title="Tema claro u oscuro"><img class="px-ico" src="assets/img/pixel/i-sol.png" alt=""></button>
   <button class="hud-logros" id="btn-logros" aria-haspopup="dialog"><img class="px-ico" src="assets/img/pixel/i-trofeo.png" alt=""> <b id="hud-logros">0</b>/<span id="hud-logros-total">10</span></button>
 </header>
 
@@ -459,6 +462,7 @@
 <script src="js/intro-trazos.js?v=20260929fino"></script>
 <script src="js/intro.js?v=20260929fino"></script>
 <script src="js/carga.js?v=20260927"></script>
+<script src="js/tema.js?v=20261001"></script>
 <script src="js/escena.js?v=20260929cine"></script>
 <script src="js/obertura.js?v=20260929cine"></script>
 <script src="js/dragon.js?v=20260927a"></script>

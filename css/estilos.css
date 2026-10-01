@@ -1149,3 +1149,63 @@ html { font-synthesis: none; }   /* las fuentes pixel son de un solo peso: nunca
 .atributos li::before, .dia-attrs li::before { content: ""; flex: none; width: 16px; height: 16px; image-rendering: pixelated; background: url("../assets/img/pixel/i-destello.png") 0 0 / 100% 100%; }
 .dia-attrs { gap: 1.1em; }
 .dia-attrs li { font-size: .75em; }
+
+/* ==========================================================================
+   TEMA CLARO (html[data-tema="claro"], js/tema.js): el valle de día y una paleta de pergamino
+   ========================================================================== */
+/* capas de día encima de las de noche, con un fundido al cambiar */
+.capa-dia { opacity: 0; transition: opacity .9s ease; }
+.plano img:not(.capa-dia) { transition: opacity .9s ease; }
+[data-tema="claro"] .capa-dia { opacity: 1; }
+[data-tema="claro"] .plano img:not(.capa-dia) { opacity: 0; }
+[data-tema="claro"] .plano-estrellas { visibility: hidden; }        /* de día no hay estrellas */
+/* botón sol/luna del menú */
+.hud-tema { display: grid; place-items: center; width: 38px; height: 38px; padding: 0; cursor: pointer; background: var(--px-noche); border: 0; clip-path: var(--px-esquina); box-shadow: inset 0 0 0 2px var(--px-contorno), inset 0 0 0 4px var(--px-acero); }
+.hud-tema .px-ico { width: 16px; height: 16px; }
+.hud-tema:hover { filter: brightness(1.15); }
+
+[data-tema="claro"] {
+  --bg: #e9f3ff; --texto: #17213a; --suave: #34415d; --tenue: #5b6884;
+  --oro: #a86a00; --oro-2: #a86a00; --hielo: #1c6db8; --verde: #1f8a4c; --rojo: #c0362b; --rosa: #c03f86; --violeta: #6a4fc6;
+  --linea: rgba(23, 33, 58, .14); --linea-oro: rgba(168, 106, 0, .35); --panel: rgba(255, 252, 244, .92); --panel-fuerte: #fffaf0;
+  --px-noche: #fff6e2; --px-noche-2: #ffefcc; --px-acero: #c9ad73;
+  --sombra: 0 14px 30px rgba(40, 60, 100, .16);
+  color-scheme: light;
+}
+[data-tema="claro"] body { color: var(--texto); }
+/* velo: de día aclara hacia la izquierda, donde vive el texto */
+[data-tema="claro"] .escena-velo {
+  background:
+    linear-gradient(90deg, rgba(244, 248, 255, calc(.84 - var(--p) * .05)) 0%, rgba(244, 248, 255, calc(.5 + var(--p) * .3)) 42%, rgba(244, 248, 255, calc(.02 + var(--p) * .55)) 72%),
+    linear-gradient(180deg, rgba(244, 248, 255, calc(.15 + var(--p) * .3)) 0%, transparent 30%, rgba(244, 248, 255, calc(.3 + var(--p) * .45)) 100%);
+}
+@media (max-width: 820px) and (orientation: portrait) {
+  [data-tema="claro"] .escena-velo { background: linear-gradient(180deg, rgba(244, 248, 255, calc(.6 + var(--p) * .25)) 0%, rgba(244, 248, 255, calc(.66 + var(--p) * .22)) 55%, rgba(244, 248, 255, calc(.35 + var(--p) * .5)) 100%); }
+}
+/* marcos, menú y botones en pergamino con contorno de píxel oscuro */
+[data-tema="claro"] .panel { background: rgba(255, 251, 240, .95); box-shadow: inset 0 0 0 2px var(--px-contorno), inset 0 0 0 4px var(--px-acero), inset 0 4px 0 4px rgba(255, 255, 255, .7); }
+[data-tema="claro"] .hud { background: #fffaf0; box-shadow: 0 2px 0 var(--px-contorno), 0 4px 0 var(--px-acero); }
+[data-tema="claro"] .hud-nav a { color: var(--suave); }
+[data-tema="claro"] .hud-nav a:hover, [data-tema="claro"] .hud-nav a.activo { color: var(--texto); background: rgba(250, 189, 24, .22); }
+[data-tema="claro"] .hud-logros { background: var(--px-noche); color: var(--texto); }
+[data-tema="claro"] .hud-xp-barra { background: rgba(23, 33, 58, .12); }
+[data-tema="claro"] .btn-linea, [data-tema="claro"] .btn-mini { color: #6b4300; box-shadow: inset 0 -4px 0 #e2c98f, inset 0 0 0 2px var(--px-contorno), inset 0 0 0 4px var(--px-acero); }
+/* tipografía: títulos oscuros con sombra dorada en vez de negra */
+[data-tema="claro"] .titulo, [data-tema="claro"] .hero-titulo, [data-tema="claro"] .subtitulo, [data-tema="claro"] .titulo-chico { text-shadow: 3px 3px 0 rgba(250, 189, 24, .45); }
+[data-tema="claro"] .hero-titulo span, [data-tema="claro"] .subtitulo, [data-tema="claro"] .estudio-lema { color: #b46f00 !important; }
+[data-tema="claro"] .kicker, [data-tema="claro"] .estudio-roles h3, [data-tema="claro"] .grafico figcaption { color: #a05f00; }
+[data-tema="claro"] .atributos li, [data-tema="claro"] .dia-attrs li { color: #a05f00; text-shadow: 1px 1px 0 rgba(255, 255, 255, .8); }
+[data-tema="claro"] .estudio-marca p, [data-tema="claro"] .rol p { text-shadow: none; }
+[data-tema="claro"] .hero-rol { color: #1c6db8; }
+[data-tema="claro"] .grafico svg text { fill: var(--suave); }
+[data-tema="claro"] ::selection { background: rgba(250, 189, 24, .4); color: #17213a; }
+/* componentes con fondo oscuro propio (fuera de los juegos, que siguen siendo pantallas nocturnas) */
+[data-tema="claro"] .esp-carta, [data-tema="claro"] .hab-fila, [data-tema="claro"] .esp-caja { background: #fffaf0; border-color: var(--px-acero); }
+[data-tema="claro"] .esp-carta:hover, [data-tema="claro"] .esp-carta:focus-visible { background: #fff0cc; }
+[data-tema="claro"] .esp-hab { color: #1f8a4c; }
+[data-tema="claro"] .lab-filtros select { background: #fffaf0; color: var(--texto); border-color: var(--px-acero); }
+[data-tema="claro"] .kpi { background: rgba(255, 255, 255, .7); }
+[data-tema="claro"] .nodo { background: rgba(255, 255, 255, .6); border-color: rgba(23, 33, 58, .25); color: var(--suave); }
+[data-tema="claro"] .nodo.abierto { background: rgba(250, 189, 24, .2); color: var(--texto); }
+[data-tema="claro"] .modal { background: rgba(23, 33, 58, .45); }
+[data-tema="claro"] .lista-logros li.hecho { background: rgba(250, 189, 24, .16); }
