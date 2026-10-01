@@ -158,9 +158,9 @@
 
   // ---------------------------------------------------------- misión 1: Studios Conari
   function abrirEstudio() {
-    const roles = [...document.querySelectorAll('#estudio .rol')].map(r => ({ ico: r.querySelector('img').getAttribute('src'), t: r.querySelector('h4').textContent, d: r.querySelector('p').textContent }));
+    const roles = [...document.querySelectorAll('main .rol')].map(r => ({ ico: r.querySelector('img').getAttribute('src'), t: r.querySelector('h4').textContent, d: r.querySelector('p').textContent }));
     const disc = [['estrella', 'Arte'], ['libro', 'Narrativa'], ['proyeccion', 'Tecnología'], ['investigacion', 'Investigación'], ['identidad', 'Identidad']].map(([i, t]) => ({ ico: `assets/img/pixel/ic-${i}.png?v=logos`, t }));   // disciplinas del estudio: solo en la misión del castillo
-    const lema = document.querySelector('#estudio .estudio-lema').textContent, desc = document.querySelector('#estudio .estudio-marca > p:not(.estudio-lema)').textContent;
+    const lema = document.querySelector('main .estudio-lema').textContent, desc = document.querySelector('main .estudio-marca > p:not(.estudio-lema)').textContent;
     diapositivas('estudio', [
       `<div class="dia-centro"><p class="pn-kicker">Misión 1 · Castillo Conari</p>
         <img class="dia-logo" src="assets/img/intro/w-completo.png?v=logos" alt="Studios Conari">
@@ -303,7 +303,8 @@
 
   // ---------------------------------------------------------- misión 5: hoja de personaje y final
   function abrirFicha() {
-    const cv = $('#cv'), txt = sel => (cv.querySelector(sel) || {}).textContent || '';
+    // en modo escenas los nodos de cada sección se mueven a su escena: se buscan dentro de <main>, no de la sección
+    const cv = $('main'), txt = sel => (cv.querySelector(sel) || {}).textContent || '';
     const exp = [...cv.querySelectorAll('.linea-tiempo li')].map(li => ({ f: li.querySelector('.fecha').textContent, t: li.querySelector('h4').textContent, l: li.querySelector('.lugar').textContent, d: li.querySelector('p:not(.lugar)').textContent }));
     const logros = [...cv.querySelectorAll('.logros-cv > div')].map(d => ({ t: d.querySelector('b').textContent, s: d.querySelector('span').textContent }));
     const certs = [...cv.querySelectorAll('.cert-duoc li')].map(li => li.textContent);
@@ -340,7 +341,7 @@
       <div class="pn-contenido"></div>
       <div class="fila-botones centro"><button type="button" class="btn btn-oro" data-clasico>Ver el portafolio completo</button><button type="button" class="btn btn-linea" data-aldea>Volver a la aldea</button><button type="button" class="btn btn-linea" data-nueva>Nueva partida</button></div>
       <p class="pn-creditos">Gracias por jugar · Kevin del Río · Studios Conari SpA · 2026</p></div>`);
-    capa.querySelector('.pn-contenido').append(limpiarClon($('#contacto .contactos').cloneNode(true)));
+    capa.querySelector('.pn-contenido').append(limpiarClon($('main .contactos').cloneNode(true)));
     KR.visitarZona('contacto');
     capa.querySelector('[data-clasico]').onclick = abrirClasico;
     capa.querySelector('[data-aldea]').onclick = () => volverAldea();
